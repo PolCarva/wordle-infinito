@@ -365,16 +365,16 @@ export default function Game() {
       {gameState.gameOver && (
         <div className="text-center">
           <h2 className="text-3xl font-bold mb-4">
-            {gameState.won ? "You Win!" : "You Lost!"}
+            {gameState.won ? "¡Ganaste!" : "¡Perdiste!"}
           </h2>
           <p className="text-xl mb-4">
             {gameState.won
-              ? "Congratulations! You guessed all the words."
-              : "Better luck next time!"}
+              ? "¡Felicidades! Has adivinado todas las palabras."
+              : "Suerte para la próxima."}
           </p>
           {!gameState.won && (
             <div className="mb-4">
-              The words were:{" "}
+              Las palabras eran:{" "}
               {gameState.boards.map((board) => board.word).join(", ")}
             </div>
           )}

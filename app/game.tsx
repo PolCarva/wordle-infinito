@@ -393,7 +393,7 @@ export default function Game() {
               {gameState.boards.map((board) => board.word).join(", ")}
             </div>
           )}
-          <Button onClick={initializeGame}>Play Again</Button>
+          <Button onClick={initializeGame}>Jugar de nuevo</Button>
         </div>
       )}
     </div>

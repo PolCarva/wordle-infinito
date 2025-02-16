@@ -5,7 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { WORD_LIST } from "./word-list";
 import { ACCEPTED_WORDS } from "./accepted-words";
-import { CornerDownLeftIcon, DeleteIcon } from "lucide-react";
+import {
+  CornerDownLeftIcon,
+  DeleteIcon,
+} from "lucide-react";
+import ThemeButton from "@/components/ThemeButton";
 
 type LetterState = "correct" | "present" | "absent" | "empty";
 
@@ -102,16 +106,22 @@ function GameBoard({
               return (
                 <div
                   key={j}
-                  className={`w-12 h-12 flex items-center justify-center text-xl font-bold rounded
-                    ${
-                      state === "correct"
-                        ? "bg-green-500"
-                        : state === "present"
-                        ? "bg-yellow-500"
-                        : state === "absent"
-                        ? "bg-gray-500"
-                        : "bg-gray-200 dark:bg-gray-700"
-                    }`}
+                  className={`flex w-12 items-center justify-center text-xl font-bold rounded
+              ${
+                state === "correct"
+                  ? "bg-green-500"
+                  : state === "present"
+                  ? "bg-yellow-500"
+                  : state === "absent"
+                  ? "bg-gray-500"
+                  : "bg-gray-200 dark:bg-gray-700"
+              }
+              ${
+                i === board.guesses.length && !board.completed
+                  ? "h-12"
+                  : "h-[3vh] text-xs"
+              } 
+              ${i > board.guesses.length ? "text-transparent" : ""}`}
                 >
                   {letter}
                 </div>
@@ -169,7 +179,7 @@ function Keyboard({
 
   const getKeyBackground = (letter: string): string => {
     if (letter === "ENTER" || letter === "BACKSPACE")
-      return "bg-slate-500 dark:bg-gray-600";
+      return "bg-slate-500 dark:bg-slate-300";
 
     const state = getLetterStates(letter.toUpperCase());
     switch (state) {
@@ -178,14 +188,14 @@ function Keyboard({
       case "present":
         return "bg-yellow-500 text-white";
       case "absent":
-        return "bg-gray-500 text-white";
+        return "bg-gray-500 text-white dark:bg-slate-600";
       default:
-        return "bg-slate-400 dark:bg-gray-700";
+        return "bg-slate-400";
     }
   };
 
   return (
-    <div className="grid gap-1 mt-4">
+    <div className="grid gap-1 max-w-[calc(100svw-10px)] mt-4">
       {rows.map((row, i) => (
         <div key={i} className="flex justify-center gap-1">
           {row.map((key) => (
@@ -193,7 +203,9 @@ function Keyboard({
               key={key}
               onClick={() => onKeyPress(key)}
               className={`${
-                key === "ENTER" || key === "BACKSPACE" ? "px-2 text-xs w-full" : "w-10"
+                key === "ENTER" || key === "BACKSPACE"
+                  ? "px-2 text-xs w-full"
+                  : "w-8 md:w-10"
               } h-14 font-bold ${getKeyBackground(key)}`}
               disabled={gameState.gameOver}
             >
@@ -318,8 +330,9 @@ export default function Game() {
 
   if (!started) {
     return (
-      <div className="flex flex-col items-center gap-4 p-8">
-        <h1 className="text-4xl font-bold mb-8">Multi-Wordle</h1>
+      <div className="flex w-full h-svh justify-center flex-col items-center gap-4">
+        <ThemeButton />
+        <h1 className="text-4xl font-bold mb-2">Multi-Wordle</h1>
         <div className="flex items-center gap-4">
           <label className="text-lg">Número de juegos:</label>
           <Input
@@ -341,7 +354,9 @@ export default function Game() {
   if (!gameState) return null;
 
   return (
-    <div className="flex flex-col items-center gap-6 p-4">
+    <div className="flex w-full flex-col items-center gap-6 p-4 pt-10">
+      <ThemeButton />
+
       <h1 className="text-4xl font-bold">Multi-Wordle</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {gameState.boards.map((board, i) => (

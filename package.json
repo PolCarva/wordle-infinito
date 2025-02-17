@@ -19,8 +19,6 @@
     "react-confetti-boom": "^1.1.2",
     "react-dom": "^18",
     "react-virtualized": "^9.22.6",
-    "react-virtualized-auto-sizer": "^1.0.25",
-    "react-window": "^1.8.11",
     "tailwind-merge": "^3.0.1",
     "tailwindcss-animate": "^1.0.7"
   },

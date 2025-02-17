@@ -23,6 +23,8 @@ type GameState = {
   gameOver: boolean;
   won: boolean;
   maxAttempts: number;
+  remainingLives: number;
+  showEndModal: boolean;
 };
 
 function getRandomWords(count: number): string[] {
@@ -61,6 +63,23 @@ function checkGuess(guess: string, answer: string): LetterState[] {
   return result;
 }
 
+function GameStats({ gameState }: { gameState: GameState }) {
+  const completedBoards = gameState.boards.filter(board => board.completed).length;
+  const totalBoards = gameState.boards.length;
+  const currentAttempt = gameState.boards[0]?.guesses.length || 0;
+
+  return (
+    <div className="text-center mb-4 p-2 bg-slate-100 dark:bg-slate-800 rounded-lg">
+      <p className="text-lg font-semibold">
+        Aciertos: {completedBoards} de {totalBoards}
+      </p>
+      <p className="text-lg font-semibold">
+        Intento {currentAttempt} de {gameState.maxAttempts} (quedan {gameState.remainingLives} vidas)
+      </p>
+    </div>
+  );
+}
+
 function GameBoard({
   board,
   currentGuess,
@@ -72,20 +91,53 @@ function GameBoard({
   gameOver: boolean;
   gameState: GameState;
 }) {
-  const rows = Array(gameState.maxAttempts)
-    .fill(null)
-    .map((_, i) => {
-      if (i < board.guesses.length) {
-        return checkGuess(board.guesses[i], board.word);
+  const getVisibleRows = () => {
+    const rows = [];
+    const isLastAttempt = board.guesses.length === gameState.maxAttempts - 1;
+    
+    // Si el tablero está completado, mostrar solo hasta el intento correcto
+    if (board.completed) {
+      const correctGuessIndex = board.guesses.findIndex(guess => guess === board.word);
+      for (let i = 0; i <= correctGuessIndex; i++) {
+        rows.push(checkGuess(board.guesses[i], board.word));
       }
-      if (i === board.guesses.length && !board.completed && !gameOver) {
-        return currentGuess
+      return rows; // Retornamos inmediatamente sin añadir filas adicionales
+    }
+    
+    // Para tableros no completados, mostrar todos los intentos
+    for (let i = 0; i < board.guesses.length; i++) {
+      rows.push(checkGuess(board.guesses[i], board.word));
+    }
+    
+    // Añadir fila actual si el tablero no está completado
+    if (!board.completed && !gameOver) {
+      rows.push(
+        currentGuess
           .padEnd(5, " ")
           .split("")
-          .map(() => "empty" as const);
+          .map(() => "empty" as const)
+      );
+    }
+    
+    // Añadir una fila adicional vacía si no está completado y no es el último intento
+    if (!board.completed && !gameOver && !isLastAttempt) {
+      rows.push(Array(5).fill("empty" as const));
+    }
+    
+    // Asegurar un mínimo de 5 filas solo si el tablero no está completado
+    if (!board.completed) {
+      while (rows.length < 5) {
+        rows.push(Array(5).fill("empty" as const));
       }
-      return Array(5).fill("empty" as const);
-    });
+    }
+    
+    return rows;
+  };
+
+  const rows = getVisibleRows();
+  const winningRowIndex = board.completed ? 
+    board.guesses.findIndex(guess => guess === board.word) : 
+    -1;
 
   return (
     <div
@@ -100,26 +152,27 @@ function GameBoard({
               const letter =
                 i < board.guesses.length
                   ? board.guesses[i][j]
-                  : currentGuess[j];
+                  : i === board.guesses.length
+                  ? currentGuess[j]
+                  : "";
               return (
                 <div
                   key={j}
                   className={`flex w-12 items-center justify-center text-xl font-bold rounded
-              ${
-                state === "correct"
-                  ? "bg-green-500"
-                  : state === "present"
-                  ? "bg-yellow-500"
-                  : state === "absent"
-                  ? "bg-gray-400"
-                  : "bg-gray-200 dark:bg-gray-700"
-              }
-              ${
-                i === board.guesses.length && !board.completed
-                  ? "h-12"
-                  : "h-[3vh] text-xs"
-              } 
-              ${i > board.guesses.length ? "text-transparent" : ""}`}
+                    ${
+                      state === "correct"
+                        ? "bg-green-500"
+                        : state === "present"
+                        ? "bg-yellow-500"
+                        : state === "absent"
+                        ? "bg-gray-400"
+                        : "bg-gray-200 dark:bg-gray-700"
+                    }
+                    ${
+                      i === board.guesses.length || i === winningRowIndex
+                        ? "h-12"
+                        : "h-[3vh] text-xs"
+                    }`}
                 >
                   {letter}
                 </div>
@@ -240,6 +293,8 @@ export default function Game() {
       gameOver: false,
       won: false,
       maxAttempts: boardCount + 5,
+      remainingLives: 5,
+      showEndModal: false,
     });
     setStarted(true);
     setError(null);
@@ -255,19 +310,22 @@ export default function Game() {
       return;
     }
 
-    const newBoards = gameState.boards.map((board) => {
-      if (board.completed) return board;
+    const isCorrectGuess = gameState.boards.some(board => board.word === normalizedGuess);
+    
+    // Actualizar vidas (solo informativo)
+    const newRemainingLives = isCorrectGuess ? 
+      gameState.remainingLives : 
+      gameState.remainingLives - 1;
 
-      return {
-        ...board,
-        guesses: [...board.guesses, normalizedGuess],
-        completed: normalizedGuess === board.word,
-      };
-    });
+    // Actualizar todos los tableros con el nuevo intento
+    const newBoards = gameState.boards.map((board) => ({
+      ...board,
+      guesses: [...board.guesses, normalizedGuess],
+      completed: board.completed || normalizedGuess === board.word,
+    }));
 
     const allCompleted = newBoards.every((board) => board.completed);
-    const attemptsExhausted =
-      newBoards[0].guesses.length >= gameState.maxAttempts;
+    const attemptsExhausted = newBoards[0].guesses.length >= gameState.maxAttempts;
 
     setGameState({
       ...gameState,
@@ -275,6 +333,8 @@ export default function Game() {
       currentGuess: "",
       gameOver: allCompleted || attemptsExhausted,
       won: allCompleted,
+      remainingLives: newRemainingLives,
+      showEndModal: true,
     });
     setError(null);
   }, [gameState]);
@@ -358,6 +418,8 @@ export default function Game() {
       <h1 className="text-4xl font-bold">Multi-Wordle</h1>
       <span> {gameState?.boards.map((board) => board.word).join(", ")}</span>
 
+      {gameState && <GameStats gameState={gameState} />}
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {gameState.boards.map((board, i) => (
           <GameBoard
@@ -377,47 +439,50 @@ export default function Game() {
         </div>
       )}
       <Keyboard onKeyPress={handleKeyPress} gameState={gameState} />
-      {gameState.gameOver && (
-        <>
-          <div className="fixed inset-0 flex items-center z-50 justify-center bg-black/50">
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg text-center">
-              <h2 className="text-3xl font-bold mb-4">
-                {gameState.won ? "¡Ganaste!" : "¡Perdiste!"}
-              </h2>
-              {gameState.won && (
-                <Confetti
-                  launchSpeed={1.5}
-                  spreadDeg={180}
-                  effectCount={3}
-                  effectInterval={500}
-                  mode="boom"
-                  particleCount={150}
-                  colors={[
-                    "#E74C3C",
-                    "#2ECC71",
-                    "#3498DB",
-                    "#F1C40F",
-                    "#9B59B6",
-                    "#1ABC9C",
-                  ]}
-                />
-              )}
-              <p className="text-xl mb-4">
-                {gameState.won
-                  ? "¡Felicidades! Has adivinado todas las palabras."
-                  : "Suerte para la próxima."}
-              </p>
-              {!gameState.won && (
-                <div className="mb-4">
-                  Las palabras eran:{" "}
-                  {gameState.boards.map((board) => board.word).join(", ")}
-                </div>
-              )}
+      {gameState.gameOver && gameState.showEndModal && (
+        <div className="fixed inset-0 flex items-center z-50 justify-center bg-black/50">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg text-center">
+            <h2 className="text-3xl font-bold mb-4">
+              {gameState.won ? "¡Ganaste!" : "¡Perdiste!"}
+            </h2>
+            {gameState.won && (
+              <Confetti
+                launchSpeed={1.5}
+                spreadDeg={180}
+                effectCount={3}
+                effectInterval={500}
+                mode="boom"
+                particleCount={150}
+                colors={[
+                  "#E74C3C",
+                  "#2ECC71",
+                  "#3498DB",
+                  "#F1C40F",
+                  "#9B59B6",
+                  "#1ABC9C",
+                ]}
+              />
+            )}
+            <p className="text-xl mb-4">
+              {gameState.won
+                ? "¡Felicidades! Has adivinado todas las palabras."
+                : "Suerte para la próxima."}
+            </p>
+            {!gameState.won && (
+              <div className="mb-4">
+                Las palabras eran:{" "}
+                {gameState.boards.map((board) => board.word).join(", ")}
+              </div>
+            )}
 
+            <div className="flex gap-4 justify-center">
+              <Button variant="outline" className="bg-red-600 hover:bg-red-700" onClick={() => setGameState(prev => prev ? { ...prev, showEndModal: false } : null)}>
+                Cerrar
+              </Button>
               <Button onClick={initializeGame}>Jugar de nuevo</Button>
             </div>
           </div>
-        </>
+        </div>
       )}
     </div>
   );

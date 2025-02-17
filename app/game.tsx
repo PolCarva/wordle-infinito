@@ -113,7 +113,7 @@ function GameBoard({
                   : state === "present"
                   ? "bg-yellow-500"
                   : state === "absent"
-                  ? "bg-gray-500"
+                  ? "bg-gray-400"
                   : "bg-gray-200 dark:bg-gray-700"
               }
               ${

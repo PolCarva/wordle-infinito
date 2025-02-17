@@ -1,6 +1,6 @@
 "use client";
 
-import { BoardState, GameState, LetterState } from "@/app/types";
+import { BoardState, GameState } from "@/app/types";
 import { checkGuess } from "@/app/utils/game-utils";
 
 interface GameBoardProps {

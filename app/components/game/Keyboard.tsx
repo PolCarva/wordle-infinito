@@ -16,77 +16,101 @@ export function Keyboard({ onKeyPress, gameState }: KeyboardProps) {
     ["ENTER", "Z", "X", "C", "V", "B", "N", "M", "BACKSPACE"],
   ];
 
-  const getLetterStates = (letter: string): LetterState => {
-    let highestState: LetterState = "empty";
-    let isUsed = false;
+  const getLetterStateInBoard = (letter: string, boardIndex: number) => {
+    const board = gameState.boards[boardIndex];
+    let state: LetterState = "empty";
 
-    gameState.boards.forEach((board) => {
-      board.guesses.forEach((guess) => {
-        const letterPositions = Array.from(guess).map((char, idx) => ({
-          char,
-          idx,
-        }));
-        letterPositions.forEach(({ char, idx }) => {
-          if (char !== letter) return;
-          isUsed = true;
-          if (board.word[idx] === letter) {
-            highestState = "correct";
-          } else if (
-            board.word.includes(letter) &&
-            highestState !== "correct"
-          ) {
-            highestState = "present";
-          } else if (highestState === "empty") {
-            highestState = "absent";
-          }
-        });
+    board.guesses.forEach((guess) => {
+      const letterPositions = Array.from(guess).map((char, idx) => ({
+        char,
+        idx,
+      }));
+      letterPositions.forEach(({ char, idx }) => {
+        if (char !== letter) return;
+        if (board.word[idx] === letter) {
+          state = "correct";
+        } else if (board.word.includes(letter) && state !== "correct") {
+          state = "present";
+        } else if (state === "empty") {
+          state = "absent";
+        }
       });
     });
 
-    return isUsed ? highestState : "empty";
+    return state;
   };
 
-  const getKeyBackground = (letter: string): string => {
-    if (letter === "ENTER" || letter === "BACKSPACE")
+  const getGradientBackground = (letter: string) => {
+    if (letter === "ENTER" || letter === "BACKSPACE") {
       return "bg-slate-500 dark:bg-slate-300";
-
-    const state = getLetterStates(letter.toUpperCase());
-    switch (state) {
-      case "correct":
-        return "bg-green-500 text-white";
-      case "present":
-        return "bg-yellow-500 text-white";
-      case "absent":
-        return "bg-gray-500 text-white dark:bg-slate-600";
-      default:
-        return "bg-slate-400";
     }
+
+    const boardCount = gameState.boards.length;
+    if (boardCount === 0) return "bg-slate-400";
+
+    const gridSize = Math.ceil(Math.sqrt(boardCount));
+    const cellSize = 100 / (gridSize - 1 || 1);
+
+    const gradients = gameState.boards.map((_, index) => {
+      const state = getLetterStateInBoard(letter, index) as LetterState;
+      const color = state === "correct" 
+        ? "rgb(34 197 94)" // green-500
+        : state === "present"
+        ? "rgb(234 179 8)" // yellow-500
+        : state === "absent"
+        ? "rgb(156 163 175)" // gray-400
+        : "rgb(229 231 235)"; // gray-200
+
+      return `linear-gradient(0deg, ${color}, ${color})`;
+    });
+
+    const positions = gameState.boards.map((_, index) => {
+      const row = Math.floor(index / gridSize);
+      const col = index % gridSize;
+      const x = Math.min(col * cellSize, 100);
+      const y = Math.min(row * cellSize, 100);
+      return `${x}% ${y}%`;
+    });
+
+    // Ajustar el tamaño para que cubra toda la tecla cuando hay pocos tableros
+    const size = boardCount <= 4 ? "50%" : `${100/gridSize}%`;
+
+    return {
+      backgroundImage: gradients.join(", "),
+      backgroundRepeat: "no-repeat",
+      backgroundSize: Array(boardCount).fill(`${size} ${size}`).join(", "),
+      backgroundPosition: positions.join(", "),
+    };
   };
 
   return (
     <div className="grid gap-1 max-w-[calc(100svw-10px)] mt-4">
       {rows.map((row, i) => (
         <div key={i} className="flex justify-center gap-1">
-          {row.map((key) => (
-            <Button
-              key={key}
-              onClick={() => onKeyPress(key)}
-              className={`${
-                key === "ENTER" || key === "BACKSPACE"
-                  ? "px-2 text-xs w-full"
-                  : "w-8 md:w-10"
-              } h-14 font-bold ${getKeyBackground(key)}`}
-              disabled={gameState.gameOver}
-            >
-              {key === "BACKSPACE" ? (
-                <DeleteIcon />
-              ) : key === "ENTER" ? (
-                <CornerDownLeftIcon />
-              ) : (
-                key
-              )}
-            </Button>
-          ))}
+          {row.map((key) => {
+            const style = getGradientBackground(key.toUpperCase());
+            return (
+              <Button
+                key={key}
+                onClick={() => onKeyPress(key)}
+                className={`${
+                  key === "ENTER" || key === "BACKSPACE"
+                    ? "px-2 text-xs w-full"
+                    : "w-8 md:w-10"
+                } h-14 font-bold`}
+                style={typeof style === "string" ? {} : style}
+                disabled={gameState.gameOver}
+              >
+                {key === "BACKSPACE" ? (
+                  <DeleteIcon />
+                ) : key === "ENTER" ? (
+                  <CornerDownLeftIcon />
+                ) : (
+                  key
+                )}
+              </Button>
+            );
+          })}
         </div>
       ))}
     </div>

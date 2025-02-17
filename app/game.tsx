@@ -128,23 +128,51 @@ export default function Game() {
 
   if (!started) {
     return (
-      <div className="flex w-full h-svh justify-center flex-col items-center gap-4">
+      <div className="flex w-full min-h-svh justify-center flex-col items-center gap-4 p-4">
         <ThemeButton />
         <h1 className="text-4xl font-bold mb-2">Multi-Wordle</h1>
-        <div className="flex items-center gap-4">
-          <label className="text-lg">Número de juegos:</label>
+        <p className="text-center max-w-md text-lg mb-4">
+          Juega al Wordle con múltiples palabras simultáneamente. ¡Un desafío
+          mayor para los amantes de las palabras!
+        </p>
+
+        <div className="flex items-center gap-4 mt-4">
+          <label htmlFor="boardCount" className="text-lg">
+            Número de palabras:
+          </label>
           <Input
+            id="boardCount"
             type="number"
-            min="1"
+            min="0"
             max="128"
             value={boardCount}
             onChange={(e) =>
               setBoardCount(Number.parseInt(e.target.value) || 1)
             }
             className="w-20"
+            aria-label="Selecciona el número de palabras para jugar"
           />
         </div>
-        <Button onClick={initializeGame}>Empezar a Jugar</Button>
+        <Button
+          onClick={initializeGame}
+          className="mt-4"
+          aria-label="Comenzar el juego"
+        >
+          Empezar a Jugar
+        </Button>
+        <div className="bg-slate-100 dark:bg-slate-800 p-4 rounded-lg max-w-md text-sm">
+          <h2 className="font-bold mb-2">Cómo jugar:</h2>
+          <ul className="list-disc list-inside space-y-1">
+            <li>Elige cuántas palabras quieres adivinar</li>
+            <li>Tienes N+5 intentos (N = número de palabras)</li>
+            <li>Cada intento se aplica a todas las palabras</li>
+            <li>Las letras verdes están en la posición correcta</li>
+            <li>
+              Las letras amarillas están en la palabra pero en otra posición
+            </li>
+            <li>¡Adivina todas las palabras antes de quedarte sin intentos!</li>
+          </ul>
+        </div>
       </div>
     );
   }

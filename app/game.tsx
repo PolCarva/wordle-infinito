@@ -414,8 +414,19 @@ export default function Game() {
   return (
     <div className="flex w-full flex-col items-center gap-6 p-4 pt-10">
       <ThemeButton />
+      <Button 
+          variant="outline" 
+          onClick={initializeGame}
+          className="text-yellow-600 fixed top-5 left-5 hover:text-yellow-700 border-yellow-600 hover:border-yellow-700"
+        >
+          Reiniciar
+        </Button>
 
-      <h1 className="text-4xl font-bold">Multi-Wordle</h1>
+      <div className="flex items-center gap-4">
+        <h1 className="text-4xl font-bold">Multi-Wordle</h1>
+      </div>
+      
+
       <span> {gameState?.boards.map((board) => board.word).join(", ")}</span>
 
       {gameState && <GameStats gameState={gameState} />}

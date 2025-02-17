@@ -11,12 +11,19 @@ import { Keyboard } from "./components/game/Keyboard";
 import { GameStats } from "./components/game/GameStats";
 import { GameState } from "./types";
 import { getRandomWords } from "./utils/game-utils";
+import { Nav } from "./components/game/Nav";
 
 export default function Game() {
   const [started, setStarted] = useState(false);
   const [boardCount, setBoardCount] = useState(2);
   const [gameState, setGameState] = useState<GameState | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isDark, setIsDark] = useState(() => {
+    if (typeof window !== "undefined") {
+      return document.documentElement.classList.contains("dark");
+    }
+    return false;
+  });
 
   const initializeGame = () => {
     const words = getRandomWords(boardCount);
@@ -126,10 +133,20 @@ export default function Game() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [gameState, handleGuess]);
 
+  const toggleTheme = () => {
+    const html = document.documentElement;
+    const isDark = html.classList.toggle("dark");
+    setIsDark(isDark);
+    localStorage.setItem("darkTheme", String(isDark));
+  };
+
   if (!started) {
     return (
       <div className="flex w-full min-h-svh justify-center flex-col items-center gap-4 p-4">
-        <ThemeButton />
+        <Nav
+          isDark={isDark}
+          onThemeToggle={toggleTheme}
+        />
         <h1 className="text-4xl font-bold mb-2">Multi-Wordle</h1>
         <p className="text-center max-w-md text-lg mb-4">
           Juega al Wordle con múltiples palabras simultáneamente. ¡Un desafío
@@ -180,24 +197,13 @@ export default function Game() {
   if (!gameState) return null;
 
   return (
-    <div className="flex w-full flex-col items-center gap-6 p-4 pt-10 pb-[240px] md:pb-4">
-      <ThemeButton />
-      <div className="flex gap-4 relative md:fixed top-5 left-5">
-        <Button
-          variant="link"
-          onClick={() => setStarted(false)}
-          className="text-yellow-600 hover:text-yellow-700 border-yellow-600 hover:border-yellow-700"
-        >
-          Volver
-        </Button>
-        <Button
-          variant="outline"
-          onClick={initializeGame}
-          className="text-yellow-600  hover:text-yellow-700 border-yellow-600 hover:border-yellow-700"
-        >
-          Reiniciar
-        </Button>
-      </div>
+    <div className="flex w-full flex-col items-center gap-6 p-4 pt-16 pb-[240px] md:pb-4">
+      <Nav
+        onBack={() => setStarted(false)}
+        onReset={initializeGame}
+        isDark={isDark}
+        onThemeToggle={toggleTheme}
+      />
 
       <div className="flex items-center gap-4">
         <h1 className="text-4xl font-bold">Multi-Wordle</h1>
@@ -212,9 +218,21 @@ export default function Game() {
           className={`
             grid grid-cols-2 max-w-[800px] md:grid-cols-3 mx-auto lg:grid-cols-4 gap-2 md:gap-8
 
-            ${gameState.boards.length === 1 ? `!grid-cols-1 lg:!grid-cols-1` : ''}
-            ${gameState.boards.length === 2 ? `!grid-cols-2 lg:!grid-cols-2` : ''}
-            ${gameState.boards.length === 3 ? `!grid-cols-2 lg:!grid-cols-3` : ''}
+            ${
+              gameState.boards.length === 1
+                ? `!grid-cols-1 lg:!grid-cols-1`
+                : ""
+            }
+            ${
+              gameState.boards.length === 2
+                ? `!grid-cols-2 lg:!grid-cols-2`
+                : ""
+            }
+            ${
+              gameState.boards.length === 3
+                ? `!grid-cols-2 lg:!grid-cols-3`
+                : ""
+            }
           
           `}
         >

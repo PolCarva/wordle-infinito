@@ -5,11 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { WORD_LIST } from "./word-list";
 import { ACCEPTED_WORDS } from "./accepted-words";
-import {
-  CornerDownLeftIcon,
-  DeleteIcon,
-} from "lucide-react";
-import ThemeButton from "@/components/ThemeButton";
+import { CornerDownLeftIcon, DeleteIcon } from "lucide-react";
+import ThemeButton from "@/components/ui/ThemeButton";
 
 type LetterState = "correct" | "present" | "absent" | "empty";
 
@@ -253,7 +250,7 @@ export default function Game() {
     const normalizedGuess = gameState.currentGuess.toUpperCase();
 
     if (!ACCEPTED_WORDS.includes(normalizedGuess)) {
-      setError("Not in word list");
+      setError("Palabra no encontrada");
       return;
     }
 
@@ -358,6 +355,8 @@ export default function Game() {
       <ThemeButton />
 
       <h1 className="text-4xl font-bold">Multi-Wordle</h1>
+      <span> {gameState?.boards.map((board) => board.word).join(", ")}</span>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {gameState.boards.map((board, i) => (
           <GameBoard
@@ -378,23 +377,28 @@ export default function Game() {
       )}
       <Keyboard onKeyPress={handleKeyPress} gameState={gameState} />
       {gameState.gameOver && (
-        <div className="text-center">
-          <h2 className="text-3xl font-bold mb-4">
-            {gameState.won ? "¡Ganaste!" : "¡Perdiste!"}
-          </h2>
-          <p className="text-xl mb-4">
-            {gameState.won
-              ? "¡Felicidades! Has adivinado todas las palabras."
-              : "Suerte para la próxima."}
-          </p>
-          {!gameState.won && (
-            <div className="mb-4">
-              Las palabras eran:{" "}
-              {gameState.boards.map((board) => board.word).join(", ")}
+        <>
+          <div className="fixed inset-0 flex items-center z-50 justify-center bg-black/50">
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg text-center">
+              <h2 className="text-3xl font-bold mb-4">
+                {gameState.won ? "¡Ganaste!" : "¡Perdiste!"}
+              </h2>
+              <p className="text-xl mb-4">
+                {gameState.won
+                  ? "¡Felicidades! Has adivinado todas las palabras."
+                  : "Suerte para la próxima."}
+              </p>
+              {!gameState.won && (
+                <div className="mb-4">
+                  Las palabras eran:{" "}
+                  {gameState.boards.map((board) => board.word).join(", ")}
+                </div>
+              )}
+
+              <Button onClick={initializeGame}>Jugar de nuevo</Button>
             </div>
-          )}
-          <Button onClick={initializeGame}>Jugar de nuevo</Button>
-        </div>
+          </div>
+        </>
       )}
     </div>
   );

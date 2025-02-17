@@ -1,16 +1,18 @@
 export type LetterState = "correct" | "present" | "absent" | "empty"
 
-export interface BoardState {
+export type BoardState = {
   word: string
   completed: boolean
   guesses: string[]
 }
 
-export interface GameState {
+export type GameState = {
   boards: BoardState[]
   currentGuess: string
   gameOver: boolean
   won: boolean
   maxAttempts: number
+  remainingLives: number
+  showEndModal: boolean
 }
 

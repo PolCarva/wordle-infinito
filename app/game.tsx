@@ -7,6 +7,7 @@ import { WORD_LIST } from "./word-list";
 import { ACCEPTED_WORDS } from "./accepted-words";
 import { CornerDownLeftIcon, DeleteIcon } from "lucide-react";
 import ThemeButton from "@/components/ui/ThemeButton";
+import Confetti from "react-confetti-boom";
 
 type LetterState = "correct" | "present" | "absent" | "empty";
 
@@ -383,6 +384,24 @@ export default function Game() {
               <h2 className="text-3xl font-bold mb-4">
                 {gameState.won ? "¡Ganaste!" : "¡Perdiste!"}
               </h2>
+              {gameState.won && (
+                <Confetti
+                  launchSpeed={1.5}
+                  spreadDeg={180}
+                  effectCount={3}
+                  effectInterval={500}
+                  mode="boom"
+                  particleCount={150}
+                  colors={[
+                    "#E74C3C",
+                    "#2ECC71",
+                    "#3498DB",
+                    "#F1C40F",
+                    "#9B59B6",
+                    "#1ABC9C",
+                  ]}
+                />
+              )}
               <p className="text-xl mb-4">
                 {gameState.won
                   ? "¡Felicidades! Has adivinado todas las palabras."

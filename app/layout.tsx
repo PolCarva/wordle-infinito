@@ -25,9 +25,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <head>
+        <script dangerouslySetInnerHTML={{
+          __html: `
+            if (localStorage.getItem('darkTheme') === 'true') {
+              document.documentElement.classList.add('dark')
+            }
+          `
+        }} />
+      </head>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white dark:bg-gray-900 dark:text-white transition-colors`}>
         {children}
       </body>
     </html>

@@ -48,37 +48,82 @@ export function Keyboard({ onKeyPress, gameState }: KeyboardProps) {
     const boardCount = gameState.boards.length;
     if (boardCount === 0) return "bg-slate-400";
 
-    const gridSize = Math.ceil(Math.sqrt(boardCount));
-    const cellSize = 100 / (gridSize - 1 || 1);
+    // Caso especial para 1 tablero
+    if (boardCount === 1) {
+      const state = getLetterStateInBoard(letter, 0) as LetterState;
+      const color = state === "correct" 
+        ? "rgb(34 197 94)"
+        : state === "present"
+        ? "rgb(234 179 8)"
+        : state === "absent"
+        ? "rgb(156 163 175)"
+        : "rgb(229 231 235)";
+
+      return {
+        background: color,
+      };
+    }
+
+    // Caso especial para 2 tableros
+    if (boardCount === 2) {
+      const gradients = gameState.boards.map((_, index) => {
+        const state = getLetterStateInBoard(letter, index) as LetterState;
+        const color = state === "correct" 
+          ? "rgb(34 197 94)"
+          : state === "present"
+          ? "rgb(234 179 8)"
+          : state === "absent"
+          ? "rgb(156 163 175)"
+          : "rgb(229 231 235)";
+
+        return `linear-gradient(0deg, ${color}, ${color})`;
+      });
+
+      return {
+        backgroundImage: gradients.join(", "),
+        backgroundRepeat: "no-repeat",
+        backgroundSize: "50% 100%",
+        backgroundPosition: "0% 0%, 100% 0%",
+      };
+    }
+
+    // Lógica para 3 o más tableros
+    const getOptimalGrid = (count: number) => {
+      const sqrt = Math.sqrt(count);
+      const cols = Math.ceil(sqrt);
+      const rows = Math.ceil(count / cols);
+      return { rows, cols };
+    };
+
+    const { rows: gridRows, cols: gridCols } = getOptimalGrid(boardCount);
+    const cellWidth = 100 / (gridCols - 1 || 1);
+    const cellHeight = 100 / (gridRows - 1 || 1);
 
     const gradients = gameState.boards.map((_, index) => {
       const state = getLetterStateInBoard(letter, index) as LetterState;
       const color = state === "correct" 
-        ? "rgb(34 197 94)" // green-500
+        ? "rgb(34 197 94)"
         : state === "present"
-        ? "rgb(234 179 8)" // yellow-500
+        ? "rgb(234 179 8)"
         : state === "absent"
-        ? "rgb(156 163 175)" // gray-400
-        : "rgb(229 231 235)"; // gray-200
+        ? "rgb(156 163 175)"
+        : "rgb(229 231 235)";
 
       return `linear-gradient(0deg, ${color}, ${color})`;
     });
 
     const positions = gameState.boards.map((_, index) => {
-      const row = Math.floor(index / gridSize);
-      const col = index % gridSize;
-      const x = Math.min(col * cellSize, 100);
-      const y = Math.min(row * cellSize, 100);
+      const row = Math.floor(index / gridCols);
+      const col = index % gridCols;
+      const x = Math.min(col * cellWidth, 100);
+      const y = Math.min(row * cellHeight, 100);
       return `${x}% ${y}%`;
     });
-
-    // Ajustar el tamaño para que cubra toda la tecla cuando hay pocos tableros
-    const size = boardCount <= 4 ? "50%" : `${100/gridSize}%`;
 
     return {
       backgroundImage: gradients.join(", "),
       backgroundRepeat: "no-repeat",
-      backgroundSize: Array(boardCount).fill(`${size} ${size}`).join(", "),
+      backgroundSize: `${100/gridCols}% ${100/gridRows}%`,
       backgroundPosition: positions.join(", "),
     };
   };
@@ -93,7 +138,9 @@ export function Keyboard({ onKeyPress, gameState }: KeyboardProps) {
               <Button
                 key={key}
                 onClick={() => onKeyPress(key)}
-                className={`${
+                className={`
+                  !bg-gray-200 text-gray-800 dark:!bg-gray-400
+                  ${
                   key === "ENTER" || key === "BACKSPACE"
                     ? "px-2 text-xs w-full"
                     : "w-8 md:w-10"

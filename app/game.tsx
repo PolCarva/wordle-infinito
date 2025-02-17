@@ -182,7 +182,7 @@ export default function Game() {
   return (
     <div className="flex w-full flex-col items-center gap-6 p-4 pt-10 pb-[240px] md:pb-4">
       <ThemeButton />
-      <div className="flex gap-4 fixed top-5 left-5">
+      <div className="flex gap-4 relative md:fixed top-5 left-5">
         <Button
           variant="link"
           onClick={() => setStarted(false)}
@@ -208,7 +208,16 @@ export default function Game() {
       {gameState && <GameStats gameState={gameState} />}
 
       <div className="w-full max-w-[1600px]">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-8">
+        <div
+          className={`
+            grid grid-cols-2 max-w-[800px] md:grid-cols-3 mx-auto lg:grid-cols-4 gap-2 md:gap-8
+
+            ${gameState.boards.length === 1 ? `!grid-cols-1 lg:!grid-cols-1` : ''}
+            ${gameState.boards.length === 2 ? `!grid-cols-2 lg:!grid-cols-2` : ''}
+            ${gameState.boards.length === 3 ? `!grid-cols-2 lg:!grid-cols-3` : ''}
+          
+          `}
+        >
           {gameState.boards.map((board, i) => (
             <GameBoard
               key={i}
@@ -227,7 +236,7 @@ export default function Game() {
           </div>
         </div>
       )}
-      <div className="fixed lg:relative  bottom-0 left-0 right-0 bg-white dark:bg-gray-900 p-4 border-t dark:border-gray-800">
+      <div className="fixed lg:relative  bottom-0 left-0 right-0 bg-white dark:bg-gray-900 lg:!bg-transparent p-4 lg:border-t-0 border-t dark:border-gray-800">
         <Keyboard onKeyPress={handleKeyPress} gameState={gameState} />
       </div>
       {gameState.gameOver && gameState.showEndModal && (

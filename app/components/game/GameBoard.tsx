@@ -55,7 +55,7 @@ export function GameBoard({ board, currentGuess, gameOver, gameState }: GameBoar
     -1;
 
   return (
-    <div className={`p-2 md:p-4 rounded-lg border ${board.completed ? "border-green-500" : "border-gray-500"}`}>
+    <div className={`p-2 md:p-4 max-w-[500px] rounded-lg border ${board.completed ? "border-green-500" : "border-gray-500"}`}>
       <div className="grid gap-1">
         {rows.map((row, i) => (
           <div key={i} className="flex gap-1">
@@ -69,7 +69,7 @@ export function GameBoard({ board, currentGuess, gameOver, gameState }: GameBoar
               return (
                 <div
                   key={j}
-                  className={`flex items-center justify-center text-xl font-bold rounded
+                  className={`flex items-center justify-center text-sm lg:text-xl font-semibold lg:font-bold rounded
                     ${
                       state === "correct"
                         ? "bg-green-500"

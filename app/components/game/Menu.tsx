@@ -96,7 +96,7 @@ export function Menu({
                   </span>
                 ))}
               </div>
-              <div className="flex gap-1 max-w-[calc(100svw-2rem)]">
+              <div className="flex gap-1 max-w-[calc(100svw-rem)]">
                 {["I", "N", "F", "I", "N", "I", "T", "O"].map((letter, i) => (
                   <span
                     key={i}

@@ -22,7 +22,6 @@ export function Nav({ onBack, onReset, isDark, onThemeToggle }: NavProps) {
             variant="ghost"
             size="icon"
             onClick={onBack}
-            className="text-yellow-600"
           >
             <ArrowLeft className="h-5 w-5" />
           </Button>
@@ -35,13 +34,12 @@ export function Nav({ onBack, onReset, isDark, onThemeToggle }: NavProps) {
             variant="ghost"
             size="icon"
             onClick={() => setShowSettings(!showSettings)}
-            className="text-yellow-600"
           >
             <Settings className="h-5 w-5" />
           </Button>
 
           {showSettings && (
-            <div className="absolute top-full mt-2 right-0 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 min-w-[200px] border dark:border-gray-700">
+            <div className="absolute top-full mt-2 right-0 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 min-w-[220px] border dark:border-gray-700">
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
                   <span className="text-sm font-medium">Tema</span>
@@ -49,7 +47,7 @@ export function Nav({ onBack, onReset, isDark, onThemeToggle }: NavProps) {
                     variant="ghost"
                     size="icon"
                     onClick={onThemeToggle}
-                    className="text-yellow-600"
+                    className="text-yellow-600 dark:hover:bg-gray-700"
                   >
                     {isDark ? (
                       <Sun className="h-5 w-5" />
@@ -68,7 +66,7 @@ export function Nav({ onBack, onReset, isDark, onThemeToggle }: NavProps) {
                         onReset();
                         setShowSettings(false);
                       }}
-                      className="text-yellow-600"
+                      className="text-yellow-600 dark:hover:bg-gray-700"
                     >
                       Reiniciar
                     </Button>
@@ -84,7 +82,7 @@ export function Nav({ onBack, onReset, isDark, onThemeToggle }: NavProps) {
                         onBack();
                         setShowSettings(false);
                       }}
-                      className="text-yellow-600"
+                      className="text-yellow-600 dark:hover:bg-gray-700"
                     >
                       Volver
                     </Button>

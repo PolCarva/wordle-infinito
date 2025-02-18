@@ -1,12 +1,7 @@
 import localFont from "next/font/local";
 import "./globals.css";
 import { metadata } from "./metadata";
-import dynamic from 'next/dynamic';
-
-const GoogleAnalytics = dynamic(
-  () => import('@next/third-parties/google').then((mod) => mod.GoogleAnalytics),
-  { ssr: false }
-);
+import { GoogleAnalytics } from '@next/third-parties/google'
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",

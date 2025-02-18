@@ -2,7 +2,13 @@
 
 import { Button } from "@/app/components/ui/button";
 import { Input } from "@/app/components/ui/input";
-import { InfinityIcon, Dices, AlertCircle, PlusCircle } from "lucide-react";
+import {
+  InfinityIcon,
+  Dices,
+  AlertCircle,
+  PlusCircle,
+  Share2,
+} from "lucide-react";
 import { WORD_LIST } from "@/app/word-list";
 import { ACCEPTED_WORDS } from "@/app/accepted-words";
 import { useState } from "react";
@@ -12,13 +18,13 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
-  DialogFooter
+  DialogFooter,
 } from "../ui/dialog";
 import Link from "next/link";
 
 interface MenuProps {
-  boardCount: number | '';
-  setBoardCount: (count: number | '') => void;
+  boardCount: number | "";
+  setBoardCount: (count: number | "") => void;
   onStart: () => void;
   setError: (error: string | null) => void;
   useRareWords: boolean;
@@ -36,6 +42,7 @@ export function Menu({
   const maxWords = useRareWords ? ACCEPTED_WORDS.length : WORD_LIST.length;
   const [showDialog, setShowDialog] = useState(false);
   const [pendingValue, setPendingValue] = useState<number | null>(null);
+  const [showShareMessage, setShowShareMessage] = useState(false);
 
   const handleRandomCount = () => {
     const random = Math.floor(Math.random() * maxWords) + 1;
@@ -43,10 +50,10 @@ export function Menu({
   };
 
   const handleBoardCountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value === '' ? '' : Number.parseInt(e.target.value);
-    
-    if (value === '') {
-      setBoardCount(value as number | '');
+    const value = e.target.value === "" ? "" : Number.parseInt(e.target.value);
+
+    if (value === "") {
+      setBoardCount(value as number | "");
       return;
     }
 
@@ -66,7 +73,11 @@ export function Menu({
   const toggleRareWords = () => {
     setUseRareWords((prev) => {
       const newValue = !prev;
-      if (!newValue && typeof boardCount === 'number' && boardCount > WORD_LIST.length) {
+      if (
+        !newValue &&
+        typeof boardCount === "number" &&
+        boardCount > WORD_LIST.length
+      ) {
         setBoardCount(WORD_LIST.length);
         setError("Se ha ajustado al máximo de palabras comunes disponibles");
       }
@@ -75,14 +86,37 @@ export function Menu({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       onStart();
+    }
+  };
+
+  const handleShare = async () => {
+    const shareData = {
+      title: "Wordle Infinito",
+      text: "¡Juega múltiples partidas de Wordle simultáneamente! 🎮✨",
+      url: window.location.origin,
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(window.location.origin);
+        setShowShareMessage(true);
+        setTimeout(() => setShowShareMessage(false), 2000);
+      }
+    } catch (err) {
+      console.error("Error compartiendo:", err);
     }
   };
 
   return (
     <>
-      <div className="flex flex-col items-center gap-8 w-full max-w-2xl mx-auto pt-16 lg:pt-0" onKeyDown={handleKeyDown}>
+      <div
+        className="flex flex-col items-center gap-8 w-full max-w-2xl mx-auto pt-16 lg:pt-0"
+        onKeyDown={handleKeyDown}
+      >
         <div className="text-center space-y-4">
           <div className="flex flex-col items-center gap-2">
             <span className="flex flex-col gap-2">
@@ -118,10 +152,12 @@ export function Menu({
 
         <div className="bg-gray-50 dark:bg-gray-800 p-8 rounded-2xl shadow-lg w-full max-w-md space-y-6">
           <div className="space-y-4">
-            <h2 className="text-xl font-semibold flex items-center gap-2">
-              <InfinityIcon className="w-6 h-6 text-green-500" />
-              Configura tu juego
-            </h2>
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-semibold flex items-center gap-2">
+                <InfinityIcon className="w-6 h-6 text-green-500" />
+                Configura tu juego
+              </h2>
+            </div>
 
             <div className="flex items-center gap-4">
               <div className="flex-1">
@@ -236,7 +272,8 @@ export function Menu({
           <DialogHeader>
             <DialogTitle>¿Usar palabras raras?</DialogTitle>
             <DialogDescription>
-              Has superado el límite de palabras comunes. ¿Quieres habilitar las palabras raras para tener más opciones?
+              Has superado el límite de palabras comunes. ¿Quieres habilitar las
+              palabras raras para tener más opciones?
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex gap-2 sm:gap-0">
@@ -244,7 +281,9 @@ export function Menu({
               variant="outline"
               onClick={() => {
                 setBoardCount(maxWords);
-                setError("Se ha establecido el máximo de palabras comunes disponibles");
+                setError(
+                  "Se ha establecido el máximo de palabras comunes disponibles"
+                );
                 setShowDialog(false);
               }}
             >

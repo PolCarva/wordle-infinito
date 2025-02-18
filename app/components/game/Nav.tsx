@@ -2,8 +2,8 @@
 
 import { Button } from "@/app/components/ui/button";
 import { Settings, ArrowLeft, Moon, Sun } from "lucide-react";
+import { Share2 } from "lucide-react";
 import { useState } from "react";
-
 interface NavProps {
   onBack?: () => void;
   onReset?: () => void;
@@ -13,22 +13,38 @@ interface NavProps {
 
 export function Nav({ onBack, onReset, isDark, onThemeToggle }: NavProps) {
   const [showSettings, setShowSettings] = useState(false);
+  const [showShareMessage, setShowShareMessage] = useState(false);
 
+  const handleShare = async () => {
+    const shareData = {
+      title: "Wordle Infinito",
+      text: "¡Juega múltiples partidas de Wordle simultáneamente! 🎮✨",
+      url: window.location.origin,
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(window.location.origin);
+        setShowShareMessage(true);
+        setTimeout(() => setShowShareMessage(false), 2000);
+      }
+    } catch (err) {
+      console.error("Error compartiendo:", err);
+    }
+  };
   return (
     <div className="fixed top-5 w-full px-5">
       <div className="relative flex justify-between items-center">
         {onBack ? (
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onBack}
-          >
+          <Button variant="ghost" size="icon" onClick={onBack}>
             <ArrowLeft className="h-5 w-5" />
           </Button>
         ) : (
           <div className="w-9 h-9" />
         )}
-        
+
         <div className="relative">
           <Button
             variant="ghost"
@@ -56,6 +72,7 @@ export function Nav({ onBack, onReset, isDark, onThemeToggle }: NavProps) {
                     )}
                   </Button>
                 </div>
+
                 {onReset && (
                   <div className="flex justify-between items-center">
                     <span className="text-sm font-medium">Reiniciar juego</span>
@@ -74,7 +91,9 @@ export function Nav({ onBack, onReset, isDark, onThemeToggle }: NavProps) {
                 )}
                 {onBack && (
                   <div className="flex justify-between items-center">
-                    <span className="text-sm font-medium">Volver al inicio</span>
+                    <span className="text-sm font-medium">
+                      Volver al inicio
+                    </span>
                     <Button
                       variant="ghost"
                       size="sm"
@@ -88,6 +107,23 @@ export function Nav({ onBack, onReset, isDark, onThemeToggle }: NavProps) {
                     </Button>
                   </div>
                 )}
+                <div className="flex justify-between order-1 items-center">
+                  <span className="text-sm font-medium">Compartir</span>
+
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleShare}
+                    className="text-yellow-600 dark:hover:bg-gray-700"
+                  >
+                    <Share2 className="w-5 h-5" />
+                  </Button>
+                  {showShareMessage && (
+                    <div className="absolute top-full right-0 mt-2 whitespace-nowrap bg-black text-white text-xs py-1 px-2 rounded">
+                      ¡Link copiado!
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           )}

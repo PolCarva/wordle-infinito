@@ -172,7 +172,7 @@ export default function Game() {
       />
 
       <div className="flex items-center gap-4">
-        <h1 className="text-4xl font-bold">Multi-Wordle</h1>
+        <h1 className="text-4xl font-bold">Wordle Infinito</h1>
       </div>
 
       {gameState && <GameStats gameState={gameState} />}

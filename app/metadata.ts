@@ -2,8 +2,8 @@ import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: {
-    default: "Multi Wordle",
-    template: "%s | Multi Wordle",
+    default: "Wordle Infinito",
+    template: "%s | Wordle Infinito",
   },
   description:
     "Juega múltiples partidas de Wordle simultáneamente. Un desafío de palabras donde puedes resolver varios puzzles a la vez.",
@@ -13,6 +13,7 @@ export const metadata: Metadata = {
     "puzzle",
     "puzle",
     "multi wordle",
+    "wordle infinito",
     "juego",
     "español",
     "wordle infinito",
@@ -51,14 +52,14 @@ export const metadata: Metadata = {
     type: "website",
     locale: "es_ES",
     url: "https://worlde-infinito.vercel.app",
-    title: "Multi Wordle - Juega múltiples Wordles a la vez",
+    title: "Wordle Infinito - Juega múltiples Wordles a la vez",
     description:
       "Juega múltiples partidas de Wordle simultáneamente. Un desafío de palabras donde puedes resolver varios puzzles a la vez.",
-    siteName: "Multi Wordle",
+    siteName: "Wordle Infinito",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Multi Wordle - Juega múltiples Wordles a la vez",
+    title: "Wordle Infinito - Juega múltiples Wordles a la vez",
     description:
       "Juega múltiples partidas de Wordle simultáneamente. Un desafío de palabras donde puedes resolver varios puzzles a la vez.",
     creator: "@PabloC21791",

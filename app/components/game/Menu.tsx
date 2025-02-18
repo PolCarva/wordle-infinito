@@ -86,7 +86,7 @@ export function Menu({
           <div className="flex flex-col items-center gap-2">
             <h1 className="flex flex-col gap-2">
               <div className="flex gap-1 mx-auto">
-                {["M", "U", "L", "T", "I"].map((letter, i) => (
+                {["W", "O", "R", "D", "L", "E"].map((letter, i) => (
                   <span
                     key={i}
                     className="w-10 h-10 md:w-16 md:h-16 bg-green-500 flex items-center justify-center rounded-lg text-white font-bold text-xl md:text-3xl shadow-md"
@@ -96,7 +96,7 @@ export function Menu({
                 ))}
               </div>
               <div className="flex gap-1">
-                {["W", "O", "R", "D", "L", "E"].map((letter, i) => (
+                {["I", "N", "F", "I", "N", "I", "T", "O"].map((letter, i) => (
                   <span
                     key={i}
                     className={`w-10 h-10 md:w-16 md:h-16 ${
@@ -115,7 +115,7 @@ export function Menu({
           </p>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg w-full max-w-md space-y-6">
+        <div className="bg-gray-50 dark:bg-gray-800 p-8 rounded-2xl shadow-lg w-full max-w-md space-y-6">
           <div className="space-y-4">
             <h2 className="text-xl font-semibold flex items-center gap-2">
               <InfinityIcon className="w-6 h-6 text-green-500" />
@@ -189,7 +189,7 @@ export function Menu({
             Empezar a Jugar
           </Button>
 
-          <div className="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-xl space-y-3">
+          <div className="bg-gray-100 dark:bg-gray-700/50 p-4 rounded-xl space-y-3">
             <h3 className="font-semibold">Cómo jugar:</h3>
             <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
               <li className="flex items-start gap-2">

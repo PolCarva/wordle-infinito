@@ -1,6 +1,50 @@
+'use client';
+
+import { Share2 } from "lucide-react";
+import { Button } from "./button";
+import { useState } from "react";
+
 export function HomeContent() {
+  const [showShareMessage, setShowShareMessage] = useState(false);
+
+  const handleShare = async () => {
+    const shareData = {
+      title: 'Wordle Infinito',
+      text: '¡Juega múltiples partidas de Wordle simultáneamente! 🎮✨',
+      url: window.location.origin
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(window.location.origin);
+        setShowShareMessage(true);
+        setTimeout(() => setShowShareMessage(false), 2000);
+      }
+    } catch (err) {
+      console.error('Error compartiendo:', err);
+    }
+  };
+
   return (
     <article className="max-w-4xl mx-auto px-4 py-8 prose dark:prose-invert prose-sm">
+      <div className="fixed bottom-4 right-4 z-50">
+        <div className="relative">
+          <Button
+            onClick={handleShare}
+            className="rounded-full p-4 bg-green-500 hover:bg-green-600 text-white shadow-lg"
+          >
+            <Share2 className="w-6 h-6" />
+          </Button>
+          {showShareMessage && (
+            <div className="absolute bottom-full right-0 mb-2 whitespace-nowrap bg-black text-white text-sm py-1 px-2 rounded">
+              ¡Link copiado!
+            </div>
+          )}
+        </div>
+      </div>
+
       <h1 className="sr-only">Wordle Infinito - El Juego de Palabras Definitivo</h1>
       
       <section className="mt-8">

@@ -85,7 +85,7 @@ export function Menu({
       <div className="flex flex-col items-center gap-8 w-full max-w-2xl mx-auto pt-16 lg:pt-0" onKeyDown={handleKeyDown}>
         <div className="text-center space-y-4">
           <div className="flex flex-col items-center gap-2">
-            <h1 className="flex flex-col gap-2">
+            <span className="flex flex-col gap-2">
               <div className="flex gap-1 mx-auto">
                 {["W", "O", "R", "D", "L", "E"].map((letter, i) => (
                   <span
@@ -108,7 +108,7 @@ export function Menu({
                   </span>
                 ))}
               </div>
-            </h1>
+            </span>
           </div>
           <p className="text-lg text-gray-600 dark:text-gray-300 max-w-md mx-auto">
             Juega al Wordle con múltiples palabras simultáneamente. ¡Un desafío

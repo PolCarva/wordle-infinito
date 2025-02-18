@@ -7,7 +7,6 @@ import {
   Dices,
   AlertCircle,
   PlusCircle,
-  Share2,
 } from "lucide-react";
 import { WORD_LIST } from "@/app/word-list";
 import { ACCEPTED_WORDS } from "@/app/accepted-words";
@@ -42,7 +41,6 @@ export function Menu({
   const maxWords = useRareWords ? ACCEPTED_WORDS.length : WORD_LIST.length;
   const [showDialog, setShowDialog] = useState(false);
   const [pendingValue, setPendingValue] = useState<number | null>(null);
-  const [showShareMessage, setShowShareMessage] = useState(false);
 
   const handleRandomCount = () => {
     const random = Math.floor(Math.random() * maxWords) + 1;
@@ -91,26 +89,7 @@ export function Menu({
     }
   };
 
-  const handleShare = async () => {
-    const shareData = {
-      title: "Wordle Infinito",
-      text: "¡Juega múltiples partidas de Wordle simultáneamente! 🎮✨",
-      url: window.location.origin,
-    };
-
-    try {
-      if (navigator.share) {
-        await navigator.share(shareData);
-      } else {
-        await navigator.clipboard.writeText(window.location.origin);
-        setShowShareMessage(true);
-        setTimeout(() => setShowShareMessage(false), 2000);
-      }
-    } catch (err) {
-      console.error("Error compartiendo:", err);
-    }
-  };
-
+  
   return (
     <>
       <div

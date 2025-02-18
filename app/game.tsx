@@ -175,8 +175,6 @@ export default function Game() {
         <h1 className="text-4xl font-bold">Multi-Wordle</h1>
       </div>
 
-      <span> {gameState?.boards.map((board) => board.word).join(", ")}</span>
-
       {gameState && <GameStats gameState={gameState} />}
 
       <div className="w-full max-w-[1600px]">
@@ -254,7 +252,7 @@ export default function Game() {
             </p>
             {!gameState.won && (
               <div className="mb-4">
-                Las palabras eran:{" "}
+                {gameState.boards.length === 1 ? "La palabra era: " : "Las palabras eran: "}
                 {gameState.boards.map((board) => board.word).join(", ")}
               </div>
             )}

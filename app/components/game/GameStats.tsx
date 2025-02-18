@@ -13,7 +13,8 @@ export function GameStats({ gameState }: { gameState: GameState }) {
         Aciertos: {completedBoards} de {totalBoards}
       </p>
       <p className="text-lg font-semibold">
-        Intento {currentAttempt} de {gameState.maxAttempts} (quedan {gameState.remainingLives} vidas)
+        Intento <span className="font-bold text-primary">{currentAttempt}</span> de <span className="font-bold">{gameState.maxAttempts}</span>{" "}
+        <span className="text-red-500">({gameState.remainingLives} vida{gameState.remainingLives === 1 ? "" : "s"} restante{gameState.remainingLives === 1 ? "" : "s"} ❤️)</span>
       </p>
     </div>
   );

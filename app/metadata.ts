@@ -62,9 +62,5 @@ export const metadata: Metadata = {
     description:
       "Juega múltiples partidas de Wordle simultáneamente. Un desafío de palabras donde puedes resolver varios puzzles a la vez.",
     creator: "@PabloC21791",
-  },
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-  },
+  }
 };

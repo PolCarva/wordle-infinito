@@ -1,26 +1,66 @@
-export const siteConfig = {
-  name: "Multi-Wordle",
-  description: "Un juego de Wordle en el que puedes jugar con múltiples palabras simultáneamente. Adivina todas las palabras antes de quedarte sin intentos.",
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: {
+    default: "Multi Wordle",
+    template: "%s | Multi Wordle",
+  },
+  description:
+    "Juega múltiples partidas de Wordle simultáneamente. Un desafío de palabras donde puedes resolver varios puzzles a la vez.",
   keywords: [
     "wordle",
-    "multi wordle",
     "juego de palabras",
-    "español",
-    "juego",
     "puzzle",
-    "acertijos",
-    "palabras",
-    "adivinanzas"
+    "puzle",
+    "multi wordle",
+    "juego",
+    "español",
+    "wordle infinito",
+    "wordle infinito español",
+    "8 palabras",
+    "8 wordle",
+    "64 palabras",
+    "64 wordle",
+    "16 palabras",
+    "16 wordle",
+    "32 palabras",
+    "32 wordle",
+    "48 palabras",
+    "48 wordle",
+    "96 palabras",
+    "96 wordle",
+    "128 palabras",
+    "128 wordle",
   ],
-  authors: [
-    {
-      name: "Pablo Carvalho",
-      url: "https://github.com/polCarva"
-    }
-  ],
+  authors: [{ name: "Pablo Carvalho" }],
   creator: "Pablo Carvalho",
-  ogImage: "/og-image.jpg",
-  links: {
-    github: "https://github.com/polCarva/wordle-infinito"
-  }
-} 
+  publisher: "Pablo Carvalho",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+    },
+  },
+  openGraph: {
+    type: "website",
+    locale: "es_ES",
+    url: "https://worlde-infinito.vercel.app",
+    title: "Multi Wordle - Juega múltiples Wordles a la vez",
+    description:
+      "Juega múltiples partidas de Wordle simultáneamente. Un desafío de palabras donde puedes resolver varios puzzles a la vez.",
+    siteName: "Multi Wordle",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Multi Wordle - Juega múltiples Wordles a la vez",
+    description:
+      "Juega múltiples partidas de Wordle simultáneamente. Un desafío de palabras donde puedes resolver varios puzzles a la vez.",
+    creator: "@PabloC21791",
+  },
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+  },
+};

@@ -80,7 +80,7 @@ export default function CreatePage() {
           url,
         });
         return;
-      } catch (_) {
+      } catch {
         // Si el usuario cancela, seguimos con el método normal
       }
     }

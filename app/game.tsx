@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/app/components/ui/button";
-import { Input } from "@/app/components/ui/input";
 import { ACCEPTED_WORDS } from "./accepted-words";
 import Confetti from "react-confetti-boom";
 import { GameBoard } from "./components/game/GameBoard";
@@ -11,6 +10,7 @@ import { GameStats } from "./components/game/GameStats";
 import { GameState } from "./types";
 import { getRandomWords } from "./utils/game-utils";
 import { Nav } from "./components/game/Nav";
+import { Menu } from "./components/game/Menu";
 
 export default function Game() {
   const [started, setStarted] = useState(false);
@@ -24,8 +24,8 @@ export default function Game() {
     return false;
   });
 
-  const initializeGame = () => {
-    const words = getRandomWords(boardCount);
+  const initializeGame = (useRareWords: boolean) => {
+    const words = getRandomWords(boardCount, useRareWords);
     setGameState({
       boards: words.map((word) => ({
         word,
@@ -146,49 +146,12 @@ export default function Game() {
           isDark={isDark}
           onThemeToggle={toggleTheme}
         />
-        <h1 className="text-4xl font-bold mb-2">Multi-Wordle</h1>
-        <p className="text-center max-w-md text-lg mb-4">
-          Juega al Wordle con múltiples palabras simultáneamente. ¡Un desafío
-          mayor para los amantes de las palabras!
-        </p>
-
-        <div className="flex items-center gap-4 mt-4">
-          <label htmlFor="boardCount" className="text-lg">
-            Número de palabras:
-          </label>
-          <Input
-            id="boardCount"
-            type="number"
-            min="0"
-            max="128"
-            value={boardCount}
-            onChange={(e) =>
-              setBoardCount(Number.parseInt(e.target.value) || 1)
-            }
-            className="w-20"
-            aria-label="Selecciona el número de palabras para jugar"
-          />
-        </div>
-        <Button
-          onClick={initializeGame}
-          className="mt-4"
-          aria-label="Comenzar el juego"
-        >
-          Empezar a Jugar
-        </Button>
-        <div className="bg-slate-100 dark:bg-slate-800 p-4 rounded-lg max-w-md text-sm">
-          <h2 className="font-bold mb-2">Cómo jugar:</h2>
-          <ul className="list-disc list-inside space-y-1">
-            <li>Elige cuántas palabras quieres adivinar</li>
-            <li>Tienes N+5 intentos (N = número de palabras)</li>
-            <li>Cada intento se aplica a todas las palabras</li>
-            <li>Las letras verdes están en la posición correcta</li>
-            <li>
-              Las letras amarillas están en la palabra pero en otra posición
-            </li>
-            <li>¡Adivina todas las palabras antes de quedarte sin intentos!</li>
-          </ul>
-        </div>
+        <Menu 
+          boardCount={boardCount}
+          setBoardCount={setBoardCount}
+          onStart={(useRareWords) => initializeGame(useRareWords)}
+          setError={setError}
+        />
       </div>
     );
   }
@@ -199,7 +162,7 @@ export default function Game() {
     <div className="flex w-full flex-col items-center gap-6 p-4 pt-16 pb-[240px] md:pb-4">
       <Nav
         onBack={() => setStarted(false)}
-        onReset={initializeGame}
+        onReset={() => initializeGame(true)}
         isDark={isDark}
         onThemeToggle={toggleTheme}
       />
@@ -304,7 +267,7 @@ export default function Game() {
               >
                 Cerrar
               </Button>
-              <Button onClick={initializeGame}>Jugar de nuevo</Button>
+              <Button onClick={() => initializeGame(true)}>Jugar de nuevo</Button>
             </div>
           </div>
         </div>

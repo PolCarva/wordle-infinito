@@ -35,6 +35,10 @@ export const metadata: Metadata = {
   authors: [{ name: "Pablo Carvalho" }],
   creator: "Pablo Carvalho",
   publisher: "Pablo Carvalho",
+  icons: {
+    icon: '/icon',
+    apple: '/apple-icon',
+  },
   robots: {
     index: true,
     follow: true,

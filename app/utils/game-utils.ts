@@ -1,16 +1,19 @@
-import { WORD_LIST } from "../word-list";
+import { WORD_LIST } from "@/app/word-list";
+import { ACCEPTED_WORDS } from "@/app/accepted-words";
 import { LetterState } from "../types";
 
-export function getRandomWords(count: number): string[] {
-  const words = [...WORD_LIST].map((word) => word.toUpperCase());
-  const selected: string[] = [];
+export const getRandomWords = (count: number, useRareWords = false) => {
+  const dictionary = useRareWords ? ACCEPTED_WORDS : WORD_LIST;
+  const words = [...dictionary];
+  const result = [];
+
   for (let i = 0; i < count; i++) {
     const index = Math.floor(Math.random() * words.length);
-    selected.push(words[index]);
-    words.splice(index, 1);
+    result.push(words.splice(index, 1)[0]);
   }
-  return selected;
-}
+
+  return result;
+};
 
 export function checkGuess(guess: string, answer: string): LetterState[] {
   const result: LetterState[] = Array(5).fill("absent");

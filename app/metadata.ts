@@ -51,7 +51,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "es_ES",
-    url: "https://worlde-infinito.vercel.app",
+    url: "https://worldeinfinito.com",
     title: "Wordle Infinito - Juega múltiples Wordles a la vez",
     description:
       "Juega múltiples partidas de Wordle simultáneamente. Un desafío de palabras donde puedes resolver varios puzzles a la vez.",
@@ -63,5 +63,8 @@ export const metadata: Metadata = {
     description:
       "Juega múltiples partidas de Wordle simultáneamente. Un desafío de palabras donde puedes resolver varios puzzles a la vez.",
     creator: "@PabloC21791",
+  },
+  alternates: {
+    canonical: "https://wordleinfinito.com",
   }
 };

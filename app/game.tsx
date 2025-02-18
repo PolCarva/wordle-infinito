@@ -63,7 +63,7 @@ export default function Game({ customWords }: GameProps) {
       setBoardCount(customWords.length);
       initializeGame();
     }
-  }, [customWords]);
+  }, [customWords, initializeGame]);
 
   // Agregamos las palabras custom al diccionario temporalmente
   useEffect(() => {

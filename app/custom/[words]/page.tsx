@@ -2,7 +2,6 @@
 
 import Game from "@/app/game";
 import { useEffect, useState } from "react";
-import { ACCEPTED_WORDS } from "@/app/accepted-words";
 import { AlertCircle } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/app/components/ui/button";

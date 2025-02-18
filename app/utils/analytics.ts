@@ -1,8 +1,12 @@
 type GameEvent = 'game_started' | 'custom_game_created' | 'custom_game_played';
+type EventParams = Record<string, string | number | boolean>;
 
-export const trackEvent = (eventName: GameEvent, params?: Record<string, any>) => {
-  // Verificamos que gtag esté disponible
-  if (typeof window !== 'undefined' && (window as any).gtag) {
-    (window as any).gtag('event', eventName, params);
+interface WindowWithGtag extends Window {
+  gtag: (command: string, event: GameEvent, params?: EventParams) => void;
+}
+
+export const trackEvent = (eventName: GameEvent, params?: EventParams) => {
+  if (typeof window !== 'undefined' && (window as WindowWithGtag).gtag) {
+    (window as WindowWithGtag).gtag('event', eventName, params);
   }
 }; 

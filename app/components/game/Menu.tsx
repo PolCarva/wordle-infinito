@@ -46,7 +46,7 @@ export function Menu({
     const value = e.target.value === '' ? '' : Number.parseInt(e.target.value);
     
     if (value === '') {
-      setBoardCount(value as any);
+      setBoardCount(value as number | '');
       return;
     }
 

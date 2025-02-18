@@ -80,7 +80,7 @@ export default function CreatePage() {
           url,
         });
         return;
-      } catch (err) {
+      } catch (_err) {
         // Si el usuario cancela, seguimos con el método normal
         console.log("User cancelled share");
       }

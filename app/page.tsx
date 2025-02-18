@@ -1,5 +1,6 @@
 import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
+import { HomeContent } from './components/ui/HomeContent';
 
 const Game = dynamic(() => import("@/app/game"), {
   loading: () => (
@@ -20,6 +21,7 @@ export default function Page() {
       }>
         <Game />
       </Suspense>
+      <HomeContent />
     </div>
   )
 }

@@ -177,10 +177,10 @@ export default function Game() {
 
       {gameState && <GameStats gameState={gameState} />}
 
-      <div className="w-full max-w-[1600px]">
+      <div className="w-full">
         <div
           className={`
-            grid grid-cols-2 max-w-[800px] md:grid-cols-3 mx-auto lg:grid-cols-4 gap-2 md:gap-8
+            grid grid-cols-2 max-w-[1600px] md:grid-cols-3 mx-auto lg:grid-cols-4 gap-2 md:gap-8
 
             ${
               gameState.boards.length === 1 
@@ -189,7 +189,7 @@ export default function Game() {
             }
             ${
               gameState.boards.length === 2
-                ? `!grid-cols-2 lg:!grid-cols-2`
+                ? `!grid-cols-2 lg:!grid-cols-2 max-w-[800px]`
                 : ""
             }
             ${
@@ -218,7 +218,7 @@ export default function Game() {
           </div>
         </div>
       )}
-      <div className="fixed lg:relative  bottom-0 left-0 right-0 bg-white dark:bg-gray-900 lg:!bg-transparent p-4 lg:border-t-0 border-t dark:border-gray-800">
+      <div className="fixed lg:relative  bottom-0 left-0 right-0 bg-white dark:bg-gray-900 lg:!bg-transparent p-2 md:p-4 lg:border-t-0 border-t dark:border-gray-800">
         <Keyboard onKeyPress={handleKeyPress} gameState={gameState} />
       </div>
       {gameState.gameOver && gameState.showEndModal && (

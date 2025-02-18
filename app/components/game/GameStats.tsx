@@ -14,7 +14,7 @@ export function GameStats({ gameState }: { gameState: GameState }) {
       </p>
       <p className="text-lg font-semibold">
         Intento <span className="font-bold text-primary">{currentAttempt}</span> de <span className="font-bold">{gameState.maxAttempts}</span>{" "}
-        <span className="text-red-500">({gameState.remainingLives} vida{gameState.remainingLives === 1 ? "" : "s"} restante{gameState.remainingLives === 1 ? "" : "s"} ❤️)</span>
+        <span className="text-red-500 block md:inline">({gameState.remainingLives} vida{gameState.remainingLives === 1 ? "" : "s"} restante{gameState.remainingLives === 1 ? "" : "s"} ❤️)</span>
       </p>
     </div>
   );

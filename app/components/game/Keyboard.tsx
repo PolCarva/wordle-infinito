@@ -51,13 +51,14 @@ export function Keyboard({ onKeyPress, gameState }: KeyboardProps) {
     // Caso especial para 1 tablero
     if (boardCount === 1) {
       const state = getLetterStateInBoard(letter, 0) as LetterState;
-      const color = state === "correct" 
-        ? "rgb(34 197 94)"
-        : state === "present"
-        ? "rgb(234 179 8)"
-        : state === "absent"
-        ? "rgb(156 163 175)"
-        : "rgb(229 231 235)";
+      const color =
+        state === "correct"
+          ? "rgb(34 197 94)"
+          : state === "present"
+          ? "rgb(234 179 8)"
+          : state === "absent"
+          ? "rgb(156 163 175)"
+          : "rgb(229 231 235)";
 
       return {
         background: color,
@@ -68,13 +69,14 @@ export function Keyboard({ onKeyPress, gameState }: KeyboardProps) {
     if (boardCount === 2) {
       const gradients = gameState.boards.map((_, index) => {
         const state = getLetterStateInBoard(letter, index) as LetterState;
-        const color = state === "correct" 
-          ? "rgb(34 197 94)"
-          : state === "present"
-          ? "rgb(234 179 8)"
-          : state === "absent"
-          ? "rgb(156 163 175)"
-          : "rgb(229 231 235)";
+        const color =
+          state === "correct"
+            ? "rgb(34 197 94)"
+            : state === "present"
+            ? "rgb(234 179 8)"
+            : state === "absent"
+            ? "rgb(156 163 175)"
+            : "rgb(229 231 235)";
 
         return `linear-gradient(0deg, ${color}, ${color})`;
       });
@@ -101,13 +103,14 @@ export function Keyboard({ onKeyPress, gameState }: KeyboardProps) {
 
     const gradients = gameState.boards.map((_, index) => {
       const state = getLetterStateInBoard(letter, index) as LetterState;
-      const color = state === "correct" 
-        ? "rgb(34 197 94)"
-        : state === "present"
-        ? "rgb(234 179 8)"
-        : state === "absent"
-        ? "rgb(156 163 175)"
-        : "rgb(229 231 235)";
+      const color =
+        state === "correct"
+          ? "rgb(34 197 94)"
+          : state === "present"
+          ? "rgb(234 179 8)"
+          : state === "absent"
+          ? "rgb(156 163 175)"
+          : "rgb(229 231 235)";
 
       return `linear-gradient(0deg, ${color}, ${color})`;
     });
@@ -123,7 +126,7 @@ export function Keyboard({ onKeyPress, gameState }: KeyboardProps) {
     return {
       backgroundImage: gradients.join(", "),
       backgroundRepeat: "no-repeat",
-      backgroundSize: `${100/gridCols}% ${100/gridRows}%`,
+      backgroundSize: `${100 / gridCols}% ${100 / gridRows}%`,
       backgroundPosition: positions.join(", "),
     };
   };
@@ -141,10 +144,10 @@ export function Keyboard({ onKeyPress, gameState }: KeyboardProps) {
                 className={`
                   !bg-gray-200 text-gray-800 dark:!bg-gray-400
                   ${
-                  key === "ENTER" || key === "BACKSPACE"
-                    ? "px-2 text-xs w-full"
-                    : "w-8 md:w-10"
-                } h-14 font-bold`}
+                    key === "ENTER" || key === "BACKSPACE"
+                      ? "px-2 text-xs w-full max-w-16"
+                      : "w-8 md:w-10"
+                  } h-14 font-bold`}
                 style={typeof style === "string" ? {} : style}
                 disabled={gameState.gameOver}
               >
@@ -162,4 +165,4 @@ export function Keyboard({ onKeyPress, gameState }: KeyboardProps) {
       ))}
     </div>
   );
-} 
+}

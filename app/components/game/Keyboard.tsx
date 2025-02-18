@@ -61,7 +61,8 @@ export function Keyboard({ onKeyPress, gameState }: KeyboardProps) {
           : "rgb(229 231 235)";
 
       return {
-        background: color,
+        backgroundImage: `linear-gradient(0deg, ${color}, ${color})`,
+        backgroundSize: "100% 100%"
       };
     }
 

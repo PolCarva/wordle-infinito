@@ -80,9 +80,8 @@ export default function CreatePage() {
           url,
         });
         return;
-      } catch (_err) {
+      } catch (_) {
         // Si el usuario cancela, seguimos con el método normal
-        console.log("User cancelled share");
       }
     }
 
@@ -93,7 +92,7 @@ export default function CreatePage() {
   const shareToTwitter = () => {
     const url = generateGameUrl();
     const text = encodeURIComponent(
-      "¡Te reto a una partida personalizada de Wordle Infinito! 🎮\n\n"
+      "¡Te reto a una partida personalizada de Wordle Infinito!"
     );
     window.open(
       `https://twitter.com/intent/tweet?text=${text}&url=${encodeURIComponent(
@@ -123,7 +122,7 @@ export default function CreatePage() {
   const shareToWhatsApp = () => {
     const url = generateGameUrl();
     const text = encodeURIComponent(
-      "¡Te reto a una partida personalizada de Wordle Infinito! 🎮\n\n"
+      "¡Te reto a una partida personalizada de Wordle Infinito!"
     );
     window.open(
       `https://wa.me/?text=${text}${encodeURIComponent(url)}`,

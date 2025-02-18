@@ -17,6 +17,10 @@ interface GameProps {
   customWords?: string[];
 }
 
+interface WindowWithTemp extends Window {
+  __TEMP_ACCEPTED_WORDS?: string[];
+}
+
 export default function Game({ customWords }: GameProps) {
   const [started, setStarted] = useState(false);
   const [boardCount, setBoardCount] = useState<number | ''>(2);
@@ -30,11 +34,10 @@ export default function Game({ customWords }: GameProps) {
     return false;
   });
 
-  const initializeGame = () => {
+  const initializeGame = useCallback(() => {
     const finalBoardCount = typeof boardCount === 'number' ? boardCount : 1;
     const words = customWords || getRandomWords(finalBoardCount, useRareWords);
     
-    // Trackeamos el inicio de partida
     trackEvent('game_started', {
       board_count: words.length,
       is_custom: !!customWords,
@@ -56,7 +59,7 @@ export default function Game({ customWords }: GameProps) {
     });
     setStarted(true);
     setError(null);
-  };
+  }, [boardCount, customWords, useRareWords]);
 
   useEffect(() => {
     if (customWords) {
@@ -65,21 +68,17 @@ export default function Game({ customWords }: GameProps) {
     }
   }, [customWords, initializeGame]);
 
-  // Agregamos las palabras custom al diccionario temporalmente
   useEffect(() => {
     if (customWords) {
       const newWords = customWords.filter(word => !ACCEPTED_WORDS.includes(word));
       if (newWords.length > 0) {
-        // Creamos una copia temporal del array para no mutar el original
         const tempAcceptedWords = [...ACCEPTED_WORDS, ...newWords];
-        // Reemplazamos la referencia al array original
-        (window as any).__TEMP_ACCEPTED_WORDS = tempAcceptedWords;
+        (window as WindowWithTemp).__TEMP_ACCEPTED_WORDS = tempAcceptedWords;
       }
     }
     
     return () => {
-      // Limpiamos al desmontar
-      delete (window as any).__TEMP_ACCEPTED_WORDS;
+      delete (window as WindowWithTemp).__TEMP_ACCEPTED_WORDS;
     };
   }, [customWords]);
 
@@ -87,7 +86,7 @@ export default function Game({ customWords }: GameProps) {
     if (!gameState || gameState.currentGuess.length !== 5) return;
 
     const normalizedGuess = gameState.currentGuess.toUpperCase();
-    const acceptedWords = (window as any).__TEMP_ACCEPTED_WORDS || ACCEPTED_WORDS;
+    const acceptedWords = (window as WindowWithTemp).__TEMP_ACCEPTED_WORDS || ACCEPTED_WORDS;
 
     if (!acceptedWords.includes(normalizedGuess)) {
       setError("Palabra no encontrada");

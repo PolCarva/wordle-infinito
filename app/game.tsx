@@ -11,6 +11,7 @@ import { GameState } from "./types";
 import { getRandomWords } from "./utils/game-utils";
 import { Nav } from "./components/game/Nav";
 import { Menu } from "./components/game/Menu";
+import { trackEvent } from './utils/analytics';
 
 interface GameProps {
   customWords?: string[];
@@ -32,6 +33,14 @@ export default function Game({ customWords }: GameProps) {
   const initializeGame = () => {
     const finalBoardCount = typeof boardCount === 'number' ? boardCount : 1;
     const words = customWords || getRandomWords(finalBoardCount, useRareWords);
+    
+    // Trackeamos el inicio de partida
+    trackEvent('game_started', {
+      board_count: words.length,
+      is_custom: !!customWords,
+      use_rare_words: useRareWords
+    });
+
     setGameState({
       boards: words.map((word) => ({
         word,

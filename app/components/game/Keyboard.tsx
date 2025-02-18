@@ -134,7 +134,7 @@ export function Keyboard({ onKeyPress, gameState }: KeyboardProps) {
   return (
     <div className="grid gap-1 max-w-[calc(100svw-10px)] mt-4">
       {rows.map((row, i) => (
-        <div key={i} className="flex justify-center gap-1">
+        <div key={i} className="flex justify-center gap-1 ">
           {row.map((key) => {
             const style = getGradientBackground(key.toUpperCase());
             return (
@@ -145,8 +145,8 @@ export function Keyboard({ onKeyPress, gameState }: KeyboardProps) {
                   !bg-gray-200 text-gray-800 dark:!bg-gray-400
                   ${
                     key === "ENTER" || key === "BACKSPACE"
-                      ? "px-2 text-xs w-full max-w-16"
-                      : "w-8 md:w-10"
+                      ? "px-2 text-xs max-w-[13vw] min-[375px]:max-w-16 w-full"
+                      : "w-8 max-w-[8.5vw] min-[375px]:max-w-none md:w-10 !px-0"
                   } h-14 font-bold`}
                 style={typeof style === "string" ? {} : style}
                 disabled={gameState.gameOver}

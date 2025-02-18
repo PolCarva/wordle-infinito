@@ -6,6 +6,7 @@ import { ACCEPTED_WORDS } from "@/app/accepted-words";
 import { AlertCircle } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/app/components/ui/button";
+import { trackEvent } from '@/app/utils/analytics';
 
 export default function CustomGamePage({
   params,
@@ -30,6 +31,11 @@ export default function CustomGamePage({
         setError("El link contiene palabras inválidas");
         return;
       }
+
+      // Trackeamos cuando alguien juega una partida personalizada
+      trackEvent('custom_game_played', {
+        word_count: decodedWords.length
+      });
 
       setWords(decodedWords);
     } catch (e) {

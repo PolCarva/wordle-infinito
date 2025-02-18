@@ -5,6 +5,7 @@ import { Button } from "@/app/components/ui/button";
 import { Input } from "@/app/components/ui/input";
 import { AlertCircle, ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import { trackEvent } from '@/app/utils/analytics';
 
 export default function CreatePage() {
   const [words, setWords] = useState<string[]>([]);
@@ -41,7 +42,11 @@ export default function CreatePage() {
       return;
     }
 
-    // Usamos btoa pero reemplazamos caracteres no seguros para URLs
+    // Trackeamos la creación de partida personalizada
+    trackEvent('custom_game_created', {
+      word_count: words.length
+    });
+
     const encodedWords = btoa(words.join(","))
       .replace(/\+/g, '-')
       .replace(/\//g, '_')

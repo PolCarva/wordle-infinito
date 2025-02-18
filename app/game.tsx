@@ -12,7 +12,11 @@ import { getRandomWords } from "./utils/game-utils";
 import { Nav } from "./components/game/Nav";
 import { Menu } from "./components/game/Menu";
 
-export default function Game() {
+interface GameProps {
+  customWords?: string[];
+}
+
+export default function Game({ customWords }: GameProps) {
   const [started, setStarted] = useState(false);
   const [boardCount, setBoardCount] = useState<number | ''>(2);
   const [useRareWords, setUseRareWords] = useState(false);
@@ -27,7 +31,7 @@ export default function Game() {
 
   const initializeGame = () => {
     const finalBoardCount = typeof boardCount === 'number' ? boardCount : 1;
-    const words = getRandomWords(finalBoardCount, useRareWords);
+    const words = customWords || getRandomWords(finalBoardCount, useRareWords);
     setGameState({
       boards: words.map((word) => ({
         word,
@@ -37,7 +41,7 @@ export default function Game() {
       currentGuess: "",
       gameOver: false,
       won: false,
-      maxAttempts: finalBoardCount + 5,
+      maxAttempts: words.length + 5,
       remainingLives: 5,
       showEndModal: false,
     });
@@ -45,12 +49,38 @@ export default function Game() {
     setError(null);
   };
 
+  useEffect(() => {
+    if (customWords) {
+      setBoardCount(customWords.length);
+      initializeGame();
+    }
+  }, [customWords]);
+
+  // Agregamos las palabras custom al diccionario temporalmente
+  useEffect(() => {
+    if (customWords) {
+      const newWords = customWords.filter(word => !ACCEPTED_WORDS.includes(word));
+      if (newWords.length > 0) {
+        // Creamos una copia temporal del array para no mutar el original
+        const tempAcceptedWords = [...ACCEPTED_WORDS, ...newWords];
+        // Reemplazamos la referencia al array original
+        (window as any).__TEMP_ACCEPTED_WORDS = tempAcceptedWords;
+      }
+    }
+    
+    return () => {
+      // Limpiamos al desmontar
+      delete (window as any).__TEMP_ACCEPTED_WORDS;
+    };
+  }, [customWords]);
+
   const handleGuess = useCallback(() => {
     if (!gameState || gameState.currentGuess.length !== 5) return;
 
     const normalizedGuess = gameState.currentGuess.toUpperCase();
+    const acceptedWords = (window as any).__TEMP_ACCEPTED_WORDS || ACCEPTED_WORDS;
 
-    if (!ACCEPTED_WORDS.includes(normalizedGuess)) {
+    if (!acceptedWords.includes(normalizedGuess)) {
       setError("Palabra no encontrada");
       return;
     }

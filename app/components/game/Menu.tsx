@@ -2,7 +2,7 @@
 
 import { Button } from "@/app/components/ui/button";
 import { Input } from "@/app/components/ui/input";
-import { InfinityIcon, Dices, AlertCircle } from "lucide-react";
+import { InfinityIcon, Dices, AlertCircle, PlusCircle } from "lucide-react";
 import { WORD_LIST } from "@/app/word-list";
 import { ACCEPTED_WORDS } from "@/app/accepted-words";
 import { useState } from "react";
@@ -14,6 +14,7 @@ import {
   DialogDescription,
   DialogFooter
 } from "../ui/dialog";
+import Link from "next/link";
 
 interface MenuProps {
   boardCount: number | '';
@@ -181,13 +182,26 @@ export function Menu({
             </div>
           </div>
 
-          <Button
-            onClick={onStart}
-            className="w-full bg-green-500 hover:bg-green-500/90 text-white shadow-[0_6px_0_0_#16a34a] active:translate-y-1 active:shadow-[0_4px_0_0_#16a34a] transition-all"
-            size="lg"
-          >
-            Empezar a Jugar
-          </Button>
+          <div className="flex flex-col gap-3">
+            <Button
+              onClick={onStart}
+              className="w-full bg-green-500 hover:bg-green-500/90 text-white shadow-[0_6px_0_0_#16a34a] active:translate-y-1 active:shadow-[0_4px_0_0_#16a34a] transition-all"
+              size="lg"
+            >
+              Empezar a Jugar
+            </Button>
+
+            <Link href="/create" className="w-full">
+              <Button
+                variant="outline"
+                className="w-full border-2 border-yellow-500 text-yellow-600 hover:bg-yellow-50 dark:text-yellow-500 bg-transparent dark:hover:bg-yellow-950/20"
+                size="lg"
+              >
+                <PlusCircle className="w-5 h-5 mr-2" />
+                Crear Partida Personalizada
+              </Button>
+            </Link>
+          </div>
 
           <div className="bg-gray-100 dark:bg-gray-700/50 p-4 rounded-xl space-y-3">
             <h3 className="font-semibold">Cómo jugar:</h3>

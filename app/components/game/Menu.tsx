@@ -8,10 +8,12 @@ import { ACCEPTED_WORDS } from "@/app/accepted-words";
 import { useState } from "react";
 
 interface MenuProps {
-  boardCount: number;
-  setBoardCount: (count: number) => void;
-  onStart: (useRareWords: boolean) => void;
+  boardCount: number | '';
+  setBoardCount: (count: number | '') => void;
+  onStart: () => void;
   setError: (error: string | null) => void;
+  useRareWords: boolean;
+  setUseRareWords: (value: boolean | ((prev: boolean) => boolean)) => void;
 }
 
 export function Menu({
@@ -19,17 +21,24 @@ export function Menu({
   setBoardCount,
   onStart,
   setError,
+  useRareWords,
+  setUseRareWords,
 }: MenuProps) {
-  const [useRareWords, setUseRareWords] = useState(false);
   const maxWords = useRareWords ? ACCEPTED_WORDS.length : WORD_LIST.length;
 
   const handleRandomCount = () => {
-    const random = Math.floor(Math.random() * 64) + 1;
+    const random = Math.floor(Math.random() * maxWords) + 1;
     setBoardCount(random);
   };
 
   const handleBoardCountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = Number.parseInt(e.target.value) || 1;
+    const value = e.target.value === '' ? '' : Number.parseInt(e.target.value);
+    
+    if (value === '') {
+      setBoardCount(value as any); // Permitimos que el input esté vacío
+      return;
+    }
+
     if (value < 1) {
       setBoardCount(1);
     } else if (value > maxWords && !useRareWords) {
@@ -51,8 +60,25 @@ export function Menu({
     }
   };
 
+  const toggleRareWords = () => {
+    setUseRareWords((prev) => {
+      const newValue = !prev;
+      if (!newValue && typeof boardCount === 'number' && boardCount > WORD_LIST.length) {
+        setBoardCount(WORD_LIST.length);
+        setError("Se ha ajustado al máximo de palabras comunes disponibles");
+      }
+      return newValue;
+    });
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      onStart();
+    }
+  };
+
   return (
-    <div className="flex flex-col items-center gap-8 w-full max-w-2xl mx-auto pt-16 lg:pt-0">
+    <div className="flex flex-col items-center gap-8 w-full max-w-2xl mx-auto pt-16 lg:pt-0" onKeyDown={handleKeyDown}>
       <div className="text-center space-y-4">
         <div className="flex flex-col items-center gap-2">
           <h1 className="flex flex-col gap-2">
@@ -109,6 +135,7 @@ export function Menu({
                   max={maxWords}
                   value={boardCount}
                   onChange={handleBoardCountChange}
+                  onKeyDown={handleKeyDown}
                   className="text-2xl font-bold text-center bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl shadow-inner focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
                 />
                 <Button
@@ -121,24 +148,38 @@ export function Menu({
                   <Dices className="w-4 h-4" />
                 </Button>
               </div>
-              <div className="mt-2 flex items-start gap-2">
-                <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
-                  <InfinityIcon className="w-4 h-4" />
-                  Elige entre 1 y {maxWords} palabras
+              <div className="mt-2 space-y-2">
+                <p className="text-sm text-gray-500 dark:text-gray-400 flex flex-col md:flex-row md:items-center">
+                  <span className="flex items-center">
+                    <InfinityIcon className="w-4 h-4 mr-1.5" />
+                    Elige entre 1 y {maxWords} palabras{" "}
+                  </span>
+                  {useRareWords && (
+                    <div className="inline-flex items-center gap-1 text-yellow-600 dark:text-yellow-500 text-sm md:ml-2">
+                      <AlertCircle className="w-4 h-4" />
+                      Usando palabras raras
+                    </div>
+                  )}
                 </p>
-                {useRareWords && (
-                  <div className="flex items-center gap-1 text-yellow-600 dark:text-yellow-500 text-sm">
-                    <AlertCircle className="w-4 h-4" />
-                    Usando palabras raras
-                  </div>
-                )}
+
+                <div className="flex flex-col gap-1">
+                  <label className="flex items-center gap-2 cursor-pointer text-sm">
+                    <input
+                      type="checkbox"
+                      checked={useRareWords}
+                      onChange={toggleRareWords}
+                      className="rounded border-yellow-500 text-yellow-500 focus:ring-yellow-500"
+                    />
+                    Habilitar palabras raras
+                  </label>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
         <Button
-          onClick={() => onStart(useRareWords)}
+          onClick={onStart}
           className="w-full bg-green-500 hover:bg-green-500/90 text-white shadow-[0_6px_0_0_#16a34a] active:translate-y-1 active:shadow-[0_4px_0_0_#16a34a] transition-all"
           size="lg"
         >

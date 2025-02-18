@@ -14,7 +14,8 @@ import { Menu } from "./components/game/Menu";
 
 export default function Game() {
   const [started, setStarted] = useState(false);
-  const [boardCount, setBoardCount] = useState(2);
+  const [boardCount, setBoardCount] = useState<number | ''>(2);
+  const [useRareWords, setUseRareWords] = useState(false);
   const [gameState, setGameState] = useState<GameState | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isDark, setIsDark] = useState(() => {
@@ -24,8 +25,9 @@ export default function Game() {
     return false;
   });
 
-  const initializeGame = (useRareWords: boolean) => {
-    const words = getRandomWords(boardCount, useRareWords);
+  const initializeGame = () => {
+    const finalBoardCount = typeof boardCount === 'number' ? boardCount : 1;
+    const words = getRandomWords(finalBoardCount, useRareWords);
     setGameState({
       boards: words.map((word) => ({
         word,
@@ -35,7 +37,7 @@ export default function Game() {
       currentGuess: "",
       gameOver: false,
       won: false,
-      maxAttempts: boardCount + 5,
+      maxAttempts: finalBoardCount + 5,
       remainingLives: 5,
       showEndModal: false,
     });
@@ -149,8 +151,10 @@ export default function Game() {
         <Menu 
           boardCount={boardCount}
           setBoardCount={setBoardCount}
-          onStart={(useRareWords) => initializeGame(useRareWords)}
+          onStart={() => initializeGame()}
           setError={setError}
+          useRareWords={useRareWords}
+          setUseRareWords={setUseRareWords}
         />
       </div>
     );
@@ -162,7 +166,7 @@ export default function Game() {
     <div className="flex w-full flex-col items-center gap-6 p-4 pt-16 pb-[240px] md:pb-4">
       <Nav
         onBack={() => setStarted(false)}
-        onReset={() => initializeGame(true)}
+        onReset={() => initializeGame()}
         isDark={isDark}
         onThemeToggle={toggleTheme}
       />
@@ -181,8 +185,8 @@ export default function Game() {
             grid grid-cols-2 max-w-[800px] md:grid-cols-3 mx-auto lg:grid-cols-4 gap-2 md:gap-8
 
             ${
-              gameState.boards.length === 1
-                ? `!grid-cols-1 lg:!grid-cols-1`
+              gameState.boards.length === 1 
+                ? `!grid-cols-1 lg:!grid-cols-1 !max-w-[500px]`
                 : ""
             }
             ${
@@ -267,7 +271,7 @@ export default function Game() {
               >
                 Cerrar
               </Button>
-              <Button onClick={() => initializeGame(true)}>Jugar de nuevo</Button>
+              <Button onClick={() => initializeGame()}>Jugar de nuevo</Button>
             </div>
           </div>
         </div>

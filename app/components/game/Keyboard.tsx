@@ -141,7 +141,6 @@ export function Keyboard({ onKeyPress, gameState }: KeyboardProps) {
       {rows.map((row, i) => (
         <div key={i} className="flex justify-center gap-1 my-1">
           {row.map((key) => {
-            const state = getLetterStateInBoard(key, 0);
             const style = getGradientBackground(key.toUpperCase());
             return (
               <Button

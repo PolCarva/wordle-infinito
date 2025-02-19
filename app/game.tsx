@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/app/components/ui/button";
 import { ACCEPTED_WORDS } from "./dictionaries/accepted/accepted-words";
-import { ACCEPTED_WORDS_2 } from "@/app/dictionaries/accepted/accepted-words-2";
 import Confetti from "react-confetti-boom";
 import { GameBoard } from "./components/game/GameBoard";
 import { Keyboard } from "./components/game/Keyboard";
@@ -187,6 +186,7 @@ export default function Game({ customWords }: GameProps) {
     if (!gameState || gameState.gameOver) return;
     handleKeyDown({ key } as KeyboardEvent);
   };
+
 
   if (!started) {
     return (

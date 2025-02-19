@@ -7,6 +7,14 @@ import { api } from '@/app/services/api';
 import { FcGoogle } from 'react-icons/fc';
 import Link from 'next/link';
 
+interface ApiError {
+    response?: {
+        data?: {
+            message?: string;
+        };
+    };
+}
+
 const AuthForm = () => {
     const [isLogin, setIsLogin] = useState(true);
     const [formData, setFormData] = useState({
@@ -33,8 +41,11 @@ const AuthForm = () => {
             login(data);
             router.push('/');
             router.refresh();
-        } catch (error: any) {
-            setError(error.response?.data?.message || 'Algo salió mal');
+        } catch (error: unknown) {
+            const errorMessage = error && typeof error === 'object' && 'response' in error
+                ? ((error as ApiError).response?.data?.message || 'Algo salió mal')
+                : 'Algo salió mal';
+            setError(errorMessage);
         } finally {
             setLoading(false);
         }

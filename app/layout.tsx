@@ -1,8 +1,8 @@
 import localFont from "next/font/local";
 import "./globals.css";
-import { metadata } from "./metadata";
 import { GoogleAnalytics } from '@next/third-parties/google'
 import { JsonLd } from "./components/seo/JsonLd";
+import type { Metadata } from 'next'
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -11,7 +11,11 @@ const geistSans = localFont({
   display: 'swap',
 });
 
-export { metadata };
+export const metadata: Metadata = {
+  title: 'Wordle Infinito',
+  description: 'Juega múltiples partidas de Wordle simultáneamente',
+  metadataBase: new URL('https://wordleinfinito.com'),
+}
 
 export const viewport = {
   width: 'device-width',

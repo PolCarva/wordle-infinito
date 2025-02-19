@@ -1,10 +1,6 @@
 "use client";
 
-import { useAuth } from '@/app/context/AuthContext';
-import Link from 'next/link';
-
 export function HomeContent() {
-  const { user, logout } = useAuth();
 
   return (
     <article className="max-w-4xl mx-auto px-4 py-8 prose dark:prose-invert prose-sm">

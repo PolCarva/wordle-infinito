@@ -1,9 +1,8 @@
-import { WORD_LIST } from "@/app/word-list";
-import { ACCEPTED_WORDS } from "@/app/accepted-words";
+import { getDictionary } from "@/app/dictionaries";
 import { LetterState } from "../types";
 
-export const getRandomWords = (count: number, useRareWords = false) => {
-  const dictionary = useRareWords ? ACCEPTED_WORDS : WORD_LIST;
+export const getRandomWords = (count: number, useRareWords = false, wordLength = 5) => {
+  const dictionary = getDictionary(wordLength, useRareWords);
   const words = [...dictionary];
   const result = [];
 
@@ -16,11 +15,12 @@ export const getRandomWords = (count: number, useRareWords = false) => {
 };
 
 export function checkGuess(guess: string, answer: string): LetterState[] {
-  const result: LetterState[] = Array(5).fill("absent");
+  const length = answer.length;
+  const result: LetterState[] = Array(length).fill("absent");
   const answerChars = answer.split("");
   const guessChars = guess.split("");
 
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < length; i++) {
     if (guessChars[i] === answerChars[i]) {
       result[i] = "correct";
       answerChars[i] = "";
@@ -28,7 +28,7 @@ export function checkGuess(guess: string, answer: string): LetterState[] {
     }
   }
 
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < length; i++) {
     if (guessChars[i] && answerChars.includes(guessChars[i])) {
       result[i] = "present";
       answerChars[answerChars.indexOf(guessChars[i])] = "";

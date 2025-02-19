@@ -11,6 +11,8 @@ interface GameBoardProps {
 }
 
 export function GameBoard({ board, currentGuess, gameOver, gameState }: GameBoardProps) {
+  const wordLength = board.word.length; // Obtenemos la longitud de la palabra actual
+
   const getVisibleRows = () => {
     const rows = [];
     const isLastAttempt = board.guesses.length === gameState.maxAttempts - 1;
@@ -30,19 +32,19 @@ export function GameBoard({ board, currentGuess, gameOver, gameState }: GameBoar
     if (!board.completed && !gameOver) {
       rows.push(
         currentGuess
-          .padEnd(5, " ")
+          .padEnd(wordLength, " ")
           .split("")
           .map(() => "empty" as const)
       );
     }
     
     if (!board.completed && !gameOver && !isLastAttempt) {
-      rows.push(Array(5).fill("empty" as const));
+      rows.push(Array(wordLength).fill("empty" as const));
     }
     
     if (!board.completed) {
-      while (rows.length < 5) {
-        rows.push(Array(5).fill("empty" as const));
+      while (rows.length < gameState.maxAttempts) {
+        rows.push(Array(wordLength).fill("empty" as const));
       }
     }
     

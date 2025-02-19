@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/app/components/ui/button";
-import { ACCEPTED_WORDS } from "./accepted-words";
+import { ACCEPTED_WORDS } from "./dictionaries/accepted/accepted-words";
+import { ACCEPTED_WORDS_2 } from "@/app/dictionaries/accepted/accepted-words-2";
 import Confetti from "react-confetti-boom";
 import { GameBoard } from "./components/game/GameBoard";
 import { Keyboard } from "./components/game/Keyboard";
@@ -12,6 +13,7 @@ import { getRandomWords } from "./utils/game-utils";
 import { Nav } from "./components/game/Nav";
 import { Menu } from "./components/game/Menu";
 import { trackEvent } from './utils/analytics';
+import { AVAILABLE_LENGTHS, getDictionary, getGameConfig } from "./dictionaries";
 
 interface GameProps {
   customWords?: string[];
@@ -23,8 +25,9 @@ interface WindowWithTemp extends Window {
 
 export default function Game({ customWords }: GameProps) {
   const [started, setStarted] = useState(false);
-  const [boardCount, setBoardCount] = useState<number | ''>(2);
+  const [boardCount, setBoardCount] = useState<number | ''>(8);
   const [useRareWords, setUseRareWords] = useState(false);
+  const [wordLength, setWordLength] = useState(5);
   const [gameState, setGameState] = useState<GameState | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isDark, setIsDark] = useState(() => {
@@ -36,12 +39,14 @@ export default function Game({ customWords }: GameProps) {
 
   const initializeGame = useCallback(() => {
     const finalBoardCount = typeof boardCount === 'number' ? boardCount : 1;
-    const words = customWords || getRandomWords(finalBoardCount, useRareWords);
+    const words = customWords || getRandomWords(finalBoardCount, useRareWords, wordLength);
+    const config = getGameConfig(wordLength);
     
     trackEvent('game_started', {
       board_count: words.length,
       is_custom: !!customWords,
-      use_rare_words: useRareWords
+      use_rare_words: useRareWords,
+      word_length: wordLength,
     });
 
     setGameState({
@@ -53,13 +58,13 @@ export default function Game({ customWords }: GameProps) {
       currentGuess: "",
       gameOver: false,
       won: false,
-      maxAttempts: words.length + 5,
-      remainingLives: 5,
+      maxAttempts: finalBoardCount + config.extraAttempts,
+      remainingLives: config.initialLives,
       showEndModal: false,
     });
     setStarted(true);
     setError(null);
-  }, [boardCount, customWords, useRareWords]);
+  }, [boardCount, customWords, useRareWords, wordLength]);
 
   useEffect(() => {
     if (customWords) {
@@ -83,18 +88,23 @@ export default function Game({ customWords }: GameProps) {
   }, [customWords]);
 
   const handleGuess = useCallback(() => {
-    if (!gameState || gameState.currentGuess.length !== 5) return;
+    if (!gameState) return;
 
-    const normalizedGuess = gameState.currentGuess.toUpperCase();
-    const acceptedWords = (window as WindowWithTemp).__TEMP_ACCEPTED_WORDS || ACCEPTED_WORDS;
+    const guess = gameState.currentGuess.toUpperCase();
+    const acceptedWords = getDictionary(wordLength, true);
 
-    if (!acceptedWords.includes(normalizedGuess)) {
-      setError("Palabra no encontrada");
+    if (guess.length !== wordLength) {
+      setError(`La palabra debe tener ${wordLength} letras`);
+      return;
+    }
+
+    if (!acceptedWords.includes(guess)) {
+      setError("Palabra no válida");
       return;
     }
 
     const isCorrectGuess = gameState.boards.some(
-      (board) => board.word === normalizedGuess
+      (board) => board.word === guess
     );
 
     // Actualizar vidas (solo informativo)
@@ -105,8 +115,8 @@ export default function Game({ customWords }: GameProps) {
     // Actualizar todos los tableros con el nuevo intento
     const newBoards = gameState.boards.map((board) => ({
       ...board,
-      guesses: [...board.guesses, normalizedGuess],
-      completed: board.completed || normalizedGuess === board.word,
+      guesses: [...board.guesses, guess],
+      completed: board.completed || guess === board.word,
     }));
 
     const allCompleted = newBoards.every((board) => board.completed);
@@ -123,60 +133,56 @@ export default function Game({ customWords }: GameProps) {
       showEndModal: true,
     });
     setError(null);
-  }, [gameState]);
+  }, [gameState, wordLength]);
 
-  const handleKeyPress = (key: string) => {
-    if (!gameState || gameState.gameOver) return;
-    if (key === "ENTER") {
-      handleGuess();
-    } else if (key === "BACKSPACE") {
-      setGameState({
-        ...gameState,
-        currentGuess: gameState.currentGuess.slice(0, -1),
-      });
-      setError(null);
-    } else if (gameState.currentGuess.length < 5) {
-      setGameState({
-        ...gameState,
-        currentGuess: gameState.currentGuess + key.toUpperCase(),
-      });
-      setError(null);
-    }
-  };
-
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent) => {
       if (!gameState || gameState.gameOver) return;
 
       if (event.key === "Enter") {
-        handleGuess();
-      } else if (event.key === "Backspace") {
-        setGameState({
-          ...gameState,
-          currentGuess: gameState.currentGuess.slice(0, -1),
-        });
-        setError(null);
-      } else if (
-        /^[A-Za-zÑñ]$/.test(event.key) &&
-        gameState.currentGuess.length < 5
-      ) {
-        setGameState({
-          ...gameState,
-          currentGuess: gameState.currentGuess + event.key.toUpperCase(),
-        });
-        setError(null);
-      }
-    };
+        if (gameState.currentGuess.length !== wordLength) {
+          setError(`La palabra debe tener ${wordLength} letras`);
+          return;
+        }
 
+        handleGuess();
+      }
+
+      if (event.key === "Backspace") {
+        setGameState(prev => ({
+          ...prev!,
+          currentGuess: prev!.currentGuess.slice(0, -1),
+        }));
+        return;
+      }
+
+      if (gameState.currentGuess.length === wordLength) return;
+
+      if (/^[A-ZÑ]$/.test(event.key.toUpperCase())) {
+        setGameState(prev => ({
+          ...prev!,
+          currentGuess: prev!.currentGuess + event.key.toUpperCase(),
+        }));
+      }
+    },
+    [gameState, wordLength]
+  );
+
+  useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [gameState, handleGuess]);
+  }, [gameState, handleKeyDown]);
 
   const toggleTheme = () => {
     const html = document.documentElement;
     const isDark = html.classList.toggle("dark");
     setIsDark(isDark);
     localStorage.setItem("darkTheme", String(isDark));
+  };
+
+  const handleKeyPress = (key: string) => {
+    if (!gameState || gameState.gameOver) return;
+    handleKeyDown({ key } as KeyboardEvent);
   };
 
   if (!started) {
@@ -193,6 +199,8 @@ export default function Game({ customWords }: GameProps) {
           setError={setError}
           useRareWords={useRareWords}
           setUseRareWords={setUseRareWords}
+          wordLength={wordLength}
+          setWordLength={setWordLength}
         />
       </div>
     );
@@ -250,13 +258,13 @@ export default function Game({ customWords }: GameProps) {
         </div>
       </div>
       {error && (
-        <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 animate-fade-out">
+        <div className="fixed top-5 md:top-auto bottom-4 z-50 left-1/2 transform -translate-x-1/2 animate-fade-out">
           <div className="bg-red-500 text-white font-bold py-2 px-4 rounded">
             {error}
           </div>
         </div>
       )}
-      <div className="fixed lg:relative  bottom-0 left-0 right-0 bg-white dark:bg-gray-900 lg:!bg-transparent p-2 md:p-4 lg:border-t-0 border-t dark:border-gray-800">
+      <div className="fixed lg:relative bottom-0 left-0 right-0 bg-white dark:bg-gray-900 lg:!bg-transparent p-2 md:p-4 lg:border-t-0 border-t dark:border-gray-800">
         <Keyboard onKeyPress={handleKeyPress} gameState={gameState} />
       </div>
       {gameState.gameOver && gameState.showEndModal && (

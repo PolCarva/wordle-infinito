@@ -1,4 +1,4 @@
-import { WORD_LIST } from "./word-list";
+import { WORD_LIST } from "../lists/word-list";
 
 // Additional words not in WORD_LIST
 const ADDITIONAL_WORDS = [

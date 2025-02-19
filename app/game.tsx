@@ -60,7 +60,7 @@ export default function Game({ customWords }: GameProps) {
       gameOver: false,
       won: false,
       maxAttempts: finalBoardCount + config.extraAttempts,
-      remainingLives: config.initialLives,
+      remainingLives: config.extraAttempts,
       showEndModal: false,
     });
     setStarted(true);

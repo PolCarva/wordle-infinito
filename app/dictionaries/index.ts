@@ -8,6 +8,8 @@ import { WORD_LIST_4 } from './lists/word-list-4';
 import { ACCEPTED_WORDS_4 } from './accepted/accepted-words-4';
 import { WORD_LIST_6 } from './lists/word-list-6';
 import { ACCEPTED_WORDS_6 } from './accepted/accepted-words-6';
+import { WORD_LIST_1 } from './lists/word-list-1';
+import { ACCEPTED_WORDS_1 } from './accepted/accepted-words-1';
 
 interface Dictionary {
   common: string[];
@@ -17,16 +19,21 @@ interface Dictionary {
 
 interface GameConfig {
   extraAttempts: number;
-  initialLives: number;
 }
 
 export const DICTIONARIES: Record<number, Dictionary> = {
+  1: {
+    common: WORD_LIST_1,
+    accepted: ACCEPTED_WORDS_1,
+    config: {
+      extraAttempts: 9,
+    }
+  },
   2: {
     common: WORD_LIST_2,
     accepted: ACCEPTED_WORDS_2,
     config: {
       extraAttempts: 8,
-      initialLives: 10,
     }
   },
   3: {
@@ -34,7 +41,6 @@ export const DICTIONARIES: Record<number, Dictionary> = {
     accepted: ACCEPTED_WORDS_3,
     config: {
       extraAttempts: 7,
-      initialLives: 8,
     }
   },
   4: {
@@ -42,7 +48,6 @@ export const DICTIONARIES: Record<number, Dictionary> = {
     accepted: ACCEPTED_WORDS_4,
     config: {
       extraAttempts: 6,
-      initialLives: 6,
     }
   },
   5: {
@@ -50,7 +55,6 @@ export const DICTIONARIES: Record<number, Dictionary> = {
     accepted: ACCEPTED_WORDS,
     config: {
       extraAttempts: 5,
-      initialLives: 5,
     }
   },
   6: {
@@ -58,7 +62,6 @@ export const DICTIONARIES: Record<number, Dictionary> = {
     accepted: ACCEPTED_WORDS_6,
     config: {
       extraAttempts: 4,
-      initialLives: 4,
     }
   },
 };

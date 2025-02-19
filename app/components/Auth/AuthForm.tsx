@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/app/context/AuthContext';
 import { api } from '@/app/services/api';
+import { FcGoogle } from 'react-icons/fc';
+import Link from 'next/link';
 
 const AuthForm = () => {
     const [isLogin, setIsLogin] = useState(true);
@@ -38,6 +40,14 @@ const AuthForm = () => {
         }
     };
 
+    const handleContinueWithoutAuth = () => {
+        router.push('/');
+    };
+
+    const handleGoogleLogin = () => {
+        window.location.href = 'http://localhost:5000/api/users/auth/google';
+    };
+
     return (
         <div className="min-h-screen flex items-center justify-center bg-background">
             <div className="w-full max-w-md p-8 space-y-6 bg-card rounded-lg shadow-lg">
@@ -50,6 +60,23 @@ const AuthForm = () => {
                         {error}
                     </div>
                 )}
+
+                <button
+                    onClick={handleGoogleLogin}
+                    className="w-full py-2 px-4 bg-white text-gray-800 rounded-md border border-gray-300 hover:bg-gray-50 flex items-center justify-center gap-2"
+                >
+                    <FcGoogle className="w-5 h-5" />
+                    Continuar con Google
+                </button>
+
+                <div className="relative">
+                    <div className="absolute inset-0 flex items-center">
+                        <div className="w-full border-t border-gray-300"></div>
+                    </div>
+                    <div className="relative flex justify-center text-sm">
+                        <span className="px-2 bg-card text-gray-500">O</span>
+                    </div>
+                </div>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     {!isLogin && (
@@ -114,14 +141,34 @@ const AuthForm = () => {
                     </button>
                 </form>
 
-                <button
-                    onClick={() => setIsLogin(!isLogin)}
-                    className="w-full text-sm text-primary hover:underline"
-                >
-                    {isLogin
-                        ? '¿No tienes cuenta? Regístrate'
-                        : '¿Ya tienes cuenta? Inicia sesión'}
-                </button>
+                <div className="space-y-4">
+                    <button
+                        onClick={() => setIsLogin(!isLogin)}
+                        className="w-full text-sm text-primary hover:underline"
+                    >
+                        {isLogin
+                            ? '¿No tienes cuenta? Regístrate'
+                            : '¿Ya tienes cuenta? Inicia sesión'}
+                    </button>
+
+                    <button
+                        onClick={handleContinueWithoutAuth}
+                        className="w-full text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:underline"
+                    >
+                        Continuar sin identificarse
+                    </button>
+
+                    <div className="text-xs text-gray-500 text-center space-x-1">
+                        <span>Al continuar, aceptas nuestros</span>
+                        <Link href="/terms" className="text-primary hover:underline">
+                            Términos de Servicio
+                        </Link>
+                        <span>y</span>
+                        <Link href="/privacy" className="text-primary hover:underline">
+                            Política de Privacidad
+                        </Link>
+                    </div>
+                </div>
             </div>
         </div>
     );

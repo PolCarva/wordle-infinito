@@ -1,9 +1,12 @@
 "use client";
 
 import { Button } from "@/app/components/ui/button";
-import { Settings, ArrowLeft, Moon, Sun } from "lucide-react";
+import { Settings, ArrowLeft, Moon, Sun, LogIn, LogOut } from "lucide-react";
 import { Share2 } from "lucide-react";
 import { useState } from "react";
+import { useAuth } from "@/app/context/AuthContext";
+import Link from "next/link";
+
 interface NavProps {
   onBack?: () => void;
   onReset?: () => void;
@@ -14,6 +17,7 @@ interface NavProps {
 export function Nav({ onBack, onReset, isDark, onThemeToggle }: NavProps) {
   const [showSettings, setShowSettings] = useState(false);
   const [showShareMessage, setShowShareMessage] = useState(false);
+  const { user, logout } = useAuth();
 
   const handleShare = async () => {
     const shareData = {
@@ -57,6 +61,36 @@ export function Nav({ onBack, onReset, isDark, onThemeToggle }: NavProps) {
           {showSettings && (
             <div className="absolute top-full mt-2 right-0 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 min-w-[220px] border dark:border-gray-700">
               <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium">
+                    {user ? 'Cerrar Sesión' : 'Iniciar Sesión'}
+                  </span>
+                  {user ? (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        logout();
+                        setShowSettings(false);
+                      }}
+                      className="text-yellow-600 dark:hover:bg-gray-700"
+                    >
+                      <LogOut className="h-5 w-5" />
+                    </Button>
+                  ) : (
+                    <Link href="/auth">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setShowSettings(false)}
+                        className="text-yellow-600 dark:hover:bg-gray-700"
+                      >
+                        <LogIn className="h-5 w-5" />
+                      </Button>
+                    </Link>
+                  )}
+                </div>
+
                 <div className="flex justify-between items-center">
                   <span className="text-sm font-medium">Tema</span>
                   <Button

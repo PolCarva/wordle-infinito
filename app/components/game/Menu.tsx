@@ -8,8 +8,6 @@ import {
   AlertCircle,
   PlusCircle,
 } from "lucide-react";
-import { WORD_LIST } from "@/app/dictionaries/lists/word-list";
-import { ACCEPTED_WORDS } from "@/app/dictionaries/accepted/accepted-words";
 import { useState } from "react";
 import {
   Dialog,

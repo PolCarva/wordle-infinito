@@ -13,7 +13,7 @@ import { getRandomWords } from "./utils/game-utils";
 import { Nav } from "./components/game/Nav";
 import { Menu } from "./components/game/Menu";
 import { trackEvent } from './utils/analytics';
-import { AVAILABLE_LENGTHS, getDictionary, getGameConfig } from "./dictionaries";
+import { getDictionary, getGameConfig } from "./dictionaries";
 
 interface GameProps {
   customWords?: string[];
@@ -25,7 +25,7 @@ interface WindowWithTemp extends Window {
 
 export default function Game({ customWords }: GameProps) {
   const [started, setStarted] = useState(false);
-  const [boardCount, setBoardCount] = useState<number | ''>(8);
+  const [boardCount, setBoardCount] = useState<number | ''>(1);
   const [useRareWords, setUseRareWords] = useState(false);
   const [wordLength, setWordLength] = useState(5);
   const [gameState, setGameState] = useState<GameState | null>(null);

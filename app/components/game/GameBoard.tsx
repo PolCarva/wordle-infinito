@@ -11,7 +11,7 @@ interface GameBoardProps {
 }
 
 export function GameBoard({ board, currentGuess, gameOver, gameState }: GameBoardProps) {
-  const wordLength = board.word.length; // Obtenemos la longitud de la palabra actual
+  const wordLength = board.word.length; 
 
   const getVisibleRows = () => {
     const rows = [];
@@ -58,6 +58,7 @@ export function GameBoard({ board, currentGuess, gameOver, gameState }: GameBoar
 
   return (
     <div className={`p-2 md:p-4 max-w-[800px] rounded-lg border ${board.completed ? "border-green-500" : "border-gray-500"}`}>
+      
       <div className="grid gap-1">
         {rows.map((row, i) => (
           <div key={i} className="flex gap-1">

@@ -12,7 +12,7 @@ import { GameState } from "./types";
 import { getRandomWords } from "./utils/game-utils";
 import { Nav } from "./components/game/Nav";
 import { Menu } from "./components/game/Menu";
-import { trackEvent } from './utils/analytics';
+import { trackEvent } from "./utils/analytics";
 import { getDictionary, getGameConfig } from "./dictionaries";
 
 interface GameProps {
@@ -25,7 +25,7 @@ interface WindowWithTemp extends Window {
 
 export default function Game({ customWords }: GameProps) {
   const [started, setStarted] = useState(false);
-  const [boardCount, setBoardCount] = useState<number | ''>(1);
+  const [boardCount, setBoardCount] = useState<number | "">(1);
   const [useRareWords, setUseRareWords] = useState(false);
   const [wordLength, setWordLength] = useState(5);
   const [gameState, setGameState] = useState<GameState | null>(null);
@@ -38,11 +38,12 @@ export default function Game({ customWords }: GameProps) {
   });
 
   const initializeGame = useCallback(() => {
-    const finalBoardCount = typeof boardCount === 'number' ? boardCount : 1;
-    const words = customWords || getRandomWords(finalBoardCount, useRareWords, wordLength);
+    const finalBoardCount = typeof boardCount === "number" ? boardCount : 1;
+    const words =
+      customWords || getRandomWords(finalBoardCount, useRareWords, wordLength);
     const config = getGameConfig(wordLength);
-    
-    trackEvent('game_started', {
+
+    trackEvent("game_started", {
       board_count: words.length,
       is_custom: !!customWords,
       use_rare_words: useRareWords,
@@ -75,13 +76,15 @@ export default function Game({ customWords }: GameProps) {
 
   useEffect(() => {
     if (customWords) {
-      const newWords = customWords.filter(word => !ACCEPTED_WORDS.includes(word));
+      const newWords = customWords.filter(
+        (word) => !ACCEPTED_WORDS.includes(word)
+      );
       if (newWords.length > 0) {
         const tempAcceptedWords = [...ACCEPTED_WORDS, ...newWords];
         (window as WindowWithTemp).__TEMP_ACCEPTED_WORDS = tempAcceptedWords;
       }
     }
-    
+
     return () => {
       delete (window as WindowWithTemp).__TEMP_ACCEPTED_WORDS;
     };
@@ -149,7 +152,7 @@ export default function Game({ customWords }: GameProps) {
       }
 
       if (event.key === "Backspace") {
-        setGameState(prev => ({
+        setGameState((prev) => ({
           ...prev!,
           currentGuess: prev!.currentGuess.slice(0, -1),
         }));
@@ -159,7 +162,7 @@ export default function Game({ customWords }: GameProps) {
       if (gameState.currentGuess.length === wordLength) return;
 
       if (/^[A-ZÑ]$/.test(event.key.toUpperCase())) {
-        setGameState(prev => ({
+        setGameState((prev) => ({
           ...prev!,
           currentGuess: prev!.currentGuess + event.key.toUpperCase(),
         }));
@@ -188,11 +191,8 @@ export default function Game({ customWords }: GameProps) {
   if (!started) {
     return (
       <div className="flex w-full min-h-svh justify-center flex-col items-center gap-4 p-4">
-        <Nav
-          isDark={isDark}
-          onThemeToggle={toggleTheme}
-        />
-        <Menu 
+        <Nav isDark={isDark} onThemeToggle={toggleTheme} />
+        <Menu
           boardCount={boardCount}
           setBoardCount={setBoardCount}
           onStart={() => initializeGame()}
@@ -220,7 +220,15 @@ export default function Game({ customWords }: GameProps) {
       <div className="flex items-center gap-4">
         <h1 className="text-4xl font-bold">Wordle Infinito</h1>
       </div>
-
+      {process.env.NODE_ENV === "development" && (
+        <div className="text-sm text-gray-500">
+          {gameState.boards.map((board, i) => (
+            <span key={i} className="mr-2">
+              {board.word}
+            </span>
+          ))}
+        </div>
+      )}
       {gameState && <GameStats gameState={gameState} />}
 
       <div className="w-full">
@@ -229,7 +237,7 @@ export default function Game({ customWords }: GameProps) {
             grid grid-cols-2 max-w-[1600px] md:grid-cols-3 mx-auto lg:grid-cols-4 gap-2 md:gap-8
 
             ${
-              gameState.boards.length === 1 
+              gameState.boards.length === 1
                 ? `!grid-cols-1 lg:!grid-cols-1 !max-w-[500px]`
                 : ""
             }
@@ -298,7 +306,9 @@ export default function Game({ customWords }: GameProps) {
             </p>
             {!gameState.won && (
               <div className="mb-4">
-                {gameState.boards.length === 1 ? "La palabra era: " : "Las palabras eran: "}
+                {gameState.boards.length === 1
+                  ? "La palabra era: "
+                  : "Las palabras eran: "}
                 {gameState.boards.map((board) => board.word).join(", ")}
               </div>
             )}

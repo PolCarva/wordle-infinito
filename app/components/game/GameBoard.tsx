@@ -11,6 +11,8 @@ interface GameBoardProps {
 }
 
 export function GameBoard({ board, currentGuess, gameOver, gameState }: GameBoardProps) {
+  const wordLength = board.word.length; 
+
   const getVisibleRows = () => {
     const rows = [];
     const isLastAttempt = board.guesses.length === gameState.maxAttempts - 1;
@@ -30,19 +32,19 @@ export function GameBoard({ board, currentGuess, gameOver, gameState }: GameBoar
     if (!board.completed && !gameOver) {
       rows.push(
         currentGuess
-          .padEnd(5, " ")
+          .padEnd(wordLength, " ")
           .split("")
           .map(() => "empty" as const)
       );
     }
     
     if (!board.completed && !gameOver && !isLastAttempt) {
-      rows.push(Array(5).fill("empty" as const));
+      rows.push(Array(wordLength).fill("empty" as const));
     }
     
     if (!board.completed) {
-      while (rows.length < 5) {
-        rows.push(Array(5).fill("empty" as const));
+      while (rows.length < gameState.maxAttempts) {
+        rows.push(Array(wordLength).fill("empty" as const));
       }
     }
     
@@ -56,6 +58,7 @@ export function GameBoard({ board, currentGuess, gameOver, gameState }: GameBoar
 
   return (
     <div className={`p-2 md:p-4 max-w-[800px] rounded-lg border ${board.completed ? "border-green-500" : "border-gray-500"}`}>
+      
       <div className="grid gap-1">
         {rows.map((row, i) => (
           <div key={i} className="flex gap-1">

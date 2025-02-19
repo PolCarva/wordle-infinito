@@ -132,16 +132,21 @@ export function Keyboard({ onKeyPress, gameState }: KeyboardProps) {
     };
   };
 
+  const handleClick = (key: string) => {
+    onKeyPress(key);
+  };
+
   return (
-    <div className="grid gap-1 max-w-[calc(100svw-10px)] mt-4">
+    <div className="w-full max-w-lg mx-auto p-2">
       {rows.map((row, i) => (
-        <div key={i} className="flex justify-center gap-1 ">
+        <div key={i} className="flex justify-center gap-1 my-1">
           {row.map((key) => {
+            const state = getLetterStateInBoard(key, 0);
             const style = getGradientBackground(key.toUpperCase());
             return (
               <Button
                 key={key}
-                onClick={() => onKeyPress(key)}
+                onClick={() => handleClick(key)}
                 className={`
                   !bg-gray-200 text-gray-800 dark:!bg-gray-400
                   ${

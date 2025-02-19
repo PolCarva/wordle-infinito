@@ -8,8 +8,6 @@ import {
   AlertCircle,
   PlusCircle,
 } from "lucide-react";
-import { WORD_LIST } from "@/app/word-list";
-import { ACCEPTED_WORDS } from "@/app/accepted-words";
 import { useState } from "react";
 import {
   Dialog,
@@ -20,6 +18,7 @@ import {
   DialogFooter,
 } from "../ui/dialog";
 import Link from "next/link";
+import { AVAILABLE_LENGTHS, getDictionary } from "@/app/dictionaries";
 
 interface MenuProps {
   boardCount: number | "";
@@ -27,7 +26,9 @@ interface MenuProps {
   onStart: () => void;
   setError: (error: string | null) => void;
   useRareWords: boolean;
-  setUseRareWords: (value: boolean | ((prev: boolean) => boolean)) => void;
+  setUseRareWords: (value: boolean) => void;
+  wordLength: number;
+  setWordLength: (length: number) => void;
 }
 
 export function Menu({
@@ -37,10 +38,14 @@ export function Menu({
   setError,
   useRareWords,
   setUseRareWords,
+  wordLength,
+  setWordLength,
 }: MenuProps) {
-  const maxWords = useRareWords ? ACCEPTED_WORDS.length : WORD_LIST.length;
   const [showDialog, setShowDialog] = useState(false);
   const [pendingValue, setPendingValue] = useState<number | null>(null);
+
+  const currentDictionary = getDictionary(wordLength, useRareWords);
+  const maxWords = currentDictionary.length;
 
   const handleRandomCount = () => {
     const random = Math.floor(Math.random() * maxWords) + 1;
@@ -48,39 +53,32 @@ export function Menu({
   };
 
   const handleBoardCountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value === "" ? "" : Number.parseInt(e.target.value);
-
+    const value = e.target.value;
+    const numValue = parseInt(value);
+    
     if (value === "") {
-      setBoardCount(value as number | "");
+      setBoardCount("");
+      return;
+    }
+    if (isNaN(numValue)) return;
+
+    if (numValue > maxWords && !useRareWords) {
+      setPendingValue(numValue);
+      setShowDialog(true);
       return;
     }
 
-    if (value < 1) {
-      setBoardCount(1);
-    } else if (value > maxWords && !useRareWords) {
-      setPendingValue(value);
-      setShowDialog(true);
-    } else if (value > ACCEPTED_WORDS.length) {
-      setBoardCount(ACCEPTED_WORDS.length);
-      setError("Has alcanzado el límite absoluto de palabras disponibles");
-    } else {
-      setBoardCount(value);
-    }
+    setBoardCount(numValue);
   };
 
   const toggleRareWords = () => {
-    setUseRareWords((prev) => {
-      const newValue = !prev;
-      if (
-        !newValue &&
-        typeof boardCount === "number" &&
-        boardCount > WORD_LIST.length
-      ) {
-        setBoardCount(WORD_LIST.length);
-        setError("Se ha ajustado al máximo de palabras comunes disponibles");
-      }
-      return newValue;
-    });
+    const newValue = !useRareWords;
+    setUseRareWords(newValue);
+    
+    if (!newValue && typeof boardCount === "number" && boardCount > maxWords) {
+      setBoardCount(maxWords);
+      setError("Se ha ajustado al máximo de palabras comunes disponibles");
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -136,6 +134,27 @@ export function Menu({
                 <InfinityIcon className="w-6 h-6 text-green-500" />
                 Configura tu juego
               </h2>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">
+                Longitud de las palabras
+              </label>
+              <div className="flex gap-2 flex-wrap">
+                {AVAILABLE_LENGTHS.map((length) => (
+                  <button
+                    key={length}
+                    onClick={() => setWordLength(length)}
+                    className={`px-4 py-2 rounded-lg ${
+                      wordLength === length
+                        ? "bg-green-500 text-white"
+                        : "bg-gray-200 dark:bg-gray-700"
+                    }`}
+                  >
+                    {length} letras
+                  </button>
+                ))}
+              </div>
             </div>
 
             <div className="flex items-center gap-4">

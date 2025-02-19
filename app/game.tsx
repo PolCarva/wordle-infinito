@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/app/components/ui/button";
-import { ACCEPTED_WORDS } from "./accepted-words";
+import { ACCEPTED_WORDS } from "./dictionaries/accepted/accepted-words";
+import { ACCEPTED_WORDS_2 } from "@/app/dictionaries/accepted/accepted-words-2";
 import Confetti from "react-confetti-boom";
 import { GameBoard } from "./components/game/GameBoard";
 import { Keyboard } from "./components/game/Keyboard";
@@ -11,7 +12,8 @@ import { GameState } from "./types";
 import { getRandomWords } from "./utils/game-utils";
 import { Nav } from "./components/game/Nav";
 import { Menu } from "./components/game/Menu";
-import { trackEvent } from './utils/analytics';
+import { trackEvent } from "./utils/analytics";
+import { getDictionary, getGameConfig } from "./dictionaries";
 
 interface GameProps {
   customWords?: string[];
@@ -23,8 +25,9 @@ interface WindowWithTemp extends Window {
 
 export default function Game({ customWords }: GameProps) {
   const [started, setStarted] = useState(false);
-  const [boardCount, setBoardCount] = useState<number | ''>(2);
+  const [boardCount, setBoardCount] = useState<number | "">(1);
   const [useRareWords, setUseRareWords] = useState(false);
+  const [wordLength, setWordLength] = useState(5);
   const [gameState, setGameState] = useState<GameState | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isDark, setIsDark] = useState(() => {
@@ -35,13 +38,16 @@ export default function Game({ customWords }: GameProps) {
   });
 
   const initializeGame = useCallback(() => {
-    const finalBoardCount = typeof boardCount === 'number' ? boardCount : 1;
-    const words = customWords || getRandomWords(finalBoardCount, useRareWords);
-    
-    trackEvent('game_started', {
+    const finalBoardCount = typeof boardCount === "number" ? boardCount : 1;
+    const words =
+      customWords || getRandomWords(finalBoardCount, useRareWords, wordLength);
+    const config = getGameConfig(wordLength);
+
+    trackEvent("game_started", {
       board_count: words.length,
       is_custom: !!customWords,
-      use_rare_words: useRareWords
+      use_rare_words: useRareWords,
+      word_length: wordLength,
     });
 
     setGameState({
@@ -53,13 +59,13 @@ export default function Game({ customWords }: GameProps) {
       currentGuess: "",
       gameOver: false,
       won: false,
-      maxAttempts: words.length + 5,
-      remainingLives: 5,
+      maxAttempts: finalBoardCount + config.extraAttempts,
+      remainingLives: config.extraAttempts,
       showEndModal: false,
     });
     setStarted(true);
     setError(null);
-  }, [boardCount, customWords, useRareWords]);
+  }, [boardCount, customWords, useRareWords, wordLength]);
 
   useEffect(() => {
     if (customWords) {
@@ -70,31 +76,38 @@ export default function Game({ customWords }: GameProps) {
 
   useEffect(() => {
     if (customWords) {
-      const newWords = customWords.filter(word => !ACCEPTED_WORDS.includes(word));
+      const newWords = customWords.filter(
+        (word) => !ACCEPTED_WORDS.includes(word)
+      );
       if (newWords.length > 0) {
         const tempAcceptedWords = [...ACCEPTED_WORDS, ...newWords];
         (window as WindowWithTemp).__TEMP_ACCEPTED_WORDS = tempAcceptedWords;
       }
     }
-    
+
     return () => {
       delete (window as WindowWithTemp).__TEMP_ACCEPTED_WORDS;
     };
   }, [customWords]);
 
   const handleGuess = useCallback(() => {
-    if (!gameState || gameState.currentGuess.length !== 5) return;
+    if (!gameState) return;
 
-    const normalizedGuess = gameState.currentGuess.toUpperCase();
-    const acceptedWords = (window as WindowWithTemp).__TEMP_ACCEPTED_WORDS || ACCEPTED_WORDS;
+    const guess = gameState.currentGuess.toUpperCase();
+    const acceptedWords = getDictionary(wordLength, true);
 
-    if (!acceptedWords.includes(normalizedGuess)) {
-      setError("Palabra no encontrada");
+    if (guess.length !== wordLength) {
+      setError(`La palabra debe tener ${wordLength} letras`);
+      return;
+    }
+
+    if (!acceptedWords.includes(guess)) {
+      setError("Palabra no válida");
       return;
     }
 
     const isCorrectGuess = gameState.boards.some(
-      (board) => board.word === normalizedGuess
+      (board) => board.word === guess
     );
 
     // Actualizar vidas (solo informativo)
@@ -105,8 +118,8 @@ export default function Game({ customWords }: GameProps) {
     // Actualizar todos los tableros con el nuevo intento
     const newBoards = gameState.boards.map((board) => ({
       ...board,
-      guesses: [...board.guesses, normalizedGuess],
-      completed: board.completed || normalizedGuess === board.word,
+      guesses: [...board.guesses, guess],
+      completed: board.completed || guess === board.word,
     }));
 
     const allCompleted = newBoards.every((board) => board.completed);
@@ -123,54 +136,45 @@ export default function Game({ customWords }: GameProps) {
       showEndModal: true,
     });
     setError(null);
-  }, [gameState]);
+  }, [gameState, wordLength]);
 
-  const handleKeyPress = (key: string) => {
-    if (!gameState || gameState.gameOver) return;
-    if (key === "ENTER") {
-      handleGuess();
-    } else if (key === "BACKSPACE") {
-      setGameState({
-        ...gameState,
-        currentGuess: gameState.currentGuess.slice(0, -1),
-      });
-      setError(null);
-    } else if (gameState.currentGuess.length < 5) {
-      setGameState({
-        ...gameState,
-        currentGuess: gameState.currentGuess + key.toUpperCase(),
-      });
-      setError(null);
-    }
-  };
-
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent) => {
       if (!gameState || gameState.gameOver) return;
 
       if (event.key === "Enter") {
-        handleGuess();
-      } else if (event.key === "Backspace") {
-        setGameState({
-          ...gameState,
-          currentGuess: gameState.currentGuess.slice(0, -1),
-        });
-        setError(null);
-      } else if (
-        /^[A-Za-zÑñ]$/.test(event.key) &&
-        gameState.currentGuess.length < 5
-      ) {
-        setGameState({
-          ...gameState,
-          currentGuess: gameState.currentGuess + event.key.toUpperCase(),
-        });
-        setError(null);
-      }
-    };
+        if (gameState.currentGuess.length !== wordLength) {
+          setError(`La palabra debe tener ${wordLength} letras`);
+          return;
+        }
 
+        handleGuess();
+      }
+
+      if (event.key === "Backspace") {
+        setGameState((prev) => ({
+          ...prev!,
+          currentGuess: prev!.currentGuess.slice(0, -1),
+        }));
+        return;
+      }
+
+      if (gameState.currentGuess.length === wordLength) return;
+
+      if (/^[A-ZÑ]$/.test(event.key.toUpperCase())) {
+        setGameState((prev) => ({
+          ...prev!,
+          currentGuess: prev!.currentGuess + event.key.toUpperCase(),
+        }));
+      }
+    },
+    [gameState, wordLength]
+  );
+
+  useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [gameState, handleGuess]);
+  }, [gameState, handleKeyDown]);
 
   const toggleTheme = () => {
     const html = document.documentElement;
@@ -179,20 +183,24 @@ export default function Game({ customWords }: GameProps) {
     localStorage.setItem("darkTheme", String(isDark));
   };
 
+  const handleKeyPress = (key: string) => {
+    if (!gameState || gameState.gameOver) return;
+    handleKeyDown({ key } as KeyboardEvent);
+  };
+
   if (!started) {
     return (
       <div className="flex w-full min-h-svh justify-center flex-col items-center gap-4 p-4">
-        <Nav
-          isDark={isDark}
-          onThemeToggle={toggleTheme}
-        />
-        <Menu 
+        <Nav isDark={isDark} onThemeToggle={toggleTheme} />
+        <Menu
           boardCount={boardCount}
           setBoardCount={setBoardCount}
           onStart={() => initializeGame()}
           setError={setError}
           useRareWords={useRareWords}
           setUseRareWords={setUseRareWords}
+          wordLength={wordLength}
+          setWordLength={setWordLength}
         />
       </div>
     );
@@ -212,7 +220,15 @@ export default function Game({ customWords }: GameProps) {
       <div className="flex items-center gap-4">
         <h1 className="text-4xl font-bold">Wordle Infinito</h1>
       </div>
-
+      {process.env.NODE_ENV === "development" && (
+        <div className="text-sm text-gray-500">
+          {gameState.boards.map((board, i) => (
+            <span key={i} className="mr-2">
+              {board.word}
+            </span>
+          ))}
+        </div>
+      )}
       {gameState && <GameStats gameState={gameState} />}
 
       <div className="w-full">
@@ -221,7 +237,7 @@ export default function Game({ customWords }: GameProps) {
             grid grid-cols-2 max-w-[1600px] md:grid-cols-3 mx-auto lg:grid-cols-4 gap-2 md:gap-8
 
             ${
-              gameState.boards.length === 1 
+              gameState.boards.length === 1
                 ? `!grid-cols-1 lg:!grid-cols-1 !max-w-[500px]`
                 : ""
             }
@@ -250,13 +266,13 @@ export default function Game({ customWords }: GameProps) {
         </div>
       </div>
       {error && (
-        <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 animate-fade-out">
+        <div className="fixed top-5 md:top-auto bottom-4 z-50 left-1/2 transform -translate-x-1/2 animate-fade-out">
           <div className="bg-red-500 text-white font-bold py-2 px-4 rounded">
             {error}
           </div>
         </div>
       )}
-      <div className="fixed lg:relative  bottom-0 left-0 right-0 bg-white dark:bg-gray-900 lg:!bg-transparent p-2 md:p-4 lg:border-t-0 border-t dark:border-gray-800">
+      <div className="fixed lg:relative bottom-0 left-0 right-0 bg-white dark:bg-gray-900 lg:!bg-transparent p-2 md:p-4 lg:border-t-0 border-t dark:border-gray-800">
         <Keyboard onKeyPress={handleKeyPress} gameState={gameState} />
       </div>
       {gameState.gameOver && gameState.showEndModal && (
@@ -290,7 +306,9 @@ export default function Game({ customWords }: GameProps) {
             </p>
             {!gameState.won && (
               <div className="mb-4">
-                {gameState.boards.length === 1 ? "La palabra era: " : "Las palabras eran: "}
+                {gameState.boards.length === 1
+                  ? "La palabra era: "
+                  : "Las palabras eran: "}
                 {gameState.boards.map((board) => board.word).join(", ")}
               </div>
             )}

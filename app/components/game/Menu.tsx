@@ -8,7 +8,7 @@ import {
   AlertCircle,
   PlusCircle,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -18,7 +18,7 @@ import {
   DialogFooter,
 } from "../ui/dialog";
 import Link from "next/link";
-import { AVAILABLE_LENGTHS, getDictionary } from "@/app/dictionaries";
+import { getAvailableLengths, getDictionary } from "@/app/dictionaries";
 
 interface MenuProps {
   boardCount: number | "";
@@ -43,9 +43,27 @@ export function Menu({
 }: MenuProps) {
   const [showDialog, setShowDialog] = useState(false);
   const [pendingValue, setPendingValue] = useState<number | null>(null);
+  const [availableLengths, setAvailableLengths] = useState<number[]>([]);
+  const [maxWords, setMaxWords] = useState(100); // valor por defecto razonable
 
-  const currentDictionary = getDictionary(wordLength, useRareWords);
-  const maxWords = currentDictionary.length;
+  useEffect(() => {
+    const loadLengths = async () => {
+      const lengths = await getAvailableLengths();
+      setAvailableLengths(lengths);
+      if (!lengths.includes(wordLength)) {
+        setWordLength(lengths[0]);
+      }
+    };
+    loadLengths();
+  }, []);
+
+  useEffect(() => {
+    const loadDictionary = async () => {
+      const dictionary = await getDictionary(wordLength, useRareWords);
+      setMaxWords(dictionary.length);
+    };
+    loadDictionary();
+  }, [wordLength, useRareWords]);
 
   const handleRandomCount = () => {
     const random = Math.floor(Math.random() * maxWords) + 1;
@@ -141,7 +159,7 @@ export function Menu({
                 Longitud de las palabras
               </label>
               <div className="flex gap-2 flex-wrap">
-                {AVAILABLE_LENGTHS.map((length) => (
+                {availableLengths.map((length) => (
                   <button
                     key={length}
                     onClick={() => setWordLength(length)}

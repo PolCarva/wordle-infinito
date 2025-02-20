@@ -5,11 +5,11 @@ import { GameState, LetterState } from "@/app/types";
 import { CornerDownLeftIcon, DeleteIcon } from "lucide-react";
 
 interface KeyboardProps {
-  onKeyPress: (key: string) => void;
+  onKeyDown: (key: string) => void;
   gameState: GameState;
 }
 
-export function Keyboard({ onKeyPress, gameState }: KeyboardProps) {
+export function Keyboard({ onKeyDown, gameState }: KeyboardProps) {
   const rows = [
     ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"],
     ["A", "S", "D", "F", "G", "H", "J", "K", "L", "Ñ"],
@@ -133,7 +133,7 @@ export function Keyboard({ onKeyPress, gameState }: KeyboardProps) {
   };
 
   const handleClick = (key: string) => {
-    onKeyPress(key);
+    onKeyDown(key);
   };
 
   return (

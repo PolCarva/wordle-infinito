@@ -1,6 +1,8 @@
 import axios from 'axios';
 
-const API_URL = 'https://wordle-infinito-back-production.up.railway.app/api';
+const API_URL = process.env.NODE_ENV === 'development' ?
+    'http://localhost:5000/api' :
+    'https://wordle-infinito-back-production.up.railway.app/api';
 
 export const api = {
     register: async (userData: {

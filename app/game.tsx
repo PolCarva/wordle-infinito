@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/app/components/ui/button";
-import { ACCEPTED_WORDS } from "../../back/dictionaries/accepted/accepted-words";
 import Confetti from "react-confetti-boom";
 import { GameBoard } from "./components/game/GameBoard";
 import { Keyboard } from "./components/game/Keyboard";
@@ -209,13 +208,13 @@ export default function Game({ customWords }: GameProps) {
         }));
       }
     },
-    [gameState, wordLength]
+    [gameState, wordLength, handleGuess]
   );
 
   useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [gameState, handleKeyDown]);
+  }, [gameState, handleKeyDown, handleGuess]);
 
   const toggleTheme = () => {
     const html = document.documentElement;

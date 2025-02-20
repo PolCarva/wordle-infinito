@@ -1,4 +1,3 @@
-import { getDictionary } from "@/app/dictionaries";
 import { LetterState } from "../types";
 
 export function getRandomWords(count: number, dictionary: string[]): string[] {

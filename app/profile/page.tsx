@@ -2,7 +2,8 @@
 
 import { useAuth, AuthProvider } from '@/app/context/AuthContext';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, User } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
+import Image from 'next/image';
 
 function ProfileContent() {
   const { user } = useAuth();
@@ -28,9 +29,11 @@ function ProfileContent() {
         <div className="bg-card rounded-lg shadow-lg p-6 space-y-6">
           <div className="flex items-center space-x-4">
             {user.imageUrl ? (
-              <img
+              <Image
                 src={user.imageUrl}
                 alt={user.username || 'Usuario'}
+                width={80}
+                height={80}
                 className="w-20 h-20 rounded-full"
               />
             ) : (

@@ -6,12 +6,10 @@ import { Button } from '@/app/components/ui/button';
 import { api } from '@/app/services/api';
 import { ArrowLeft, Copy, Swords } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { AVAILABLE_LENGTHS } from '@/app/dictionaries';
 
 function VersusContent() {
     const { user } = useAuth();
     const router = useRouter();
-    const [gameCode, setGameCode] = useState('');
     const [joinCode, setJoinCode] = useState('');
     const [error, setError] = useState('');
     const [copied, setCopied] = useState(false);
@@ -27,7 +25,7 @@ function VersusContent() {
             }
         };
         loadLengths();
-    }, []);
+    }, [wordLength]);
 
     if (!user) {
         router.push('/auth');
@@ -37,11 +35,12 @@ function VersusContent() {
     const createGame = async () => {
         try {
             setError('');
-            const { gameCode, gameId } = await api.createVersusGame(user!.userId, wordLength);
+            const { gameId } = await api.createVersusGame(user!.userId, wordLength);
             router.push(`/versus/game/${gameId}`);
-        } catch (error: any) {
-            console.error('Error creating game:', error);
-            setError(error.response?.data?.message || 'Error creando la partida');
+        } catch (err: unknown) {
+            const errorData = err as { response?: { data?: { message?: string } } };
+            console.error('Error creating game:', errorData);
+            setError(errorData.response?.data?.message || 'Error creando la partida');
         }
     };
 
@@ -55,14 +54,15 @@ function VersusContent() {
             console.log('Intentando unirse con código:', joinCode.toUpperCase());
             const { gameId } = await api.joinVersusGame(joinCode.toUpperCase(), user!.userId);
             router.push(`/versus/game/${gameId}`);
-        } catch (error: any) {
-            console.error('Error joining game:', error.response?.data);
-            setError(error.response?.data?.message || 'Error uniéndose a la partida');
+        } catch (err: unknown) {
+            const errorData = err as { response?: { data?: { message?: string } } };
+            console.error('Error joining game:', errorData);
+            setError(errorData.response?.data?.message || 'Error uniéndose a la partida');
         }
     };
 
     const copyCode = () => {
-        navigator.clipboard.writeText(gameCode);
+        navigator.clipboard.writeText(joinCode);
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
     };
@@ -112,14 +112,14 @@ function VersusContent() {
                         Crear nueva partida
                     </Button>
 
-                    {gameCode && (
+                    {joinCode && (
                         <div className="p-6 bg-card rounded-lg shadow-lg text-center space-y-4">
                             <p className="text-sm text-gray-600 dark:text-gray-400">
                                 Comparte este código con tu oponente:
                             </p>
                             <div className="flex items-center justify-center space-x-2">
                                 <p className="text-3xl font-mono font-bold tracking-wider">
-                                    {gameCode}
+                                    {joinCode}
                                 </p>
                                 <button
                                     onClick={copyCode}

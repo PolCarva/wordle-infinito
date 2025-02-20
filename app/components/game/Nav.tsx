@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/app/components/ui/button";
-import { Settings, ArrowLeft, Moon, Sun, LogIn, LogOut, User, Swords } from "lucide-react";
+import { Settings, ArrowLeft, Moon, Sun, LogIn, LogOut, Swords } from "lucide-react";
 import { Share2 } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/app/context/AuthContext";
@@ -12,6 +12,19 @@ interface NavProps {
   onReset?: () => void;
   isDark: boolean;
   onThemeToggle: () => void;
+}
+
+function getInitials(name: string | undefined, email: string): string {
+  if (name) {
+    return name
+      .split(' ')
+      .map(word => word[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  }
+  // Si no hay nombre, usar las primeras dos letras del email
+  return email.slice(0, 2).toUpperCase();
 }
 
 export function Nav({ onBack, onReset, isDark, onThemeToggle }: NavProps) {
@@ -74,17 +87,9 @@ export function Nav({ onBack, onReset, isDark, onThemeToggle }: NavProps) {
                       href={`/profile/${user.userId}`} 
                       className="flex items-center space-x-3 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
                     >
-                      {user.imageUrl ? (
-                        <img 
-                          src={user.imageUrl} 
-                          alt={user.username || 'Usuario'} 
-                          className="w-10 h-10 rounded-full"
-                        />
-                      ) : (
-                        <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground">
-                          {getInitials(user.username || user.email)}
-                        </div>
-                      )}
+                      <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-sm font-medium text-primary-foreground">
+                        {getInitials(user.username, user.email)}
+                      </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium truncate">
                           {user.username || 'Usuario'}
@@ -197,15 +202,4 @@ export function Nav({ onBack, onReset, isDark, onThemeToggle }: NavProps) {
       </div>
     </div>
   );
-}
-
-function getInitials(name: string | undefined): string {
-  if (!name) return '??';
-  
-  return name
-    .split(' ')
-    .map(word => word[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2);
 }

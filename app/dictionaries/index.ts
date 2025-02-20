@@ -4,15 +4,17 @@ export interface GameConfig {
     extraAttempts: number;
 }
 
+const AVAILABLE_LENGTHS = [4, 5];
+
 let availableLengthsCache: number[] | null = null;
-let dictionaryCache: Record<number, string[]> = {};
-let configCache: Record<number, GameConfig> = {};
+const dictionaryCache: Record<number, string[]> = {};
+const configCache: Record<number, GameConfig> = {};
 
 export async function getAvailableLengths(): Promise<number[]> {
     if (!availableLengthsCache) {
         availableLengthsCache = await api.getAvailableLengths();
     }
-    return availableLengthsCache;
+    return availableLengthsCache || AVAILABLE_LENGTHS;
 }
 
 export async function getDictionary(length: number, useRare = false): Promise<string[]> {
@@ -28,7 +30,4 @@ export async function getGameConfig(length: number): Promise<GameConfig> {
         configCache[length] = await api.getGameConfig(length);
     }
     return configCache[length];
-}
-
-// Para compatibilidad con el código existente
-export const AVAILABLE_LENGTHS = [4, 5]; 
+} 

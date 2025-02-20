@@ -1,13 +1,13 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { useAuth, AuthProvider } from '@/app/context/AuthContext';
+import { useAuth } from '@/app/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { GameBoard } from '@/app/components/game/GameBoard';
 import { Keyboard } from '@/app/components/game/Keyboard';
 import { api } from '@/app/services/api';
 import { Button } from '@/app/components/ui/button';
-import { Copy, ArrowLeft, Settings, Swords } from 'lucide-react';
+import { Copy } from 'lucide-react';
 import { Nav } from '@/app/components/game/Nav';
 import { useTheme } from 'next-themes';
 
@@ -25,13 +25,21 @@ interface VersusGame {
     gameCode: string;
 }
 
+interface ApiError {
+    response?: {
+        data?: {
+            message?: string;
+        };
+    };
+}
+
 function GameContent({ gameId }: { gameId: string }) {
     const { user } = useAuth();
     const router = useRouter();
     const [game, setGame] = useState<VersusGame | null>(null);
     const [currentGuess, setCurrentGuess] = useState('');
-    const [error, setError] = useState('');
     const { theme, setTheme } = useTheme();
+    const [error, setError] = useState('');
 
     const handleGuess = useCallback(async () => {
         if (!game) return;
@@ -46,9 +54,9 @@ function GameContent({ gameId }: { gameId: string }) {
             const response = await api.makeGuess(gameId, user!.userId, currentGuess.toUpperCase());
             setGame(response.game);
             setCurrentGuess('');
-            setError('');
-        } catch (error: any) {
-            setError(error.response?.data?.message || 'Error al realizar el intento');
+        } catch (error: unknown) {
+            const err = error as ApiError;
+            setError(err.response?.data?.message || 'Error al realizar el intento');
         }
     }, [currentGuess, gameId, user, game]);
 
@@ -136,8 +144,9 @@ function GameContent({ gameId }: { gameId: string }) {
         try {
             const response = await api.setReady(gameId, user!.userId);
             setGame(response);
-        } catch (error) {
-            setError('Error marcando como listo');
+        } catch (error: unknown) {
+            const err = error as ApiError;
+            setError(err.response?.data?.message || 'Error marcando como listo');
         }
     };
 

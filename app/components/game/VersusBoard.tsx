@@ -4,10 +4,9 @@ interface VersusBoardProps {
     guesses: string[];
     currentGuess: string;
     solution: string;
-    won: boolean;
 }
 
-export function VersusBoard({ guesses, currentGuess, solution, won }: VersusBoardProps) {
+export function VersusBoard({ guesses, currentGuess, solution }: VersusBoardProps) {
     const wordLength = solution.length;
     const maxAttempts = 6;
 

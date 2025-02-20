@@ -55,7 +55,7 @@ export function Menu({
       }
     };
     loadLengths();
-  }, []);
+  }, [setWordLength, wordLength]);
 
   useEffect(() => {
     const loadDictionary = async () => {

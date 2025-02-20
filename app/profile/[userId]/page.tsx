@@ -5,6 +5,7 @@ import { useAuth, AuthProvider } from '@/app/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
 import { api } from '@/app/services/api';
+import Image from 'next/image';
 
 interface ProfileStats {
   gamesPlayed: number;
@@ -88,9 +89,11 @@ function ProfileContent({ userId }: { userId: string }) {
         <div className="bg-card rounded-lg shadow-lg p-6 space-y-6">
           <div className="flex items-center space-x-4">
             {profileData.imageUrl ? (
-              <img
+              <Image
                 src={profileData.imageUrl}
                 alt={profileData.username || 'Usuario'}
+                width={80}
+                height={80}
                 className="w-20 h-20 rounded-full"
               />
             ) : (

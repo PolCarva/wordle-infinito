@@ -24,12 +24,38 @@ interface WindowWithTemp extends Window {
   __TEMP_ACCEPTED_WORDS?: string[];
 }
 
+interface Stats {
+    gamesPlayed: number;
+    gamesWon: number;
+    streak: number;
+    winRate: number;
+    versusPlayed: number;
+    versusWon: number;
+    versusWinRate: number;
+    versusStreak: number;
+    versusBestStreak: number;
+}
+
 export default function Game({ customWords }: GameProps) {
-  const [started, setStarted] = useState(false);
+  const [started, setStarted] = useState(() => {
+    if (typeof window !== "undefined") {
+      const savedGame = localStorage.getItem("currentGame");
+      return !!savedGame;
+    }
+    return false;
+  });
+
+  const [gameState, setGameState] = useState<GameState | null>(() => {
+    if (typeof window !== "undefined") {
+      const savedState = localStorage.getItem("gameState");
+      return savedState ? JSON.parse(savedState) : null;
+    }
+    return null;
+  });
+
   const [boardCount, setBoardCount] = useState<number | "">(1);
   const [useRareWords, setUseRareWords] = useState(false);
   const [wordLength, setWordLength] = useState(5);
-  const [gameState, setGameState] = useState<GameState | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isDark, setIsDark] = useState(() => {
     if (typeof window !== "undefined") {
@@ -38,11 +64,7 @@ export default function Game({ customWords }: GameProps) {
     return false;
   });
   const { user } = useAuth();
-  const [stats, setStats] = useState({
-    gamesPlayed: 0,
-    gamesWon: 0,
-    streak: 0
-  });
+  const [stats, setStats] = useState<Stats | null>(null);
 
   const initializeGame = useCallback(async () => {
     const finalBoardCount = typeof boardCount === "number" ? boardCount : 1;
@@ -50,14 +72,7 @@ export default function Game({ customWords }: GameProps) {
     const words = customWords || getRandomWords(finalBoardCount, dictionary);
     const config = await getGameConfig(wordLength);
 
-    trackEvent("game_started", {
-      board_count: words.length,
-      is_custom: !!customWords,
-      use_rare_words: useRareWords,
-      word_length: wordLength,
-    });
-
-    setGameState({
+    const newGameState = {
       boards: words.map((word, index) => ({
         word,
         completed: false,
@@ -70,8 +85,12 @@ export default function Game({ customWords }: GameProps) {
       maxAttempts: finalBoardCount + config.extraAttempts,
       remainingLives: config.extraAttempts,
       showEndModal: false,
-    });
+    };
+
+    setGameState(newGameState);
     setStarted(true);
+    localStorage.setItem("currentGame", "true");
+    localStorage.setItem("gameState", JSON.stringify(newGameState));
     setError(null);
   }, [boardCount, customWords, useRareWords, wordLength]);
 
@@ -85,38 +104,43 @@ export default function Game({ customWords }: GameProps) {
           );
           if (newWords.length > 0) {
             const tempAcceptedWords = [...acceptedWords, ...newWords];
-            (window as WindowWithTemp).__TEMP_ACCEPTED_WORDS = tempAcceptedWords;
+            if (typeof window !== "undefined") {
+              (window as WindowWithTemp).__TEMP_ACCEPTED_WORDS = tempAcceptedWords;
+            }
           }
+          initializeGame();
         } catch (error) {
-          console.error('Error validating custom words:', error);
+          console.error("Error validando palabras personalizadas:", error);
+          setError("Error validando palabras personalizadas");
         }
       };
-
       validateCustomWords();
-      setBoardCount(customWords.length);
-      initializeGame();
-
-      return () => {
-        delete (window as WindowWithTemp).__TEMP_ACCEPTED_WORDS;
-      };
     }
-  }, [customWords, initializeGame, wordLength]);
+  }, [customWords, wordLength, initializeGame]);
 
   useEffect(() => {
     if (user) {
       api.getStats(user.userId)
-        .then(stats => setStats(stats))
+        .then(stats => {
+          setStats(stats);
+          // Solo inicializar si NO hay estado guardado y hay palabras personalizadas
+          if (!gameState && customWords) {
+            initializeGame();
+          }
+        })
         .catch(console.error);
     }
-  }, [user]);
+  }, [user, customWords, initializeGame, gameState]);
 
   const updateGameStats = useCallback(async (won: boolean) => {
-    if (!user) return;
+    if (!user || !stats) return;
 
     const newStats = {
+      ...stats,
       gamesPlayed: stats.gamesPlayed + 1,
       gamesWon: stats.gamesWon + (won ? 1 : 0),
-      streak: won ? stats.streak + 1 : 0
+      streak: won ? stats.streak + 1 : 0,
+      winRate: Math.round(((stats.gamesWon + (won ? 1 : 0)) / (stats.gamesPlayed + 1)) * 100)
     };
 
     try {
@@ -167,7 +191,7 @@ export default function Game({ customWords }: GameProps) {
       updateGameStats(allCompleted);
     }
 
-    setGameState({
+    const newGameState = {
       ...gameState,
       boards: newBoards,
       currentGuess: "",
@@ -175,7 +199,10 @@ export default function Game({ customWords }: GameProps) {
       won: allCompleted,
       remainingLives: newRemainingLives,
       showEndModal: true,
-    });
+    };
+
+    setGameState(newGameState);
+    localStorage.setItem("gameState", JSON.stringify(newGameState));
     setError(null);
   }, [gameState, wordLength, updateGameStats]);
 
@@ -237,6 +264,18 @@ export default function Game({ customWords }: GameProps) {
       setError('Error iniciando el juego');
     }
   };
+
+  // Actualizar localStorage cuando cambia el estado del juego
+  useEffect(() => {
+    if (gameState) {
+      if (gameState.gameOver) {
+        localStorage.removeItem("currentGame");
+        localStorage.removeItem("gameState");
+      } else {
+        localStorage.setItem("gameState", JSON.stringify(gameState));
+      }
+    }
+  }, [gameState]);
 
   if (!started) {
     return (

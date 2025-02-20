@@ -1,9 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useAuth, AuthProvider } from '@/app/context/AuthContext';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Swords } from 'lucide-react';
 import { api } from '@/app/services/api';
 import Image from 'next/image';
 
@@ -12,6 +11,12 @@ interface ProfileStats {
   gamesWon: number;
   streak: number;
   winRate: number;
+  versusPlayed: number;
+  versusWon: number;
+  versusWinRate: number;
+  versusStreak: number;
+  bestStreak: number;
+  versusBestStreak: number;
 }
 
 interface ProfileData {
@@ -32,47 +37,25 @@ function getInitials(name: string | undefined): string {
 }
 
 function ProfileContent({ userId }: { userId: string }) {
-  const { user } = useAuth();
   const router = useRouter();
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchProfileData = async () => {
+    const loadProfile = async () => {
       try {
-        // Si es el perfil del usuario actual, usar los datos del contexto
-        if (user && user.userId === userId) {
-          setProfileData({
-            username: user.username,
-            email: user.email,
-            imageUrl: user.imageUrl,
-            stats: user.stats
-          });
-        } else {
-          // Si no, hacer una petición al backend
-          const response = await api.getProfile(userId);
-          setProfileData(response);
-        }
-      } catch (error) {
-        console.error('Error fetching profile:', error);
-        router.push('/');
-      } finally {
-        setLoading(false);
+        const data = await api.getProfile(userId);
+        setProfileData(data);
+        console.log(data);
+      } catch (err) {
+        console.error(err);
       }
     };
+    loadProfile();
+  }, [userId]);
 
-    fetchProfileData();
-  }, [userId, user, router]);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      </div>
-    );
+  if (!profileData) {
+    return <div>Cargando...</div>;
   }
-
-  if (!profileData) return null;
 
   return (
     <div className="min-h-screen bg-background">
@@ -102,27 +85,33 @@ function ProfileContent({ userId }: { userId: string }) {
               </div>
             )}
             <div>
-              <h1 className="text-2xl font-bold text-foreground">
-                {profileData.username || 'Usuario'}
-              </h1>
-              <p className="text-gray-500 dark:text-gray-400">
-                {profileData.email}
-              </p>
+              <h1 className="text-2xl font-bold">{profileData.username || 'Usuario'}</h1>
+              <p className="text-gray-500 dark:text-gray-400">{profileData.email}</p>
             </div>
           </div>
 
           <div className="border-t dark:border-gray-700 pt-6">
-            <h2 className="text-lg font-semibold mb-4 text-foreground">
-              Estadísticas de juego
-            </h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <h2 className="text-lg font-semibold mb-4">Estadísticas de juego</h2>
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
               <StatCard title="Partidas jugadas" value={profileData.stats.gamesPlayed} />
               <StatCard title="Victorias" value={profileData.stats.gamesWon} />
-              <StatCard 
-                title="Porcentaje de victorias" 
-                value={`${Math.round(profileData.stats.winRate)}%`} 
-              />
+              <StatCard title="Ratio victorias" value={`${Math.round(profileData.stats.winRate)}%`} />
               <StatCard title="Racha actual" value={profileData.stats.streak} />
+              <StatCard title="Mejor racha" value={profileData.stats.bestStreak || 0} />
+            </div>
+          </div>
+
+          <div className="border-t dark:border-gray-700 pt-6">
+            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <Swords className="w-5 h-5" />
+              Estadísticas Versus
+            </h2>
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+              <StatCard title="Duelos jugados" value={profileData.stats.versusPlayed} />
+              <StatCard title="Duelos ganados" value={profileData.stats.versusWon} />
+              <StatCard title="Ratio victorias" value={`${Math.round(profileData.stats.versusWinRate)}%`} />
+              <StatCard title="Racha actual" value={profileData.stats.versusStreak || 0} />
+              <StatCard title="Mejor racha" value={profileData.stats.versusBestStreak || 0} />
             </div>
           </div>
         </div>
@@ -131,19 +120,15 @@ function ProfileContent({ userId }: { userId: string }) {
   );
 }
 
+export default function ProfilePage({ params }: { params: { userId: string } }) {
+  return <ProfileContent userId={params.userId} />;
+}
+
 function StatCard({ title, value }: { title: string; value: number | string }) {
   return (
     <div className="bg-background p-4 rounded-lg border dark:border-gray-700">
       <p className="text-sm text-gray-500 dark:text-gray-400">{title}</p>
-      <p className="text-2xl font-bold text-foreground">{value}</p>
+      <p className="text-2xl font-bold">{value}</p>
     </div>
-  );
-}
-
-export default function ProfilePage({ params }: { params: { userId: string } }) {
-  return (
-    <AuthProvider>
-      <ProfileContent userId={params.userId} />
-    </AuthProvider>
   );
 } 

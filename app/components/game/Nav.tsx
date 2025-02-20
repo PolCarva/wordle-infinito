@@ -14,7 +14,7 @@ interface NavProps {
   onThemeToggle: () => void;
 }
 
-function getInitials(name: string | undefined, email: string): string {
+function getInitials(name: string | undefined, email: string | undefined): string {
   if (name) {
     return name
       .split(' ')
@@ -23,7 +23,10 @@ function getInitials(name: string | undefined, email: string): string {
       .toUpperCase()
       .slice(0, 2);
   }
-  // Si no hay nombre, usar las primeras dos letras del email
+  // Si no hay nombre ni email, devolver valor por defecto
+  if (!email) return 'US';
+  
+  // Si hay email, usar las primeras dos letras
   return email.slice(0, 2).toUpperCase();
 }
 

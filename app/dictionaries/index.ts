@@ -13,7 +13,6 @@ const CACHE_DURATION = 5 * 60 * 1000; // 5 minutos en milisegundos
 const AVAILABLE_LENGTHS = [1, 2, 3, 4, 5, 6];
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 
-let availableLengthsCache: number[] | null = null;
 const cache = {
     lengths: null as CacheEntry<number[]> | null,
     dictionaries: new Map<string, CacheEntry<string[]>>(),

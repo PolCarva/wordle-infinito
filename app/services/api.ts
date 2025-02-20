@@ -28,6 +28,10 @@ export const api = {
         gamesPlayed: number;
         gamesWon: number;
         streak: number;
+        winRate: number;
+        versusPlayed: number;
+        versusWon: number;
+        versusWinRate: number;
     }) => {
         const response = await axios.put(`${API_URL}/users/stats/${userId}`, stats);
         return response.data;
@@ -38,8 +42,11 @@ export const api = {
         return response.data;
     },
 
-    createVersusGame: async (userId: string, wordLength: number = 5) => {
-        const response = await axios.post(`${API_URL}/versus/create`, { userId, wordLength });
+    createVersusGame: async (userId: string | undefined, wordLength: number = 5) => {
+        const response = await axios.post(`${API_URL}/versus/create`, { 
+            userId: userId || null,  // Enviar null si no hay userId
+            wordLength 
+        });
         return response.data;
     },
 

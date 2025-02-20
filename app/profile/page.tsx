@@ -2,7 +2,7 @@
 
 import { useAuth, AuthProvider } from '@/app/context/AuthContext';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Swords } from 'lucide-react';
 import Image from 'next/image';
 
 function ProfileContent() {
@@ -57,6 +57,27 @@ function ProfileContent() {
                 value={`${Math.round(user.stats?.winRate || 0)}%`} 
               />
               <StatCard title="Racha actual" value={user.stats?.streak || 0} />
+            </div>
+          </div>
+
+          <div className="border-t dark:border-gray-700 pt-6">
+            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <Swords className="w-5 h-5" />
+              Estadísticas Versus
+            </h2>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              <StatCard 
+                title="Duelos jugados" 
+                value={user.stats?.versusPlayed || 0} 
+              />
+              <StatCard 
+                title="Duelos ganados" 
+                value={user.stats?.versusWon || 0} 
+              />
+              <StatCard 
+                title="Ratio victorias" 
+                value={`${Math.round(user.stats?.versusWinRate || 0)}%`} 
+              />
             </div>
           </div>
         </div>

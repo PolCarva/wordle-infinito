@@ -28,6 +28,9 @@ export interface User {
         gamesWon: number;
         streak: number;
         winRate: number;
+        versusPlayed: number;
+        versusWon: number;
+        versusWinRate: number;
     };
 }
 

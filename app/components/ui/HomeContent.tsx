@@ -5,9 +5,23 @@ import { Swords } from "lucide-react";
 import Link from "next/link";
 
 export function HomeContent() {
-
   return (
     <article className="max-w-4xl mx-auto px-4 py-8 prose dark:prose-invert prose-sm">
+      <section className="mt-8">
+        <h2 className="text-xl font-bold mb-4">¡Nuevo! Modo Versus</h2>
+        <div className="flex flex-col items-center md:items-start space-y-4">
+          <p className="text-gray-600 text-start dark:text-gray-300">
+            Desafía a otros jugadores en tiempo real. ¡El primero en adivinar la
+            palabra gana!
+          </p>
+          <Link href="/versus">
+            <Button className="flex items-center space-x-2">
+              <Swords className="h-5 w-5" />
+              <span>Jugar Versus</span>
+            </Button>
+          </Link>
+        </div>
+      </section>
       <h1 className="sr-only">
         Wordle Infinito - El Juego de Palabras Definitivo
       </h1>
@@ -84,21 +98,6 @@ export function HomeContent() {
           jugar. ¡Desafía tu mente con este adictivo juego de palabras en
           español!
         </p>
-      </section>
-
-      <section className="mt-8">
-        <h2 className="text-xl font-bold mb-4">¡Nuevo! Modo Versus</h2>
-        <div className="flex flex-col items-center space-y-4">
-          <p className="text-gray-600 dark:text-gray-300">
-            Desafía a otros jugadores en tiempo real. ¡El primero en adivinar la palabra gana!
-          </p>
-          <Link href="/versus">
-            <Button className="flex items-center space-x-2">
-              <Swords className="h-5 w-5" />
-              <span>Jugar Versus</span>
-            </Button>
-          </Link>
-        </div>
       </section>
     </article>
   );

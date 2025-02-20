@@ -14,6 +14,9 @@ interface User {
         gamesWon: number;
         streak: number;
         winRate: number;
+        versusPlayed: number;
+        versusWon: number;
+        versusWinRate: number;
     };
 }
 
@@ -47,7 +50,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 gamesPlayed: 0,
                 gamesWon: 0,
                 streak: 0,
-                winRate: 0
+                winRate: 0,
+                versusPlayed: 0,
+                versusWon: 0,
+                versusWinRate: 0
             }
         };
         setUser(userWithStats);

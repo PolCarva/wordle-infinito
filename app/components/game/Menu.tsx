@@ -7,6 +7,7 @@ import {
   Dices,
   AlertCircle,
   PlusCircle,
+  Swords,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import {
@@ -73,7 +74,7 @@ export function Menu({
   const handleBoardCountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     const numValue = parseInt(value);
-    
+
     if (value === "") {
       setBoardCount("");
       return;
@@ -92,7 +93,7 @@ export function Menu({
   const toggleRareWords = () => {
     const newValue = !useRareWords;
     setUseRareWords(newValue);
-    
+
     if (!newValue && typeof boardCount === "number" && boardCount > maxWords) {
       setBoardCount(maxWords);
       setError("Se ha ajustado al máximo de palabras comunes disponibles");
@@ -105,7 +106,6 @@ export function Menu({
     }
   };
 
-  
   return (
     <>
       <div
@@ -234,7 +234,7 @@ export function Menu({
             </div>
           </div>
 
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-5">
             <Button
               onClick={onStart}
               className="w-full bg-green-500 hover:bg-green-500/90 text-white shadow-[0_6px_0_0_#16a34a] active:translate-y-1 active:shadow-[0_4px_0_0_#16a34a] transition-all"
@@ -242,6 +242,12 @@ export function Menu({
             >
               Empezar a Jugar
             </Button>
+            <Link href="/versus" className="w-full">
+              <Button variant="default" className="w-full dark:bg-white bg-black dark:hover:bg-white/90 hover:bg-black/90 dark:text-black text-white shadow-[0_6px_0_0_#3a3a3a] dark:shadow-[0_6px_0_0_#e5e5e5] active:translate-y-1 active:shadow-[0_4px_0_0_#3a3a3a] dark:active:shadow-[0_4px_0_0_#e5e5e5] transition-all" size="lg">
+                <Swords className="w-5 h-5 mr-2" />
+                Jugar Versus
+              </Button>
+            </Link>
 
             <Link href="/create" className="w-full">
               <Button

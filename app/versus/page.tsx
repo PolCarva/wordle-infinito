@@ -27,19 +27,18 @@ function VersusContent() {
         loadLengths();
     }, [wordLength]);
 
-    if (!user) {
-        router.push('/auth');
-        return null;
-    }
-
     const createGame = async () => {
+        if (!user) {
+            router.push('/auth');
+            return;
+        }
+
         try {
             setError('');
-            const { gameId } = await api.createVersusGame(user!.userId, wordLength);
+            const { gameId } = await api.createVersusGame(user.userId, wordLength);
             router.push(`/versus/game/${gameId}`);
         } catch (err: unknown) {
             const errorData = err as { response?: { data?: { message?: string } } };
-            console.error('Error creating game:', errorData);
             setError(errorData.response?.data?.message || 'Error creando la partida');
         }
     };

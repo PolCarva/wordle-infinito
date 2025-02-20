@@ -56,7 +56,7 @@ const AuthForm = () => {
     };
 
     const handleGoogleLogin = () => {
-        window.location.href = 'https://api.wordleinfinito/api/users/auth/google';
+        window.location.href = 'https://wordle-infinito-back-production.up.railway.app/api/users/auth/google';
     };
 
     return (

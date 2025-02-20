@@ -58,7 +58,6 @@ export function GameBoard({ board, currentGuess, gameOver, gameState }: GameBoar
 
   return (
     <div className={`p-2 md:p-4 max-w-[800px] rounded-lg border ${board.completed ? "border-green-500" : "border-gray-500"}`}>
-      
       <div className="grid gap-1">
         {rows.map((row, i) => (
           <div key={i} className="flex gap-1">
@@ -88,7 +87,8 @@ export function GameBoard({ board, currentGuess, gameOver, gameState }: GameBoar
                         : "w-full h-[2vh] md:h-[3vh] text-[10px] md:text-xs"
                     }`}
                 >
-                  {letter}
+                  {/* Solo mostrar la letra si no está oculta o si el juego terminó */}
+                  {(!gameState.hideLetters || gameOver) ? letter : ''}
                 </div>
               );
             })}
@@ -97,4 +97,50 @@ export function GameBoard({ board, currentGuess, gameOver, gameState }: GameBoar
       </div>
     </div>
   );
+}
+
+function Cell({ letter, status, hideLetters }: { letter: string, status?: string, hideLetters?: boolean }) {
+  return (
+    <div className={`w-14 h-14 border-2 flex items-center justify-center text-2xl font-bold ${getStatusClasses(status)}`}>
+      {!hideLetters ? letter : ''}
+    </div>
+  );
+}
+
+function Row({ word, solution, isComplete, hideLetters }: { word: string[], solution: string, isComplete: boolean, hideLetters?: boolean }) {
+  return (
+    <div className="grid grid-cols-5 gap-1">
+      {word.map((letter, i) => (
+        <Cell 
+          key={i} 
+          letter={letter} 
+          status={isComplete ? getStatus(letter, i, solution) : undefined}
+          hideLetters={hideLetters}
+        />
+      ))}
+    </div>
+  );
+}
+
+function getStatusClasses(status?: string) {
+  switch (status) {
+    case "correct":
+      return "bg-green-500";
+    case "present":
+      return "bg-yellow-500";
+    case "absent":
+      return "bg-gray-400";
+    default:
+      return "bg-gray-200 dark:bg-gray-700";
+  }
+}
+
+function getStatus(letter: string, index: number, solution: string) {
+  if (letter === solution[index]) {
+    return "correct";
+  } else if (solution.includes(letter)) {
+    return "present";
+  } else {
+    return "absent";
+  }
 } 

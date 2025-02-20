@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/app/components/ui/button";
-import { Settings, ArrowLeft, Moon, Sun, LogIn, LogOut, User } from "lucide-react";
+import { Settings, ArrowLeft, Moon, Sun, LogIn, LogOut, User, Swords } from "lucide-react";
 import { Share2 } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/app/context/AuthContext";
@@ -18,6 +18,13 @@ export function Nav({ onBack, onReset, isDark, onThemeToggle }: NavProps) {
   const [showSettings, setShowSettings] = useState(false);
   const [showShareMessage, setShowShareMessage] = useState(false);
   const { user, logout } = useAuth();
+
+  const handleBack = () => {
+    if (onBack) {
+      onBack();
+      setShowSettings(false);
+    }
+  };
 
   const handleShare = async () => {
     const shareData = {
@@ -42,7 +49,7 @@ export function Nav({ onBack, onReset, isDark, onThemeToggle }: NavProps) {
     <div className="fixed top-5 w-full px-5">
       <div className="relative flex justify-between items-center">
         {onBack ? (
-          <Button variant="ghost" size="icon" onClick={onBack}>
+          <Button variant="ghost" size="icon" onClick={handleBack}>
             <ArrowLeft className="h-5 w-5" />
           </Button>
         ) : (
@@ -121,6 +128,20 @@ export function Nav({ onBack, onReset, isDark, onThemeToggle }: NavProps) {
                 </div>
 
                 <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium">Versus</span>
+                  <Link href="/versus">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setShowSettings(false)}
+                      className="text-yellow-600 dark:hover:bg-gray-700"
+                    >
+                      <Swords className="h-5 w-5" />
+                    </Button>
+                  </Link>
+                </div>
+
+                <div className="flex justify-between items-center">
                   <span className="text-sm font-medium">Tema</span>
                   <Button
                     variant="ghost"
@@ -149,24 +170,6 @@ export function Nav({ onBack, onReset, isDark, onThemeToggle }: NavProps) {
                       className="text-yellow-600 dark:hover:bg-gray-700"
                     >
                       Reiniciar
-                    </Button>
-                  </div>
-                )}
-                {onBack && (
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm font-medium">
-                      Volver al inicio
-                    </span>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => {
-                        onBack();
-                        setShowSettings(false);
-                      }}
-                      className="text-yellow-600 dark:hover:bg-gray-700"
-                    >
-                      Volver
                     </Button>
                   </div>
                 )}

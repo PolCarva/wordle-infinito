@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = 'https://wordle-infinito-back-production.up.railway.app/api';
 
 export const api = {
     register: async (userData: {
@@ -34,5 +34,47 @@ export const api = {
     getProfile: async (userId: string) => {
         const response = await axios.get(`${API_URL}/users/profile/${userId}`);
         return response.data;
+    },
+
+    createVersusGame: async (userId: string, wordLength: number = 5) => {
+        const response = await axios.post(`${API_URL}/versus/create`, { userId, wordLength });
+        return response.data;
+    },
+
+    joinVersusGame: async (gameCode: string, userId: string) => {
+        const response = await axios.post(`${API_URL}/versus/join`, { gameCode, userId });
+        return response.data;
+    },
+
+    makeGuess: async (gameId: string, userId: string, guess: string) => {
+        const response = await axios.post(`${API_URL}/versus/guess`, { gameId, userId, guess });
+        return response.data;
+    },
+
+    getVersusGame: async (gameId: string) => {
+        const response = await axios.get(`${API_URL}/versus/game/${gameId}`);
+        return response.data;
+    },
+
+    setReady: async (gameId: string, userId: string) => {
+        const response = await axios.post(`${API_URL}/versus/ready`, { gameId, userId });
+        return response.data;
+    },
+
+    getAvailableLengths: async () => {
+        const response = await axios.get(`${API_URL}/dictionary/available-lengths`);
+        return response.data.lengths;
+    },
+
+    getGameConfig: async (length: number) => {
+        const response = await axios.get(`${API_URL}/dictionary/config/${length}`);
+        return response.data;
+    },
+
+    getWords: async (length: number, includeRare = false) => {
+        const response = await axios.get(
+            `${API_URL}/dictionary/words/${length}?rare=${includeRare}`
+        );
+        return response.data.words;
     }
 }; 

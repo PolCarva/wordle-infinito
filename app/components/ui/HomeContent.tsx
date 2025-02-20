@@ -1,5 +1,9 @@
 "use client";
 
+import { Button } from "@/app/components/ui/button";
+import { Swords } from "lucide-react";
+import Link from "next/link";
+
 export function HomeContent() {
 
   return (
@@ -80,6 +84,21 @@ export function HomeContent() {
           jugar. ¡Desafía tu mente con este adictivo juego de palabras en
           español!
         </p>
+      </section>
+
+      <section className="mt-8">
+        <h2 className="text-xl font-bold mb-4">¡Nuevo! Modo Versus</h2>
+        <div className="flex flex-col items-center space-y-4">
+          <p className="text-gray-600 dark:text-gray-300">
+            Desafía a otros jugadores en tiempo real. ¡El primero en adivinar la palabra gana!
+          </p>
+          <Link href="/versus">
+            <Button className="flex items-center space-x-2">
+              <Swords className="h-5 w-5" />
+              <span>Jugar Versus</span>
+            </Button>
+          </Link>
+        </div>
       </section>
     </article>
   );

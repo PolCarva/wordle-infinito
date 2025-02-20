@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/app/components/ui/button";
-import { ACCEPTED_WORDS } from "./dictionaries/accepted/accepted-words";
+import { ACCEPTED_WORDS } from "../../back/dictionaries/accepted/accepted-words";
 import Confetti from "react-confetti-boom";
 import { GameBoard } from "./components/game/GameBoard";
 import { Keyboard } from "./components/game/Keyboard";
@@ -12,7 +12,7 @@ import { getRandomWords } from "./utils/game-utils";
 import { Nav } from "./components/game/Nav";
 import { Menu } from "./components/game/Menu";
 import { trackEvent } from "./utils/analytics";
-import { getDictionary, getGameConfig } from "./dictionaries";
+import { getDictionary, getGameConfig } from "../../back/dictionaries";
 import { useAuth } from "@/app/context/AuthContext";
 import { api } from "@/app/services/api";
 
@@ -44,11 +44,11 @@ export default function Game({ customWords }: GameProps) {
     streak: 0
   });
 
-  const initializeGame = useCallback(() => {
+  const initializeGame = useCallback(async () => {
     const finalBoardCount = typeof boardCount === "number" ? boardCount : 1;
-    const words =
-      customWords || getRandomWords(finalBoardCount, useRareWords, wordLength);
-    const config = getGameConfig(wordLength);
+    const dictionary = await getDictionary(wordLength, useRareWords);
+    const words = customWords || getRandomWords(finalBoardCount, dictionary);
+    const config = await getGameConfig(wordLength);
 
     trackEvent("game_started", {
       board_count: words.length,
@@ -58,10 +58,11 @@ export default function Game({ customWords }: GameProps) {
     });
 
     setGameState({
-      boards: words.map((word) => ({
+      boards: words.map((word, index) => ({
         word,
         completed: false,
         guesses: [],
+        id: index
       })),
       currentGuess: "",
       gameOver: false,
@@ -76,26 +77,30 @@ export default function Game({ customWords }: GameProps) {
 
   useEffect(() => {
     if (customWords) {
+      const validateCustomWords = async () => {
+        try {
+          const acceptedWords = await getDictionary(wordLength, true);
+          const newWords = customWords.filter(
+            (word) => !acceptedWords.includes(word)
+          );
+          if (newWords.length > 0) {
+            const tempAcceptedWords = [...acceptedWords, ...newWords];
+            (window as WindowWithTemp).__TEMP_ACCEPTED_WORDS = tempAcceptedWords;
+          }
+        } catch (error) {
+          console.error('Error validating custom words:', error);
+        }
+      };
+
+      validateCustomWords();
       setBoardCount(customWords.length);
       initializeGame();
-    }
-  }, [customWords, initializeGame]);
 
-  useEffect(() => {
-    if (customWords) {
-      const newWords = customWords.filter(
-        (word) => !ACCEPTED_WORDS.includes(word)
-      );
-      if (newWords.length > 0) {
-        const tempAcceptedWords = [...ACCEPTED_WORDS, ...newWords];
-        (window as WindowWithTemp).__TEMP_ACCEPTED_WORDS = tempAcceptedWords;
-      }
+      return () => {
+        delete (window as WindowWithTemp).__TEMP_ACCEPTED_WORDS;
+      };
     }
-
-    return () => {
-      delete (window as WindowWithTemp).__TEMP_ACCEPTED_WORDS;
-    };
-  }, [customWords]);
+  }, [customWords, initializeGame, wordLength]);
 
   useEffect(() => {
     if (user) {
@@ -122,11 +127,11 @@ export default function Game({ customWords }: GameProps) {
     }
   }, [user, stats]);
 
-  const handleGuess = useCallback(() => {
+  const handleGuess = useCallback(async () => {
     if (!gameState) return;
 
     const guess = gameState.currentGuess.toUpperCase();
-    const acceptedWords = getDictionary(wordLength, true);
+    const acceptedWords = await getDictionary(wordLength, true);
 
     if (guess.length !== wordLength) {
       setError(`La palabra debe tener ${wordLength} letras`);
@@ -224,6 +229,14 @@ export default function Game({ customWords }: GameProps) {
     handleKeyDown({ key } as KeyboardEvent);
   };
 
+  const handleStart = async () => {
+    try {
+      await initializeGame();
+    } catch (error) {
+      console.error('Error initializing game:', error);
+      setError('Error iniciando el juego');
+    }
+  };
 
   if (!started) {
     return (
@@ -232,7 +245,7 @@ export default function Game({ customWords }: GameProps) {
         <Menu
           boardCount={boardCount}
           setBoardCount={setBoardCount}
-          onStart={() => initializeGame()}
+          onStart={handleStart}
           setError={setError}
           useRareWords={useRareWords}
           setUseRareWords={setUseRareWords}
@@ -310,7 +323,7 @@ export default function Game({ customWords }: GameProps) {
         </div>
       )}
       <div className="fixed lg:relative bottom-0 left-0 right-0 bg-white dark:bg-gray-900 lg:!bg-transparent p-2 md:p-4 lg:border-t-0 border-t dark:border-gray-800">
-        <Keyboard onKeyPress={handleKeyPress} gameState={gameState} />
+        <Keyboard onKeyDown={handleKeyPress} gameState={gameState} />
       </div>
       {gameState.gameOver && gameState.showEndModal && (
         <div className="fixed inset-0 flex items-center z-50 justify-center bg-black/50">

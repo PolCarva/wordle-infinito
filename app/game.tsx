@@ -13,6 +13,8 @@ import { Nav } from "./components/game/Nav";
 import { Menu } from "./components/game/Menu";
 import { trackEvent } from "./utils/analytics";
 import { getDictionary, getGameConfig } from "./dictionaries";
+import { useAuth } from "@/app/context/AuthContext";
+import { api } from "@/app/services/api";
 
 interface GameProps {
   customWords?: string[];
@@ -34,6 +36,12 @@ export default function Game({ customWords }: GameProps) {
       return document.documentElement.classList.contains("dark");
     }
     return false;
+  });
+  const { user } = useAuth();
+  const [stats, setStats] = useState({
+    gamesPlayed: 0,
+    gamesWon: 0,
+    streak: 0
   });
 
   const initializeGame = useCallback(() => {
@@ -89,6 +97,31 @@ export default function Game({ customWords }: GameProps) {
     };
   }, [customWords]);
 
+  useEffect(() => {
+    if (user) {
+      api.getStats(user.userId)
+        .then(stats => setStats(stats))
+        .catch(console.error);
+    }
+  }, [user]);
+
+  const updateGameStats = useCallback(async (won: boolean) => {
+    if (!user) return;
+
+    const newStats = {
+      gamesPlayed: stats.gamesPlayed + 1,
+      gamesWon: stats.gamesWon + (won ? 1 : 0),
+      streak: won ? stats.streak + 1 : 0
+    };
+
+    try {
+      const updatedStats = await api.updateStats(user.userId, newStats);
+      setStats(updatedStats);
+    } catch (error) {
+      console.error('Error actualizando estadísticas:', error);
+    }
+  }, [user, stats]);
+
   const handleGuess = useCallback(() => {
     if (!gameState) return;
 
@@ -125,6 +158,10 @@ export default function Game({ customWords }: GameProps) {
     const attemptsExhausted =
       newBoards[0].guesses.length >= gameState.maxAttempts;
 
+    if (allCompleted || attemptsExhausted) {
+      updateGameStats(allCompleted);
+    }
+
     setGameState({
       ...gameState,
       boards: newBoards,
@@ -135,7 +172,7 @@ export default function Game({ customWords }: GameProps) {
       showEndModal: true,
     });
     setError(null);
-  }, [gameState, wordLength]);
+  }, [gameState, wordLength, updateGameStats]);
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {

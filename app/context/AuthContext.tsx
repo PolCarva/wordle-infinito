@@ -6,6 +6,15 @@ import { useRouter } from 'next/navigation';
 interface User {
     userId: string;
     token: string;
+    username?: string;
+    email: string;
+    imageUrl?: string;
+    stats: {
+        gamesPlayed: number;
+        gamesWon: number;
+        streak: number;
+        winRate: number;
+    };
 }
 
 interface AuthContextType {
@@ -32,8 +41,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }, []);
 
     const login = (userData: User) => {
-        setUser(userData);
-        localStorage.setItem('user', JSON.stringify(userData));
+        const userWithStats = {
+            ...userData,
+            stats: userData.stats || {
+                gamesPlayed: 0,
+                gamesWon: 0,
+                streak: 0,
+                winRate: 0
+            }
+        };
+        setUser(userWithStats);
+        localStorage.setItem('user', JSON.stringify(userWithStats));
     };
 
     const logout = () => {

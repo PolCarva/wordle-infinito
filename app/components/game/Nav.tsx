@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/app/components/ui/button";
-import { Settings, ArrowLeft, Moon, Sun, LogIn, LogOut } from "lucide-react";
+import { Settings, ArrowLeft, Moon, Sun, LogIn, LogOut, User } from "lucide-react";
 import { Share2 } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/app/context/AuthContext";
@@ -61,6 +61,35 @@ export function Nav({ onBack, onReset, isDark, onThemeToggle }: NavProps) {
           {showSettings && (
             <div className="absolute top-full mt-2 right-0 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 min-w-[220px] border dark:border-gray-700">
               <div className="space-y-4">
+                {user && (
+                  <>
+                    <Link 
+                      href={`/profile/${user.userId}`} 
+                      className="flex items-center space-x-3 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+                    >
+                      {user.imageUrl ? (
+                        <img 
+                          src={user.imageUrl} 
+                          alt={user.username || 'Usuario'} 
+                          className="w-10 h-10 rounded-full"
+                        />
+                      ) : (
+                        <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground">
+                          {getInitials(user.username || user.email)}
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">
+                          {user.username || 'Usuario'}
+                        </p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                          {user.email}
+                        </p>
+                      </div>
+                    </Link>
+                    <div className="border-t dark:border-gray-700" />
+                  </>
+                )}
                 <div className="flex justify-between items-center">
                   <span className="text-sm font-medium">
                     {user ? 'Cerrar Sesión' : 'Iniciar Sesión'}
@@ -165,4 +194,15 @@ export function Nav({ onBack, onReset, isDark, onThemeToggle }: NavProps) {
       </div>
     </div>
   );
+}
+
+function getInitials(name: string | undefined): string {
+  if (!name) return '??';
+  
+  return name
+    .split(' ')
+    .map(word => word[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
 }

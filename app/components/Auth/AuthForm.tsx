@@ -56,9 +56,11 @@ const AuthForm = () => {
     };
 
     const handleGoogleLogin = () => {
-        window.location.href = process.env.NODE_ENV === 'production' 
-            ? 'https://wordle-infinito-back-production.up.railway.app/api/users/auth/google'
-            : 'http://localhost:5000/api/users/auth/google';
+        const backendUrl = process.env.NODE_ENV === 'production'
+            ? 'https://wordle-infinito-back-production.up.railway.app'
+            : 'http://localhost:5000';
+        
+        window.location.href = `${backendUrl}/api/users/auth/google`;
     };
 
     return (

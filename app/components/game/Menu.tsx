@@ -109,7 +109,7 @@ export function Menu({
   return (
     <>
       <div
-        className="flex flex-col items-center gap-8 w-full max-w-2xl mx-auto pt-16 lg:pt-0"
+        className="flex flex-col items-center gap-8 w-full max-w-2xl mx-auto pt-16"
         onKeyDown={handleKeyDown}
       >
         <div className="text-center space-y-4">
@@ -158,18 +158,18 @@ export function Menu({
               <label className="text-sm font-medium">
                 Longitud de las palabras
               </label>
-              <div className="flex gap-2 flex-wrap">
+              <div className="flex gap-2 flex-wrap justify-between">
                 {availableLengths.map((length) => (
                   <button
                     key={length}
                     onClick={() => setWordLength(length)}
-                    className={`px-4 py-2 rounded-lg ${
+                    className={`px-4 py-2 w-[calc(calc(100%/3)-0.5rem)] text-center rounded-lg ${
                       wordLength === length
                         ? "bg-green-500 text-white"
                         : "bg-gray-200 dark:bg-gray-700"
                     }`}
                   >
-                    {length} letras
+                    {length} letra{length !== 1 ? "s" : ""}
                   </button>
                 ))}
               </div>

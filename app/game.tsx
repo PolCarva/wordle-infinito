@@ -14,6 +14,7 @@ import { trackEvent } from "./utils/analytics";
 import { getDictionary, getGameConfig } from "@/app/dictionaries";
 import { useAuth } from "@/app/context/AuthContext";
 import { api } from "@/app/services/api";
+import { BOARD_MAX_WIDTHS } from '@/app/constants/styles';
 
 interface GameProps {
   customWords?: string[];
@@ -283,21 +284,37 @@ export default function Game({ customWords }: GameProps) {
       <div className="w-full">
         <div
           className={`
-            grid grid-cols-2 max-w-[1600px] md:grid-cols-3 mx-auto lg:grid-cols-4 gap-2 md:gap-8
+            grid grid-cols-2 ${
+              BOARD_MAX_WIDTHS[wordLength]?.[gameState.boards.length] || 
+              BOARD_MAX_WIDTHS[wordLength]?.["all"] || 
+              'max-w-[1600px]'
+            } md:grid-cols-3 mx-auto lg:grid-cols-4 gap-2 md:gap-8
 
             ${
               gameState.boards.length === 1
-                ? `!grid-cols-1 lg:!grid-cols-1 !max-w-[500px]`
+                ? `!grid-cols-1 lg:!grid-cols-1 ${
+                    BOARD_MAX_WIDTHS[wordLength]?.[1] || 
+                    BOARD_MAX_WIDTHS[wordLength]?.["all"] || 
+                    'max-w-[500px]'
+                  }`
                 : ""
             }
             ${
               gameState.boards.length === 2
-                ? `!grid-cols-2 lg:!grid-cols-2 max-w-[800px]`
+                ? `!grid-cols-2 lg:!grid-cols-2 ${
+                    BOARD_MAX_WIDTHS[wordLength]?.[2] || 
+                    BOARD_MAX_WIDTHS[wordLength]?.["all"] || 
+                    'max-w-[800px]'
+                  }`
                 : ""
             }
             ${
               gameState.boards.length === 3
-                ? `!grid-cols-2 lg:!grid-cols-3`
+                ? `!grid-cols-2 lg:!grid-cols-3 ${
+                    BOARD_MAX_WIDTHS[wordLength]?.[3] || 
+                    BOARD_MAX_WIDTHS[wordLength]?.["all"] || 
+                    'max-w-[1200px]'
+                  }`
                 : ""
             }
           

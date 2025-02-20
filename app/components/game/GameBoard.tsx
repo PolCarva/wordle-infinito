@@ -2,6 +2,7 @@
 
 import { BoardState, GameState } from "@/app/types";
 import { checkGuess } from "@/app/utils/game-utils";
+import { BOARD_MAX_WIDTHS } from "@/app/constants/styles";
 
 interface GameBoardProps {
   board: BoardState;
@@ -10,25 +11,32 @@ interface GameBoardProps {
   gameState: GameState;
 }
 
-export function GameBoard({ board, currentGuess, gameOver, gameState }: GameBoardProps) {
-  const wordLength = board.word.length; 
+export function GameBoard({
+  board,
+  currentGuess,
+  gameOver,
+  gameState,
+}: GameBoardProps) {
+  const wordLength = board.word.length;
 
   const getVisibleRows = () => {
     const rows = [];
     const isLastAttempt = board.guesses.length === gameState.maxAttempts - 1;
-    
+
     if (board.completed) {
-      const correctGuessIndex = board.guesses.findIndex(guess => guess === board.word);
+      const correctGuessIndex = board.guesses.findIndex(
+        (guess) => guess === board.word
+      );
       for (let i = 0; i <= correctGuessIndex; i++) {
         rows.push(checkGuess(board.guesses[i], board.word));
       }
       return rows;
     }
-    
+
     for (let i = 0; i < board.guesses.length; i++) {
       rows.push(checkGuess(board.guesses[i], board.word));
     }
-    
+
     if (!board.completed && !gameOver) {
       rows.push(
         currentGuess
@@ -37,27 +45,35 @@ export function GameBoard({ board, currentGuess, gameOver, gameState }: GameBoar
           .map(() => "empty" as const)
       );
     }
-    
+
     if (!board.completed && !gameOver && !isLastAttempt) {
       rows.push(Array(wordLength).fill("empty" as const));
     }
-    
+
     if (!board.completed) {
       while (rows.length < gameState.maxAttempts) {
         rows.push(Array(wordLength).fill("empty" as const));
       }
     }
-    
+
     return rows;
   };
 
   const rows = getVisibleRows();
-  const winningRowIndex = board.completed ? 
-    board.guesses.findIndex(guess => guess === board.word) : 
-    -1;
+  const winningRowIndex = board.completed
+    ? board.guesses.findIndex((guess) => guess === board.word)
+    : -1;
 
   return (
-    <div className={`p-2 md:p-4 max-w-[800px] rounded-lg border ${board.completed ? "border-green-500" : "border-gray-500"}`}>
+    <div
+      className={`p-2 md:p-4 ${
+        BOARD_MAX_WIDTHS[wordLength]?.[board.guesses.length] ||
+        BOARD_MAX_WIDTHS[wordLength]?.["all"] ||
+        "max-w-[800px]"
+      } rounded-lg border ${
+        board.completed ? "border-green-500" : "border-gray-500"
+      }`}
+    >
       <div className="grid gap-1">
         {rows.map((row, i) => (
           <div key={i} className="flex gap-1">
@@ -88,7 +104,7 @@ export function GameBoard({ board, currentGuess, gameOver, gameState }: GameBoar
                     }`}
                 >
                   {/* Solo mostrar la letra si no está oculta o si el juego terminó */}
-                  {(!gameState.hideLetters || gameOver) ? letter : ''}
+                  {!gameState.hideLetters || gameOver ? letter : ""}
                 </div>
               );
             })}

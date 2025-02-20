@@ -11,7 +11,7 @@ import { getRandomWords } from "./utils/game-utils";
 import { Nav } from "./components/game/Nav";
 import { Menu } from "./components/game/Menu";
 import { trackEvent } from "./utils/analytics";
-import { getDictionary, getGameConfig } from "../../back/dictionaries";
+import { getDictionary, getGameConfig } from "@/app/dictionaries";
 import { useAuth } from "@/app/context/AuthContext";
 import { api } from "@/app/services/api";
 

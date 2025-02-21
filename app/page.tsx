@@ -20,12 +20,11 @@ const games = [
     isComingSoon: false,
   },
   {
-    title: "Combinations",
-    description: "Combina letras y crea palabras",
-    path: "/combinations",
+    title: "Colordle",
+    description: "Combina colores para formar el orden correcto",
+    path: "/colordle",
     backgroundColor: "bg-[#fff4e3]",
-    icon: "🔤",
-    isComingSoon: true,
+    icon: "🎨",
   },
   {
     title: "SpellBee",

@@ -8,18 +8,16 @@ import { Button } from "./ui/button";
 import { LeaderboardModal } from "./ui/LeaderboardModal";
 import GameCard from "./ui/GameCard";
 
-interface HomeContentProps {
-  games: Array<{
-    title: string;
-    description: string;
-    path: string;
-    backgroundColor: string;
-    icon: string;
-    isComingSoon: boolean;
-  }>;
+interface Game {
+  title: string;
+  description: string;
+  path: string;
+  backgroundColor: string;
+  icon: string;
+  isComingSoon?: boolean;
 }
 
-export function HomeContent({ games }: HomeContentProps) {
+export function HomeContent({ games }: { games: Game[] }) {
   const [showLeaderboard, setShowLeaderboard] = useState(false);
 
   return (

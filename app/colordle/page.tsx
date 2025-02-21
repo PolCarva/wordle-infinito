@@ -56,6 +56,11 @@ function ColordleContent() {
   return (
     <div className="flex flex-col items-center gap-8 p-4">
       <h1 className="text-4xl font-bold text-center">Colordle</h1>
+      {process.env.NODE_ENV === 'development' && (
+        <div className="text-lg font-mono bg-gray-100 dark:bg-gray-800 p-4 rounded-lg">
+          <p>Solución: {solution.join(" ")}</p>
+        </div>
+      )}
       
       <div className="w-full max-w-sm">
         <ColorBoard 

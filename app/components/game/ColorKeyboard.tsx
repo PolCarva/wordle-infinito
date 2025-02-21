@@ -25,23 +25,40 @@ export function ColorKeyboard({ onColorSelect, onDelete, onEnter, disabled, gues
   };
 
   const getColorStatus = (color: string) => {
-    let status = '';
-    
+    const totalInSolution = solution.filter(c => c === color).length;
+    if (totalInSolution === 0) return 'absent';
+
+    // Verificar si el último intento fue una victoria
+    const lastGuess = guesses[guesses.length - 1];
+    if (lastGuess?.every((c, i) => c === solution[i])) {
+      return solution.includes(color) ? 'correct' : 'absent';
+    }
+
+    let correctCount = 0;
+    let incorrectUsages = 0;
+
     for (const guess of guesses) {
       for (let i = 0; i < guess.length; i++) {
         if (guess[i] !== color) continue;
         
         if (solution[i] === color) {
-          return 'correct';
-        } else if (solution.includes(color)) {
-          status = 'present';
+          correctCount++;
         } else {
-          status = status || 'absent';
+          incorrectUsages++;
         }
       }
     }
-    
-    return status;
+
+    // Si todas las veces que usamos el color están en posición correcta
+    if (correctCount > 0 && incorrectUsages === 0) {
+      return 'correct';
+    }
+    // Si hay al menos un uso incorrecto del color que está en la solución
+    if (incorrectUsages > 0 && totalInSolution > 0) {
+      return 'present';
+    }
+
+    return '';
   };
 
   const getColorBackground = (color: string) => {

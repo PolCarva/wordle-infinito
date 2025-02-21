@@ -133,7 +133,13 @@ export function Keyboard({ onKeyDown, gameState }: KeyboardProps) {
   };
 
   const handleClick = (key: string) => {
-    onKeyDown(key);
+    if (key === "BACKSPACE") {
+      onKeyDown("Backspace");
+    } else if (key === "ENTER") {
+      onKeyDown("Enter");
+    } else {
+      onKeyDown(key);
+    }
   };
 
   return (
@@ -156,13 +162,15 @@ export function Keyboard({ onKeyDown, gameState }: KeyboardProps) {
                 style={typeof style === "string" ? {} : style}
                 disabled={gameState.gameOver}
               >
-                {key === "BACKSPACE" ? (
-                  <DeleteIcon />
-                ) : key === "ENTER" ? (
-                  <CornerDownLeftIcon />
-                ) : (
-                  key
-                )}
+                <div className="flex items-center justify-center w-full h-full">
+                  {key === "BACKSPACE" ? (
+                    <DeleteIcon className="h-5 w-5" />
+                  ) : key === "ENTER" ? (
+                    <CornerDownLeftIcon className="h-5 w-5" />
+                  ) : (
+                    key
+                  )}
+                </div>
               </Button>
             );
           })}

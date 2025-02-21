@@ -5,7 +5,6 @@ import { Button } from "@/app/components/ui/button";
 import { Input } from "@/app/components/ui/input";
 import {
   AlertCircle,
-  ArrowLeft,
   Link2,
   XCircle,
 } from "lucide-react";
@@ -15,7 +14,6 @@ import {
   Instagram,
   Linkedin,
 } from "@/app/components/ui/icons";
-import Link from "next/link";
 import { trackEvent } from "@/app/utils/analytics";
 import { AuthProvider } from "@/app/context/AuthContext";
 import MainLayout from "../components/layouts/MainLayout";

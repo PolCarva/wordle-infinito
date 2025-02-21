@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useAuth, AuthProvider } from "@/app/context/AuthContext";
 import { Button } from "@/app/components/ui/button";
 import { api } from "@/app/services/api";
-import { Copy, Swords, Trophy } from "lucide-react";
+import { Copy } from "lucide-react";
 import { useRouter } from "next/navigation";
 import MainLayout from "../components/layouts/MainLayout";
 import { LeaderboardModal } from "../components/ui/LeaderboardModal";

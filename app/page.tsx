@@ -1,11 +1,5 @@
-import GameCard from "./components/ui/GameCard";
 import { AuthProvider } from "./context/AuthContext";
 import MainLayout from "./components/layouts/MainLayout";
-import Image from "next/image";
-import { Crown, Trophy } from "lucide-react";
-import Link from "next/link";
-import { Button } from "./components/ui/button";
-import { LeaderboardModal } from "./components/ui/LeaderboardModal";
 import { HomeContent } from "./components/HomeContent";
 
 const games = [

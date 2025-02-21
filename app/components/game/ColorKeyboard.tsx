@@ -25,40 +25,31 @@ export function ColorKeyboard({ onColorSelect, onDelete, onEnter, disabled, gues
   };
 
   const getColorStatus = (color: string) => {
-    const totalInSolution = solution.filter(c => c === color).length;
-    if (totalInSolution === 0) return 'absent';
+    let colorWasUsed = false;
+    let hasCorrectPosition = false;
 
-    // Verificar si el último intento fue una victoria
-    const lastGuess = guesses[guesses.length - 1];
-    if (lastGuess?.every((c, i) => c === solution[i])) {
-      return solution.includes(color) ? 'correct' : 'absent';
-    }
-
-    let correctCount = 0;
-    let incorrectUsages = 0;
-
+    // Revisar todos los intentos para ver si el color se usó correctamente alguna vez
     for (const guess of guesses) {
       for (let i = 0; i < guess.length; i++) {
         if (guess[i] !== color) continue;
         
+        colorWasUsed = true;
         if (solution[i] === color) {
-          correctCount++;
-        } else {
-          incorrectUsages++;
+          hasCorrectPosition = true;
+          break;
         }
       }
+      if (hasCorrectPosition) break;
     }
 
-    // Si todas las veces que usamos el color están en posición correcta
-    if (correctCount > 0 && incorrectUsages === 0) {
-      return 'correct';
-    }
-    // Si hay al menos un uso incorrecto del color que está en la solución
-    if (incorrectUsages > 0 && totalInSolution > 0) {
-      return 'present';
-    }
+    if (!colorWasUsed) return '';
+    if (hasCorrectPosition) return 'correct';
 
-    return '';
+    // Si el color no está en la solución
+    if (!solution.includes(color)) return 'absent';
+
+    // Si está en la solución pero no en posición correcta
+    return 'present';
   };
 
   const getColorBackground = (color: string) => {

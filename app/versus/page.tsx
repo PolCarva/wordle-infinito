@@ -4,9 +4,10 @@ import { useState, useEffect } from "react";
 import { useAuth, AuthProvider } from "@/app/context/AuthContext";
 import { Button } from "@/app/components/ui/button";
 import { api } from "@/app/services/api";
-import { Copy, Swords } from "lucide-react";
+import { Copy, Swords, Trophy } from "lucide-react";
 import { useRouter } from "next/navigation";
 import MainLayout from "../components/layouts/MainLayout";
+import { LeaderboardModal } from "../components/ui/LeaderboardModal";
 
 function VersusContent() {
   const { user } = useAuth();
@@ -16,6 +17,7 @@ function VersusContent() {
   const [copied, setCopied] = useState(false);
   const [wordLength, setWordLength] = useState(5);
   const [availableLengths, setAvailableLengths] = useState<number[]>([]);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
 
   useEffect(() => {
     const loadLengths = async () => {
@@ -74,11 +76,50 @@ function VersusContent() {
 
   return (
     <div className="min-h-[calc(100vh-3.5rem)] bg-background">
-      <div className="max-w-md mx-auto px-4 py-12">
+      <div className="max-w-md mx-auto px-4 pb-12">
         <div className="text-center mb-8">
-          <Swords className="h-12 w-12 mx-auto mb-4 text-foreground" />
-          <h1 className="text-3xl font-bold text-foreground">Wordle Versus</h1>
-          <p className="mt-2 text-muted-foreground">
+         
+          <div className="flex flex-col items-center gap-2">
+            <div className="flex gap-1 mx-auto">
+              {["W", "O", "R", "D", "L", "E"].map((letter, i) => (
+                <span
+                  key={i}
+                  className={`${
+                    letter === " "
+                      ? "w-3 h-10 md:w-6 md:h-16 bg-transparent"
+                      : i === 0
+                      ? "w-10 h-10 md:w-16 md:h-16 bg-gray-500"
+                      : i === 2
+                      ? "w-10 h-10 md:w-16 md:h-16 bg-green-500"
+                      : i === 3
+                      ? "w-10 h-10 md:w-16 md:h-16 bg-yellow-500"
+                      : "w-10 h-10 md:w-16 md:h-16 bg-green-500"
+                  } flex items-center justify-center rounded-lg text-white font-bold text-xl md:text-3xl ${letter !== " " ? "shadow-md" : ""}`}
+                >
+                  {letter}
+                </span>
+              ))}
+            </div>
+            <div className="flex gap-1 mx-auto">
+              {["V", "E", "R", "S", "U", "S"].map((letter, i) => (
+                <span
+                  key={i}
+                  className={`${
+                    letter === " "
+                      ? "w-3 h-10 md:w-6 md:h-16 bg-transparent"
+                      : i === 2 || i === 0
+                      ? "w-10 h-10 md:w-16 md:h-16 bg-gray-500"
+                      : i === 5 || i === 1
+                      ? "w-10 h-10 md:w-16 md:h-16 bg-yellow-500"
+                      : "w-10 h-10 md:w-16 md:h-16 bg-green-500"
+                  } flex items-center justify-center rounded-lg text-white font-bold text-xl md:text-3xl ${letter !== " " ? "shadow-md" : ""}`}
+                >
+                  {letter}
+                </span>
+              ))}
+            </div>
+          </div>
+          <p className="mt-4 text-lg text-muted-foreground">
             Compite contra otro jugador en tiempo real
           </p>
         </div>
@@ -159,6 +200,10 @@ function VersusContent() {
           {error && <p className="text-destructive text-center">{error}</p>}
         </div>
       </div>
+      <LeaderboardModal 
+        open={showLeaderboard} 
+        onOpenChange={setShowLeaderboard} 
+      />
     </div>
   );
 }

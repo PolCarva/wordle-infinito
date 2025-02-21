@@ -85,5 +85,10 @@ export const api = {
             `${API_URL}/dictionary/words/${length}?rare=${includeRare}`
         );
         return response.data.words;
+    },
+
+    getLeaderboard: async () => {
+        const response = await axios.get(`${API_URL}/users/leaderboard`);
+        return response.data;
     }
 }; 

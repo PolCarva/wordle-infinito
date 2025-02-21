@@ -257,10 +257,10 @@ function GameContent({ gameId }: { gameId: string }) {
                 isDark={theme === 'dark'}
                 onThemeToggle={handleThemeToggle}
             />
-            <div className="p-4 pt-20">
+            <div className="p-4">
                 <div className="max-w-2xl mx-auto">
                     <div className="grid grid-cols-2 gap-4">
-                        <div>
+                        <div className=''>
                             <h2 className="text-center mb-4">Tú</h2>
                             <GameBoard
                                 board={myBoard}
@@ -275,6 +275,7 @@ function GameContent({ gameId }: { gameId: string }) {
                                     remainingLives: 1,
                                     showEndModal: false
                                 }}
+                                isVersus={true}
                             />
                         </div>
                         <div>
@@ -293,6 +294,7 @@ function GameContent({ gameId }: { gameId: string }) {
                                     showEndModal: false,
                                     hideLetters: true
                                 }}
+                                isVersus={true}
                             />
                         </div>
                     </div>

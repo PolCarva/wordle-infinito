@@ -9,6 +9,7 @@ interface GameBoardProps {
   currentGuess: string;
   gameOver: boolean;
   gameState: GameState;
+  isVersus?: boolean;
 }
 
 export function GameBoard({
@@ -16,6 +17,7 @@ export function GameBoard({
   currentGuess,
   gameOver,
   gameState,
+  isVersus,
 }: GameBoardProps) {
   const wordLength = board.word.length;
 
@@ -63,13 +65,14 @@ export function GameBoard({
   const winningRowIndex = board.completed
     ? board.guesses.findIndex((guess) => guess === board.word)
     : -1;
-
   return (
     <div
       className={`p-2 md:p-4 ${
-        BOARD_MAX_WIDTHS[wordLength]?.[board.guesses.length] ||
-        BOARD_MAX_WIDTHS[wordLength]?.["all"] ||
-        "max-w-[800px]"
+        isVersus 
+          ? BOARD_MAX_WIDTHS[wordLength]?.[1] + " mx-auto "
+          : BOARD_MAX_WIDTHS[wordLength]?.[board.guesses.length] ||
+            BOARD_MAX_WIDTHS[wordLength]?.["all"] ||
+            "max-w-[800px]"
       } rounded-lg border ${
         board.completed ? "border-green-500" : "border-gray-500"
       }`}
@@ -103,7 +106,6 @@ export function GameBoard({
                         : "w-full h-[2vh] md:h-[3vh] text-[10px] md:text-xs"
                     }`}
                 >
-                  {/* Solo mostrar la letra si no está oculta o si el juego terminó */}
                   {!gameState.hideLetters || gameOver ? letter : ""}
                 </div>
               );

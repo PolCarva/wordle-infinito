@@ -297,7 +297,7 @@ export default function Game({ customWords }: GameProps) {
   if (!gameState) return null;
 
   return (
-    <div className="flex w-full flex-col items-center gap-6 p-4 pt-16 pb-[240px] md:pb-4">
+    <div className="flex w-full flex-col items-center gap-6 p-4 pb-[240px] md:pb-4">
       <Nav
         onBack={() => setStarted(false)}
         onReset={() => initializeGame()}

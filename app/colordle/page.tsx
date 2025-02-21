@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { AuthProvider } from "../context/AuthContext";
 import MainLayout from "../components/layouts/MainLayout";
 import { ColorBoard } from "../components/game/ColorBoard";

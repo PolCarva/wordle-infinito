@@ -109,7 +109,7 @@ export function Menu({
   return (
     <>
       <div
-        className="flex flex-col items-center gap-8 w-full max-w-2xl mx-auto pt-16"
+        className="flex flex-col items-center gap-8 w-full max-w-2xl mx-auto"
         onKeyDown={handleKeyDown}
       >
         <div className="text-center space-y-4">

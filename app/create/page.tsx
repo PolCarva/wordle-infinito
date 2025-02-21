@@ -17,6 +17,8 @@ import {
 } from "@/app/components/ui/icons";
 import Link from "next/link";
 import { trackEvent } from "@/app/utils/analytics";
+import { AuthProvider } from "@/app/context/AuthContext";
+import MainLayout from "../components/layouts/MainLayout";
 
 export default function CreatePage() {
   const [words, setWords] = useState<string[]>([]);
@@ -131,117 +133,113 @@ export default function CreatePage() {
   };
 
   return (
-    <div className="flex flex-col items-center gap-8 w-full max-w-2xl mx-auto p-4 pt-16">
-      <div className="w-full flex justify-between items-center">
-        <Link href="/">
-          <Button variant="ghost" size="icon">
-            <ArrowLeft className="w-6 h-6" />
-          </Button>
-        </Link>
-        <h1 className="text-2xl font-bold">Crear Partida Personalizada</h1>
-        <div className="w-10" />
-      </div>
+    <AuthProvider>
+      <MainLayout>
+        <div className="flex flex-col items-center gap-8 w-full max-w-2xl mx-auto p-4">
+          <h1 className="text-2xl font-bold text-foreground">Crear Partida Personalizada</h1>
 
-      <div className="bg-gray-50 dark:bg-gray-800 p-8 rounded-2xl shadow-lg w-full max-w-md space-y-6">
-        <div className="space-y-4">
-          <div className="flex gap-2">
-            <Input
-              value={currentWord}
-              onChange={(e) => {
-                setCurrentWord(e.target.value.toUpperCase());
-                setError(null);
-              }}
-              placeholder="PALABRA"
-              maxLength={5}
-              className="text-2xl font-bold uppercase text-center bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl shadow-inner focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
-              onKeyDown={(e) => e.key === "Enter" && handleAddWord()}
-            />
-            <Button onClick={handleAddWord}>Agregar</Button>
-          </div>
+          <div className="bg-card border border-border p-8 rounded-2xl w-full max-w-md space-y-6">
+            <div className="space-y-4">
+              <div className="flex gap-2">
+                <Input
+                  value={currentWord}
+                  onChange={(e) => {
+                    setCurrentWord(e.target.value.toUpperCase());
+                    setError(null);
+                  }}
+                  placeholder="PALABRA"
+                  maxLength={5}
+                  className="text-2xl font-bold uppercase text-center bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl shadow-inner focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
+                  onKeyDown={(e) => e.key === "Enter" && handleAddWord()}
+                />
+                <Button onClick={handleAddWord}>Agregar</Button>
+              </div>
 
-          {error && (
-            <div className="flex items-center gap-2 text-sm text-red-500">
-              <AlertCircle className="w-4 h-4" />
-              {error}
-            </div>
-          )}
-
-          <div className="border rounded-xl p-4 min-h-40 space-y-2">
-            <div className="text-sm text-gray-500 dark:text-gray-400">
-              Palabras agregadas: {words.length}
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {words.map((word, i) => (
-                <div
-                  key={i}
-                  className="bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-200 px-3 py-1 rounded-full text-sm font-medium group flex items-center gap-1"
-                >
-                  {word}
-                  <div className="w-0 group-hover:w-5 grid place-content-center transition-all duration-200 overflow-hidden">
-                    <button
-                      onClick={() => handleRemoveWord(word)}
-                      className="scale-0 group-hover:scale-100 self-center transition-transform duration-200"
-                      title="Eliminar palabra"
-                    >
-                      <XCircle className="w-4 h-4 hover:text-red-500" />
-                    </button>
-                  </div>
+              {error && (
+                <div className="flex items-center gap-2 text-sm text-red-500">
+                  <AlertCircle className="w-4 h-4" />
+                  {error}
                 </div>
-              ))}
+              )}
+
+              <div className="border rounded-xl p-4 min-h-40 space-y-2">
+                <div className="text-sm text-gray-500 dark:text-gray-400">
+                  Palabras agregadas: {words.length}
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {words.map((word, i) => (
+                    <div
+                      key={i}
+                      className="bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-200 px-3 py-1 rounded-full text-sm font-medium group flex items-center gap-1"
+                    >
+                      {word}
+                      <div className="w-0 group-hover:w-5 grid place-content-center transition-all duration-200 overflow-hidden">
+                        <button
+                          onClick={() => handleRemoveWord(word)}
+                          className="scale-0 group-hover:scale-100 self-center transition-transform duration-200"
+                          title="Eliminar palabra"
+                        >
+                          <XCircle className="w-4 h-4 hover:text-red-500" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <Button
+                onClick={handleShare}
+                variant="default"
+                className="w-full"
+                disabled={words.length === 0}
+              >
+                <Link2 className="w-5 h-5 mr-2" />
+                Copiar Link
+              </Button>
+
+              <div className="flex gap-2 flex-wrap">
+                <Button
+                  onClick={shareToTwitter}
+                  className="flex-1 bg-black hover:bg-black/90 text-white"
+                  disabled={words.length === 0}
+                >
+                  <Twitter className="w-5 h-5 mr-2" />
+                  Twitter
+                </Button>
+
+                <Button
+                  onClick={shareToInstagram}
+                  className="flex-1 bg-[#E4405F] hover:bg-[#E4405F]/90 text-white"
+                  disabled={words.length === 0}
+                >
+                  <Instagram className="w-5 h-5 mr-2" />
+                  Instagram
+                </Button>
+
+                <Button
+                  onClick={shareToLinkedin}
+                  className="flex-1 bg-[#0a66c2] hover:bg-[#0a66c2]/90 text-white"
+                  disabled={words.length === 0}
+                >
+                  <Linkedin className="w-5 h-5 mr-2" />
+                  LinkedIn
+                </Button>
+
+                <Button
+                  onClick={shareToWhatsApp}
+                  className="flex-1 bg-[#25D366] hover:bg-[#25D366]/90 text-white"
+                  disabled={words.length === 0}
+                >
+                  <Whatsapp className="w-5 h-5 mr-2" />
+                  Whatsapp
+                </Button>
+              </div>
             </div>
           </div>
         </div>
-
-        <div className="space-y-4">
-          <Button
-            onClick={handleShare}
-            variant="default"
-            className="w-full"
-            disabled={words.length === 0}
-          >
-            <Link2 className="w-5 h-5 mr-2" />
-            Copiar Link
-          </Button>
-
-          <div className="flex gap-2 flex-wrap">
-            <Button
-              onClick={shareToTwitter}
-              className="flex-1 bg-black hover:bg-black/90 text-white"
-              disabled={words.length === 0}
-            >
-              <Twitter className="w-5 h-5 mr-2" />
-              Twitter
-            </Button>
-
-            <Button
-              onClick={shareToInstagram}
-              className="flex-1 bg-[#E4405F] hover:bg-[#E4405F]/90 text-white"
-              disabled={words.length === 0}
-            >
-              <Instagram className="w-5 h-5 mr-2" />
-              Instagram
-            </Button>
-
-            <Button
-              onClick={shareToLinkedin}
-              className="flex-1 bg-[#0a66c2] hover:bg-[#0a66c2]/90 text-white"
-              disabled={words.length === 0}
-            >
-              <Linkedin className="w-5 h-5 mr-2" />
-              LinkedIn
-            </Button>
-
-            <Button
-              onClick={shareToWhatsApp}
-              className="flex-1 bg-[#25D366] hover:bg-[#25D366]/90 text-white"
-              disabled={words.length === 0}
-            >
-              <Whatsapp className="w-5 h-5 mr-2" />
-              Whatsapp
-            </Button>
-          </div>
-        </div>
-      </div>
-    </div>
+      </MainLayout>
+    </AuthProvider>
   );
 }

@@ -98,5 +98,15 @@ export const api = {
             words: response.data.words,
             description: response.data.description
         };
+    },
+
+    requestRematch: async (gameId: string, userId: string) => {
+        const response = await axios.post(`${API_URL}/versus/rematch/${gameId}`, { userId });
+        return response.data;
+    },
+
+    cancelRematch: async (gameId: string, userId: string) => {
+        const response = await axios.post(`${API_URL}/versus/cancel-rematch/${gameId}`, { userId });
+        return response.data;
     }
 }; 

@@ -159,19 +159,21 @@ export function Menu({
                 Longitud de las palabras
               </label>
               <div className="flex gap-2 flex-wrap justify-between">
-                {availableLengths.map((length) => (
-                  <button
-                    key={length}
-                    onClick={() => setWordLength(length)}
-                    className={`px-4 py-2 w-[calc(calc(100%/3)-0.5rem)] text-center rounded-lg ${
-                      wordLength === length
-                        ? "bg-green-500 text-white"
-                        : "bg-gray-200 dark:bg-gray-700"
-                    }`}
-                  >
-                    {length} letra{length !== 1 ? "s" : ""}
-                  </button>
-                ))}
+                {availableLengths.map(
+                  (length) => (
+                      <button
+                        key={length}
+                        onClick={() => setWordLength(length)}
+                        className={`px-4 py-2 w-[calc(calc(100%/3)-0.5rem)] text-center rounded-lg ${
+                          wordLength === length
+                            ? "bg-green-500 text-white"
+                            : "bg-gray-200 dark:bg-gray-700"
+                        }`}
+                      >
+                        {length} letra{length !== 1 ? "s" : ""}
+                      </button>
+                    )
+                )}
               </div>
             </div>
 
@@ -243,7 +245,11 @@ export function Menu({
               Empezar a Jugar
             </Button>
             <Link href="/versus" className="w-full">
-              <Button variant="default" className="w-full dark:bg-white bg-black dark:hover:bg-white/90 hover:bg-black/90 dark:text-black text-white shadow-[0_6px_0_0_#3a3a3a] dark:shadow-[0_6px_0_0_#e5e5e5] active:translate-y-1 active:shadow-[0_4px_0_0_#3a3a3a] dark:active:shadow-[0_4px_0_0_#e5e5e5] transition-all" size="lg">
+              <Button
+                variant="default"
+                className="w-full dark:bg-white bg-black dark:hover:bg-white/90 hover:bg-black/90 dark:text-black text-white shadow-[0_6px_0_0_#3a3a3a] dark:shadow-[0_6px_0_0_#e5e5e5] active:translate-y-1 active:shadow-[0_4px_0_0_#3a3a3a] dark:active:shadow-[0_4px_0_0_#e5e5e5] transition-all"
+                size="lg"
+              >
                 <Swords className="w-5 h-5 mr-2" />
                 Jugar Versus
               </Button>

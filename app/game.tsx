@@ -7,12 +7,11 @@ import { Keyboard } from "./components/game/Keyboard";
 import { GameStats } from "./components/game/GameStats";
 import { GameState } from "./types";
 import { getRandomWords } from "./utils/game-utils";
-import { Nav } from "./components/game/Nav";
 import { Menu } from "./components/game/Menu";
 import { getDictionary, getGameConfig } from "@/app/dictionaries";
 import { useAuth } from "@/app/context/AuthContext";
 import { api } from "@/app/services/api";
-import { BOARD_MAX_WIDTHS } from '@/app/constants/styles';
+import { BOARD_MAX_WIDTHS } from "@/app/constants/styles";
 import { EndGameModal } from "./components/game/EndGameModal";
 
 interface GameProps {
@@ -24,25 +23,25 @@ interface WindowWithTemp extends Window {
 }
 
 interface Stats {
-    gamesPlayed: number;
-    gamesWon: number;
-    streak: number;
-    winRate: number;
-    versusPlayed: number;
-    versusWon: number;
-    versusWinRate: number;
-    versusStreak: number;
-    versusBestStreak: number;
+  gamesPlayed: number;
+  gamesWon: number;
+  streak: number;
+  winRate: number;
+  versusPlayed: number;
+  versusWon: number;
+  versusWinRate: number;
+  versusStreak: number;
+  versusBestStreak: number;
 }
 
 export default function Game({ customWords }: GameProps) {
   const [started, setStarted] = useState(() => {
-    if (typeof window === 'undefined') return false;
+    if (typeof window === "undefined") return false;
     return !!localStorage.getItem("currentGame");
   });
 
   const [gameState, setGameState] = useState<GameState | null>(() => {
-    if (typeof window === 'undefined') return null;
+    if (typeof window === "undefined") return null;
     const savedState = localStorage.getItem("gameState");
     return savedState ? JSON.parse(savedState) : null;
   });
@@ -51,12 +50,7 @@ export default function Game({ customWords }: GameProps) {
   const [useRareWords, setUseRareWords] = useState(false);
   const [wordLength, setWordLength] = useState(5);
   const [error, setError] = useState<string | null>(null);
-  const [isDark, setIsDark] = useState(() => {
-    if (typeof window !== "undefined") {
-      return document.documentElement.classList.contains("dark");
-    }
-    return false;
-  });
+
   const { user } = useAuth();
   const [stats, setStats] = useState<Stats | null>(null);
 
@@ -71,7 +65,7 @@ export default function Game({ customWords }: GameProps) {
         word,
         completed: false,
         guesses: [],
-        id: index
+        id: index,
       })),
       currentGuess: "",
       gameOver: false,
@@ -99,7 +93,8 @@ export default function Game({ customWords }: GameProps) {
           if (newWords.length > 0) {
             const tempAcceptedWords = [...acceptedWords, ...newWords];
             if (typeof window !== "undefined") {
-              (window as WindowWithTemp).__TEMP_ACCEPTED_WORDS = tempAcceptedWords;
+              (window as WindowWithTemp).__TEMP_ACCEPTED_WORDS =
+                tempAcceptedWords;
             }
           }
           initializeGame();
@@ -114,8 +109,9 @@ export default function Game({ customWords }: GameProps) {
 
   useEffect(() => {
     if (user) {
-      api.getStats(user.userId)
-        .then(stats => {
+      api
+        .getStats(user.userId)
+        .then((stats) => {
           setStats(stats);
           // Solo inicializar si NO hay estado guardado y hay palabras personalizadas
           if (!gameState && customWords) {
@@ -126,24 +122,29 @@ export default function Game({ customWords }: GameProps) {
     }
   }, [user, customWords, initializeGame, gameState]);
 
-  const updateGameStats = useCallback(async (won: boolean) => {
-    if (!user || !stats) return;
+  const updateGameStats = useCallback(
+    async (won: boolean) => {
+      if (!user || !stats) return;
 
-    const newStats = {
-      ...stats,
-      gamesPlayed: stats.gamesPlayed + 1,
-      gamesWon: stats.gamesWon + (won ? 1 : 0),
-      streak: won ? stats.streak + 1 : 0,
-      winRate: Math.round(((stats.gamesWon + (won ? 1 : 0)) / (stats.gamesPlayed + 1)) * 100)
-    };
+      const newStats = {
+        ...stats,
+        gamesPlayed: stats.gamesPlayed + 1,
+        gamesWon: stats.gamesWon + (won ? 1 : 0),
+        streak: won ? stats.streak + 1 : 0,
+        winRate: Math.round(
+          ((stats.gamesWon + (won ? 1 : 0)) / (stats.gamesPlayed + 1)) * 100
+        ),
+      };
 
-    try {
-      const updatedStats = await api.updateStats(user.userId, newStats);
-      setStats(updatedStats);
-    } catch (error) {
-      console.error('Error actualizando estadísticas:', error);
-    }
-  }, [user, stats]);
+      try {
+        const updatedStats = await api.updateStats(user.userId, newStats);
+        setStats(updatedStats);
+      } catch (error) {
+        console.error("Error actualizando estadísticas:", error);
+      }
+    },
+    [user, stats]
+  );
 
   const handleGuess = useCallback(async () => {
     if (!gameState) return;
@@ -241,26 +242,37 @@ export default function Game({ customWords }: GameProps) {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [gameState, handleKeyDown, handleGuess]);
 
-  const toggleTheme = () => {
-    const html = document.documentElement;
-    const isDark = html.classList.toggle("dark");
-    setIsDark(isDark);
-    localStorage.setItem("darkTheme", String(isDark));
-  };
-
   const handleKeyPress = (key: string) => {
     if (!gameState || gameState.gameOver) return;
-    handleKeyDown({ key } as KeyboardEvent);
+
+    // Normalizar las teclas para que coincidan con el evento del teclado físico
+    if (key === "ENTER") {
+      handleGuess();
+    } else if (key === "BACKSPACE") {
+      setGameState(prev => ({
+        ...prev!,
+        currentGuess: prev!.currentGuess.slice(0, -1)
+      }));
+    } else {
+      // Solo agregar la letra si no excede el límite
+      if (gameState.currentGuess.length < wordLength) {
+        setGameState(prev => ({
+          ...prev!,
+          currentGuess: prev!.currentGuess + key
+        }));
+      }
+    }
   };
 
   const handleStart = async () => {
     try {
       await initializeGame();
     } catch (error) {
-      console.error('Error initializing game:', error);
-      setError('Error iniciando el juego');
+      console.error("Error initializing game:", error);
+      setError("Error iniciando el juego");
     }
   };
+
 
   // Actualizar localStorage cuando cambia el estado del juego
   useEffect(() => {
@@ -277,7 +289,6 @@ export default function Game({ customWords }: GameProps) {
   if (!started) {
     return (
       <div className="flex w-full min-h-svh justify-center flex-col items-center gap-4 p-4">
-        <Nav isDark={isDark} onThemeToggle={toggleTheme} />
         <Menu
           boardCount={boardCount}
           setBoardCount={setBoardCount}
@@ -296,23 +307,20 @@ export default function Game({ customWords }: GameProps) {
 
   return (
     <div className="flex w-full flex-col items-center gap-6 p-4 pb-[240px] md:pb-4">
-      <Nav
-        onBack={() => setStarted(false)}
-        onReset={() => initializeGame()}
-        isDark={isDark}
-        onThemeToggle={toggleTheme}
-      />
 
       <div className="flex items-center gap-4">
         <h1 className="text-4xl font-bold">Wordle Infinito</h1>
       </div>
       {process.env.NODE_ENV === "development" && (
-        <div className="text-sm text-gray-500">
-          {gameState.boards.map((board, i) => (
-            <span key={i} className="mr-2">
-              {board.word}
-            </span>
-          ))}
+        <div className="text-lg font-mono bg-gray-100 dark:bg-gray-800 p-4 rounded-lg">
+          <p>
+            SOLUCIONES: {" "}
+            {gameState.boards.map((board, i) => (
+              <span key={i} className="mr-2">
+                {board.word}
+              </span>
+            ))}
+          </p>
         </div>
       )}
       {gameState && <GameStats gameState={gameState} />}
@@ -321,35 +329,35 @@ export default function Game({ customWords }: GameProps) {
         <div
           className={`
             grid grid-cols-2 ${
-              BOARD_MAX_WIDTHS[wordLength]?.[gameState.boards.length] || 
-              BOARD_MAX_WIDTHS[wordLength]?.["all"] || 
-              'max-w-[1600px]'
+              BOARD_MAX_WIDTHS[wordLength]?.[gameState.boards.length] ||
+              BOARD_MAX_WIDTHS[wordLength]?.["all"] ||
+              "max-w-[1600px]"
             } md:grid-cols-3 mx-auto lg:grid-cols-4 gap-2 md:gap-8
 
             ${
               gameState.boards.length === 1
                 ? `!grid-cols-1 lg:!grid-cols-1 ${
-                    BOARD_MAX_WIDTHS[wordLength]?.[1] || 
-                    BOARD_MAX_WIDTHS[wordLength]?.["all"] || 
-                    'max-w-[500px]'
+                    BOARD_MAX_WIDTHS[wordLength]?.[1] ||
+                    BOARD_MAX_WIDTHS[wordLength]?.["all"] ||
+                    "max-w-[500px]"
                   }`
                 : ""
             }
             ${
               gameState.boards.length === 2
                 ? `!grid-cols-2 lg:!grid-cols-2 ${
-                    BOARD_MAX_WIDTHS[wordLength]?.[2] || 
-                    BOARD_MAX_WIDTHS[wordLength]?.["all"] || 
-                    'max-w-[800px]'
+                    BOARD_MAX_WIDTHS[wordLength]?.[2] ||
+                    BOARD_MAX_WIDTHS[wordLength]?.["all"] ||
+                    "max-w-[800px]"
                   }`
                 : ""
             }
             ${
               gameState.boards.length === 3
                 ? `!grid-cols-2 lg:!grid-cols-3 ${
-                    BOARD_MAX_WIDTHS[wordLength]?.[3] || 
-                    BOARD_MAX_WIDTHS[wordLength]?.["all"] || 
-                    'max-w-[1200px]'
+                    BOARD_MAX_WIDTHS[wordLength]?.[3] ||
+                    BOARD_MAX_WIDTHS[wordLength]?.["all"] ||
+                    "max-w-[1200px]"
                   }`
                 : ""
             }
@@ -382,8 +390,12 @@ export default function Game({ customWords }: GameProps) {
         show={gameState.showEndModal}
         won={gameState.won}
         boards={gameState.boards}
-        solution={gameState.boards.map(board => board.word)}
-        onClose={() => setGameState(prev => prev ? { ...prev, showEndModal: false } : null)}
+        solution={gameState.boards.map((board) => board.word)}
+        onClose={() =>
+          setGameState((prev) =>
+            prev ? { ...prev, showEndModal: false } : null
+          )
+        }
         onPlayAgain={() => initializeGame()}
       />
     </div>

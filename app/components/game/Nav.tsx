@@ -1,7 +1,15 @@
 "use client";
 
 import { Button } from "@/app/components/ui/button";
-import { Settings, ArrowLeft, Moon, Sun, LogIn, LogOut, Swords } from "lucide-react";
+import {
+  Settings,
+  ArrowLeft,
+  Moon,
+  Sun,
+  LogIn,
+  LogOut,
+  Swords,
+} from "lucide-react";
 import { Share2 } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/app/context/AuthContext";
@@ -9,28 +17,34 @@ import Link from "next/link";
 
 interface NavProps {
   onBack?: () => void;
-  onReset?: () => void;
   isDark: boolean;
   onThemeToggle: () => void;
 }
 
-function getInitials(name: string | undefined, email: string | undefined): string {
+function getInitials(
+  name: string | undefined,
+  email: string | undefined
+): string {
   if (name) {
     return name
-      .split(' ')
-      .map(word => word[0])
-      .join('')
+      .split(" ")
+      .map((word) => word[0])
+      .join("")
       .toUpperCase()
       .slice(0, 2);
   }
   // Si no hay nombre ni email, devolver valor por defecto
-  if (!email) return 'US';
-  
+  if (!email) return "US";
+
   // Si hay email, usar las primeras dos letras
   return email.slice(0, 2).toUpperCase();
 }
 
-export function Nav({ onBack, onReset, isDark, onThemeToggle }: NavProps) {
+export function Nav({
+  onBack,
+  isDark,
+  onThemeToggle,
+}: NavProps) {
   const [showSettings, setShowSettings] = useState(false);
   const [showShareMessage, setShowShareMessage] = useState(false);
   const { user, logout } = useAuth();
@@ -63,15 +77,17 @@ export function Nav({ onBack, onReset, isDark, onThemeToggle }: NavProps) {
   };
   return (
     <div className="fixed top-5 w-full px-5">
-      <div className="relative flex justify-between items-center">
-        {onBack ? (
-          <Button variant="ghost" size="icon" onClick={handleBack}>
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-        ) : (
-          <div className="w-9 h-9" />
-        )}
-
+      <div className="flex justify-between items-center">
+        <div className="flex items-center gap-2">
+          {onBack && (
+            <Button variant="ghost" size="icon" onClick={handleBack}>
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            
+          )}
+          
+        </div>
+      
         <div className="relative">
           <Button
             variant="ghost"
@@ -80,14 +96,15 @@ export function Nav({ onBack, onReset, isDark, onThemeToggle }: NavProps) {
           >
             <Settings className="h-5 w-5" />
           </Button>
+          
 
           {showSettings && (
             <div className="absolute top-full mt-2 right-0 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 min-w-[220px] border dark:border-gray-700">
               <div className="space-y-4">
                 {user && (
                   <>
-                    <Link 
-                      href={`/profile/${user.userId}`} 
+                    <Link
+                      href={`/profile/${user.userId}`}
                       className="flex items-center space-x-3 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
                     >
                       <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-sm font-medium text-primary-foreground">
@@ -95,7 +112,7 @@ export function Nav({ onBack, onReset, isDark, onThemeToggle }: NavProps) {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium truncate">
-                          {user.username || 'Usuario'}
+                          {user.username || "Usuario"}
                         </p>
                         <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
                           {user.email}
@@ -107,7 +124,7 @@ export function Nav({ onBack, onReset, isDark, onThemeToggle }: NavProps) {
                 )}
                 <div className="flex justify-between items-center">
                   <span className="text-sm font-medium">
-                    {user ? 'Cerrar Sesión' : 'Iniciar Sesión'}
+                    {user ? "Cerrar Sesión" : "Iniciar Sesión"}
                   </span>
                   {user ? (
                     <Button
@@ -165,22 +182,6 @@ export function Nav({ onBack, onReset, isDark, onThemeToggle }: NavProps) {
                   </Button>
                 </div>
 
-                {onReset && (
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm font-medium">Reiniciar juego</span>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => {
-                        onReset();
-                        setShowSettings(false);
-                      }}
-                      className="text-yellow-600 dark:hover:bg-gray-700"
-                    >
-                      Reiniciar
-                    </Button>
-                  </div>
-                )}
                 <div className="flex justify-between order-1 items-center">
                   <span className="text-sm font-medium">Compartir</span>
 

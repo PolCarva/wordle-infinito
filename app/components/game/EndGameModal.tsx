@@ -77,7 +77,7 @@ export function EndGameModal({
           </p>
           {description && (
             <p className="text-gray-600 dark:text-gray-400 mt-2">
-              "{description}"
+              &ldquo;{description}&rdquo;
             </p>
           )}
         </div>
@@ -95,4 +95,4 @@ export function EndGameModal({
       </div>
     </div>
   );
-} 
+}

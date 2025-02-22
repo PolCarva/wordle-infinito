@@ -23,6 +23,8 @@ interface VersusGame {
     creatorReady: boolean;
     opponentReady: boolean;
     gameCode: string;
+    creatorWantsRematch: boolean;
+    opponentWantsRematch: boolean;
 }
 
 interface ApiError {
@@ -40,6 +42,7 @@ function GameContent({ gameId }: { gameId: string }) {
     const [currentGuess, setCurrentGuess] = useState('');
     const { theme, setTheme } = useTheme();
     const [error, setError] = useState('');
+    const [wantsRematch, setWantsRematch] = useState(false);
 
     const handleGuess = useCallback(async () => {
         if (!game) return;
@@ -112,6 +115,17 @@ function GameContent({ gameId }: { gameId: string }) {
 
     const handleThemeToggle = () => {
         setTheme(theme === 'dark' ? 'light' : 'dark');
+    };
+
+    const handleRematch = async () => {
+        try {
+            const response = await api.requestRematch(gameId, user!.userId);
+            setGame(response);
+            setWantsRematch(true);
+        } catch (error) {
+            console.log(error);
+            setError('Error solicitando revancha');
+        }
     };
 
     if (!user || !game) {
@@ -336,6 +350,40 @@ function GameContent({ gameId }: { gameId: string }) {
                                 {game.winner === user.userId ? '¡Ganaste!' : '¡Perdiste!'}
                             </h2>
                             <p className="mt-2">La palabra era: {game.word}</p>
+                            
+                            <div className="mt-4 space-y-4">
+                                {!wantsRematch ? (
+                                    <Button 
+                                        onClick={handleRematch}
+                                        className="bg-green-500 hover:bg-green-600 text-white"
+                                    >
+                                        Jugar de nuevo
+                                    </Button>
+                                ) : (
+                                    <div className="space-y-2">
+                                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                                            {isCreator ? (
+                                                game.opponentWantsRematch ? 
+                                                    "¡El oponente también quiere jugar! Iniciando nueva partida..." :
+                                                    "Esperando respuesta del oponente..."
+                                            ) : (
+                                                game.creatorWantsRematch ?
+                                                    "¡El creador también quiere jugar! Iniciando nueva partida..." :
+                                                    "Esperando respuesta del creador..."
+                                            )}
+                                        </p>
+                                        <Button 
+                                            variant="outline" 
+                                            onClick={() => {
+                                                setWantsRematch(false);
+                                                api.cancelRematch(gameId, user!.userId);
+                                            }}
+                                        >
+                                            Cancelar
+                                        </Button>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     )}
                 </div>

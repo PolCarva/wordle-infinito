@@ -5,8 +5,6 @@ import { AuthProvider } from "../context/AuthContext";
 import MainLayout from "../components/layouts/MainLayout";
 import { GameBoard } from "../components/game/GameBoard";
 import { Keyboard } from "../components/game/Keyboard";
-import { Nav } from "../components/game/Nav";
-import { useTheme } from "next-themes";
 import { GameState } from "../types";
 import { api } from '../services/api';
 import { EndGameModal } from "../components/game/EndGameModal";
@@ -36,8 +34,6 @@ function BoluldleContent() {
   const [gameState, setGameState] = useState<GameState>(getInitialState());
   const [dictionary, setDictionary] = useState<string[]>([]);
   const [boluldeDictionary, setBoluldeDictionary] = useState<string[]>([]);
-  const { theme, setTheme } = useTheme();
-  const [isDark, setIsDark] = useState(false);
   const [currentWordDesc, setCurrentWordDesc] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
 
@@ -71,26 +67,6 @@ function BoluldleContent() {
     };
     loadDictionaries();
   }, []);
-
-  useEffect(() => {
-    setIsDark(theme === 'dark');
-  }, [theme]);
-
-  useEffect(() => {
-    const handleKeyPress = (event: KeyboardEvent) => {
-      const key = event.key.toUpperCase();
-      
-      if (key === 'ENTER' || key === 'BACKSPACE' || key === 'DELETE') {
-        handleKeyDown(key === 'DELETE' ? 'BACKSPACE' : key);
-      } else if (/^[A-ZÑ]$/.test(key)) {
-        handleKeyDown(key);
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyPress);
-    return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [gameState]);
-
   const handleKeyDown = (key: string) => {
     if (gameState.gameOver) return;
 
@@ -136,6 +112,24 @@ function BoluldleContent() {
       }));
     }
   };
+  
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      const key = event.key.toUpperCase();
+      
+      if (key === 'ENTER' || key === 'BACKSPACE' || key === 'DELETE') {
+        handleKeyDown(key === 'DELETE' ? 'BACKSPACE' : key);
+      } else if (/^[A-ZÑ]$/.test(key)) {
+        handleKeyDown(key);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gameState]);
+
+
 
   const handleReset = () => {
     // Usar el diccionario de Boludle para la nueva palabra
@@ -151,6 +145,7 @@ function BoluldleContent() {
     });
   };
 
+
   // Limpiar el error después de un tiempo
   useEffect(() => {
     if (error) {
@@ -163,11 +158,6 @@ function BoluldleContent() {
 
   return (
     <>
-      <Nav 
-        onReset={handleReset}
-        isDark={isDark}
-        onThemeToggle={() => setTheme(isDark ? 'light' : 'dark')}
-      />
       <div className="flex flex-col items-center gap-8 p-4">
         <h1 className="text-4xl font-bold text-center">Boludle</h1>
         {process.env.NODE_ENV === 'development' && (

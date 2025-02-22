@@ -133,7 +133,14 @@ export function Keyboard({ onKeyDown, gameState }: KeyboardProps) {
   };
 
   const handleClick = (key: string) => {
-    onKeyDown(key);
+    // Normalizar las teclas especiales
+    if (key === "BACKSPACE") {
+      onKeyDown("BACKSPACE");
+    } else if (key === "ENTER") {
+      onKeyDown("ENTER");
+    } else {
+      onKeyDown(key);
+    }
   };
 
   return (

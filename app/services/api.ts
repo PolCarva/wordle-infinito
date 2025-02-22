@@ -90,5 +90,13 @@ export const api = {
     getLeaderboard: async () => {
         const response = await axios.get(`${API_URL}/users/leaderboard`);
         return response.data;
+    },
+
+    getBoluWords: async () => {
+        const response = await axios.get(`${API_URL}/dictionary/boludle-words`);
+        return {
+            words: response.data.words,
+            description: response.data.description
+        };
     }
 }; 

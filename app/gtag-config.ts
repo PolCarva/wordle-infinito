@@ -1,4 +1,4 @@
-export const GA_TRACKING_ID = 'G-RGBJB9PVJV'
+export const GA_TRACKING_ID = 'G-PFSYFEQR3H'
 
 interface GtagEvent {
   action: string;

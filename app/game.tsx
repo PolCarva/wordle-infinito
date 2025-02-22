@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Button } from "@/app/components/ui/button";
-import Confetti from "react-confetti-boom";
+
 import { GameBoard } from "./components/game/GameBoard";
 import { Keyboard } from "./components/game/Keyboard";
 import { GameStats } from "./components/game/GameStats";
@@ -14,6 +13,7 @@ import { getDictionary, getGameConfig } from "@/app/dictionaries";
 import { useAuth } from "@/app/context/AuthContext";
 import { api } from "@/app/services/api";
 import { BOARD_MAX_WIDTHS } from '@/app/constants/styles';
+import { EndGameModal } from "./components/game/EndGameModal";
 
 interface GameProps {
   customWords?: string[];
@@ -37,19 +37,14 @@ interface Stats {
 
 export default function Game({ customWords }: GameProps) {
   const [started, setStarted] = useState(() => {
-    if (typeof window !== "undefined") {
-      const savedGame = localStorage.getItem("currentGame");
-      return !!savedGame;
-    }
-    return false;
+    if (typeof window === 'undefined') return false;
+    return !!localStorage.getItem("currentGame");
   });
 
   const [gameState, setGameState] = useState<GameState | null>(() => {
-    if (typeof window !== "undefined") {
-      const savedState = localStorage.getItem("gameState");
-      return savedState ? JSON.parse(savedState) : null;
-    }
-    return null;
+    if (typeof window === 'undefined') return null;
+    const savedState = localStorage.getItem("gameState");
+    return savedState ? JSON.parse(savedState) : null;
   });
 
   const [boardCount, setBoardCount] = useState<number | "">(1);
@@ -186,7 +181,10 @@ export default function Game({ customWords }: GameProps) {
     const attemptsExhausted =
       newBoards[0].guesses.length >= gameState.maxAttempts;
 
-    if (allCompleted || attemptsExhausted) {
+    // Solo mostrar la modal si el juego realmente terminó
+    const isGameOver = allCompleted || attemptsExhausted;
+
+    if (isGameOver) {
       updateGameStats(allCompleted);
     }
 
@@ -194,10 +192,10 @@ export default function Game({ customWords }: GameProps) {
       ...gameState,
       boards: newBoards,
       currentGuess: "",
-      gameOver: allCompleted || attemptsExhausted,
+      gameOver: isGameOver,
       won: allCompleted,
       remainingLives: newRemainingLives,
-      showEndModal: true,
+      showEndModal: isGameOver, // Solo mostrar la modal si el juego terminó
     };
 
     setGameState(newGameState);
@@ -379,61 +377,15 @@ export default function Game({ customWords }: GameProps) {
       <div className="fixed lg:relative bottom-0 left-0 right-0 bg-white dark:bg-gray-900 lg:!bg-transparent p-2 md:p-4 lg:border-t-0 border-t dark:border-gray-800">
         <Keyboard onKeyDown={handleKeyPress} gameState={gameState} />
       </div>
-      {gameState.gameOver && gameState.showEndModal && (
-        <div className="fixed inset-0 flex items-center z-50 justify-center bg-black/50">
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg text-center">
-            <h2 className="text-3xl font-bold mb-4">
-              {gameState.won ? "¡Ganaste!" : "¡Perdiste!"}
-            </h2>
-            {gameState.won && (
-              <Confetti
-                launchSpeed={1.5}
-                spreadDeg={180}
-                effectCount={3}
-                effectInterval={500}
-                mode="boom"
-                particleCount={150}
-                colors={[
-                  "#E74C3C",
-                  "#2ECC71",
-                  "#3498DB",
-                  "#F1C40F",
-                  "#9B59B6",
-                  "#1ABC9C",
-                ]}
-              />
-            )}
-            <p className="text-xl mb-4">
-              {gameState.won
-                ? "¡Felicidades! Has adivinado todas las palabras."
-                : "Suerte para la próxima."}
-            </p>
-            {!gameState.won && (
-              <div className="mb-4">
-                {gameState.boards.length === 1
-                  ? "La palabra era: "
-                  : "Las palabras eran: "}
-                {gameState.boards.map((board) => board.word).join(", ")}
-              </div>
-            )}
 
-            <div className="flex gap-4 justify-center">
-              <Button
-                variant="outline"
-                className="bg-red-600 text-white hover:text-white hover:bg-red-700"
-                onClick={() =>
-                  setGameState((prev) =>
-                    prev ? { ...prev, showEndModal: false } : null
-                  )
-                }
-              >
-                Cerrar
-              </Button>
-              <Button onClick={() => initializeGame()}>Jugar de nuevo</Button>
-            </div>
-          </div>
-        </div>
-      )}
+      <EndGameModal
+        show={gameState.showEndModal}
+        won={gameState.won}
+        boards={gameState.boards}
+        solution={gameState.boards.map(board => board.word)}
+        onClose={() => setGameState(prev => prev ? { ...prev, showEndModal: false } : null)}
+        onPlayAgain={() => initializeGame()}
+      />
     </div>
   );
 }

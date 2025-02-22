@@ -34,6 +34,14 @@ const games = [
     icon: "🐝",
     isComingSoon: true,
   },
+  {
+    title: "Boludle",
+    description: "La versión argentina del Wordle, con palabras del lunfardo y expresiones locales",
+    path: "/boludle",
+    backgroundColor: "bg-blue-500",
+    icon: "🧉",
+    isComingSoon: false
+  },
 ];
 
 export default function Page() {

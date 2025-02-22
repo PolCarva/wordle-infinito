@@ -2,8 +2,9 @@
 
 import { useAuth, AuthProvider } from '@/app/context/AuthContext';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Swords } from 'lucide-react';
+import {  Swords } from 'lucide-react';
 import Image from 'next/image';
+import MainLayout from '../components/layouts/MainLayout';
 
 function ProfileContent() {
   const { user } = useAuth();
@@ -16,16 +17,9 @@ function ProfileContent() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="fixed top-4 left-4">
-        <button
-          onClick={() => router.back()}
-          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full"
-        >
-          <ArrowLeft className="h-6 w-6" />
-        </button>
-      </div>
+     
 
-      <div className="max-w-2xl mx-auto px-4 py-16">
+      <div className="max-w-2xl mx-auto px-4">
         <div className="bg-card rounded-lg shadow-lg p-6 space-y-6">
           <div className="flex items-center space-x-4">
             {user.imageUrl ? (
@@ -89,7 +83,9 @@ function ProfileContent() {
 export default function ProfilePage() {
   return (
     <AuthProvider>
-      <ProfileContent />
+      <MainLayout>
+        <ProfileContent />
+      </MainLayout>
     </AuthProvider>
   );
 }

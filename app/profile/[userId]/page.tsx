@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Swords } from 'lucide-react';
+import { Swords } from 'lucide-react';
 import { api } from '@/app/services/api';
 import Image from 'next/image';
+import MainLayout from '../../components/layouts/MainLayout';
 
 interface ProfileStats {
   gamesPlayed: number;
@@ -59,16 +60,7 @@ function ProfileContent({ userId }: { userId: string }) {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="fixed top-4 left-4">
-        <button
-          onClick={() => router.back()}
-          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full"
-        >
-          <ArrowLeft className="h-6 w-6" />
-        </button>
-      </div>
-
-      <div className="max-w-2xl mx-auto px-4 py-16">
+      <div className="max-w-2xl mx-auto px-4">
         <div className="bg-card rounded-lg shadow-lg p-6 space-y-6">
           <div className="flex items-center space-x-4">
             {profileData.imageUrl ? (
@@ -121,7 +113,11 @@ function ProfileContent({ userId }: { userId: string }) {
 }
 
 export default function ProfilePage({ params }: { params: { userId: string } }) {
-  return <ProfileContent userId={params.userId} />;
+  return (
+    <MainLayout>
+      <ProfileContent userId={params.userId} />
+    </MainLayout>
+  );
 }
 
 function StatCard({ title, value }: { title: string; value: number | string }) {

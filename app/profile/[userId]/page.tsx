@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { Swords } from 'lucide-react';
 import { api } from '@/app/services/api';
 import Image from 'next/image';
@@ -38,7 +37,6 @@ function getInitials(name: string | undefined): string {
 }
 
 function ProfileContent({ userId }: { userId: string }) {
-  const router = useRouter();
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
 
   useEffect(() => {

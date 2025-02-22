@@ -1,12 +1,13 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
+import { useState } from "react";
 import { AuthProvider } from "../context/AuthContext";
 import MainLayout from "../components/layouts/MainLayout";
 import { ColorBoard } from "../components/game/ColorBoard";
 import { ColorKeyboard } from "../components/game/ColorKeyboard";
+import { EndGameModal } from "../components/game/EndGameModal";
 
-const COLORS = ['🟥', '🟧', '🟨', '🟩', '🟦', '🟪', '⬛️', '🟫', '⬜'];
+const COLORS = ["🟥", "🟧", "🟨", "🟩", "🟦", "🟪", "⬛️", "🟫", "⬜"];
 const WORD_LENGTH = 5;
 const MAX_ATTEMPTS = 6;
 
@@ -20,7 +21,7 @@ function getRandomColors() {
 }
 
 function ColordleContent() {
-  const [solution] = useState(() => getRandomColors());
+  const [solution, setSolution] = useState(() => getRandomColors());
   const [guesses, setGuesses] = useState<string[][]>([]);
   const [currentGuess, setCurrentGuess] = useState<string[]>([]);
   const [gameOver, setGameOver] = useState(false);
@@ -39,7 +40,7 @@ function ColordleContent() {
 
   const onEnter = () => {
     if (currentGuess.length !== WORD_LENGTH) return;
-    
+
     const newGuesses = [...guesses, currentGuess];
     setGuesses(newGuesses);
     setCurrentGuess([]);
@@ -53,17 +54,23 @@ function ColordleContent() {
     }
   };
 
+  const handleReset = () => {
+    setSolution(getRandomColors());
+    setGuesses([]);
+    setCurrentGuess([]);
+    setGameOver(false);
+    setWon(false);
+  };
+
   return (
     <div className="flex flex-col items-center gap-8 p-4">
       <h1 className="text-4xl font-bold text-center">Colordle</h1>
-      {process.env.NODE_ENV === 'development' && (
-        <div className="text-lg font-mono bg-gray-100 dark:bg-gray-800 p-4 rounded-lg">
-          <p>Solución: {solution.join(" ")}</p>
-        </div>
+      {process.env.NODE_ENV === "development" && (
+        <p>Solución: {solution.join(" ")}</p>
       )}
-      
+
       <div className="w-full max-w-sm">
-        <ColorBoard 
+        <ColorBoard
           guesses={guesses}
           currentGuess={currentGuess}
           solution={solution}
@@ -72,7 +79,7 @@ function ColordleContent() {
         />
       </div>
 
-      <ColorKeyboard 
+      <ColorKeyboard
         onColorSelect={onColorSelect}
         onDelete={onDelete}
         onEnter={onEnter}
@@ -81,16 +88,21 @@ function ColordleContent() {
         solution={solution}
       />
 
-      {gameOver && (
-        <div className="text-center">
-          <p className="text-xl font-bold mb-2">
-            {won ? "¡Felicitaciones!" : "¡Inténtalo de nuevo!"}
-          </p>
-          <p className="text-lg">
-            La combinación era: {solution.join(" ")}
-          </p>
-        </div>
-      )}
+      <EndGameModal
+        show={gameOver}
+        won={won}
+        solution={solution}
+        boards={[
+          {
+            word: solution.join(""),
+            completed: gameOver,
+            guesses: guesses.map((g) => g.join("")),
+            id: 1,
+          },
+        ]}
+        onClose={() => setGameOver(false)}
+        onPlayAgain={handleReset}
+      />
     </div>
   );
 }
@@ -103,4 +115,4 @@ export default function ColordlePage() {
       </MainLayout>
     </AuthProvider>
   );
-} 
+}

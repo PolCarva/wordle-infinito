@@ -9,6 +9,7 @@ const MainNav = () => {
   const { theme, setTheme } = useTheme();
   const isDark = theme === 'dark';
 
+
   const handleThemeToggle = () => {
     setTheme(isDark ? 'light' : 'dark');
   };
@@ -18,7 +19,7 @@ const MainNav = () => {
       <Nav 
         isDark={isDark} 
         onThemeToggle={handleThemeToggle}
-        onBack={() => router.back()}
+        onBack={window.location.pathname !== '/' ? () => router.back() : undefined}
       />
     </div>
   );

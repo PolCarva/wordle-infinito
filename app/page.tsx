@@ -27,18 +27,10 @@ const games = [
     icon: "🎨",
   },
   {
-    title: "SpellBee",
-    description: "Forma palabras con 7 letras",
-    path: "/spellbee",
-    backgroundColor: "bg-[#ffe9b4]",
-    icon: "🐝",
-    isComingSoon: true,
-  },
-  {
     title: "Boludle",
     description: "La versión argentina del Wordle, con palabras del lunfardo y expresiones locales",
     path: "/boludle",
-    backgroundColor: "bg-blue-500",
+    backgroundColor: "bg-blue-300",
     icon: "🧉",
     isComingSoon: false
   },

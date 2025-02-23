@@ -9,6 +9,7 @@ import {
   LogIn,
   LogOut,
   Swords,
+  Home,
 } from "lucide-react";
 import { Share2 } from "lucide-react";
 import { useState } from "react";
@@ -40,11 +41,7 @@ function getInitials(
   return email.slice(0, 2).toUpperCase();
 }
 
-export function Nav({
-  onBack,
-  isDark,
-  onThemeToggle,
-}: NavProps) {
+export function Nav({ onBack, isDark, onThemeToggle }: NavProps) {
   const [showSettings, setShowSettings] = useState(false);
   const [showShareMessage, setShowShareMessage] = useState(false);
   const { user, logout } = useAuth();
@@ -79,15 +76,21 @@ export function Nav({
     <div className="fixed top-5 w-full px-5">
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-2">
-          {onBack && (
+          {onBack ? (
             <Button variant="ghost" size="icon" onClick={handleBack}>
               <ArrowLeft className="h-5 w-5" />
             </Button>
-            
+          ) : (
+            window.location.pathname !== '/' && (
+              <Link href="/">
+                <Button variant="ghost" size="icon">
+                  <Home className="h-5 w-5" />
+                </Button>
+              </Link>
+            )
           )}
-          
         </div>
-      
+
         <div className="relative">
           <Button
             variant="ghost"
@@ -96,7 +99,6 @@ export function Nav({
           >
             <Settings className="h-5 w-5" />
           </Button>
-          
 
           {showSettings && (
             <div className="absolute top-full mt-2 right-0 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 min-w-[220px] border dark:border-gray-700">

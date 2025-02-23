@@ -53,7 +53,7 @@ function ProfileContent({ userId }: { userId: string }) {
   }, [userId]);
 
   if (!profileData) {
-    return <div>Cargando...</div>;
+    return <div className='flex justify-center items-center h-screen'>Cargando...</div>;
   }
 
   return (

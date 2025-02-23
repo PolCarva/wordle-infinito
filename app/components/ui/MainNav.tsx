@@ -19,7 +19,7 @@ const MainNav = () => {
       <Nav 
         isDark={isDark} 
         onThemeToggle={handleThemeToggle}
-        onBack={window.location.pathname !== '/' ? () => router.back() : undefined}
+        onBack={window.location.pathname !== '/' ? () => router.back() : () => router.push('/')}
       />
     </div>
   );

@@ -73,7 +73,7 @@ export function GameBoard({
           : BOARD_MAX_WIDTHS[wordLength]?.[board.guesses.length] ||
             BOARD_MAX_WIDTHS[wordLength]?.["all"] ||
             "max-w-[800px]"
-      } rounded-lg border ${
+      } rounded-lg border w-full ${
         board.completed ? "border-green-500" : "border-gray-500"
       }`}
     >

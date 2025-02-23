@@ -34,6 +34,14 @@ const games = [
     icon: "🧉",
     isComingSoon: false
   },
+  {
+    title: "Contrarreloj",
+    description: "¿Cuántas palabras puedes adivinar en un minuto?",
+    path: "/contrarreloj",
+    backgroundColor: "bg-amber-400",
+    icon: "⏰",
+    isComingSoon: false,
+  },
 ];
 
 export default function Page() {

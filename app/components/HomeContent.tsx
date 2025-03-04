@@ -1,158 +1,70 @@
-"use client";
-
-import { useState } from "react";
-import { Crown, Trophy } from "lucide-react";
-import Link from "next/link";
-import Image from "next/image";
-import { Button } from "./ui/button";
-import { LeaderboardModal } from "./ui/LeaderboardModal";
-import GameCard from "./ui/GameCard";
-
-interface Game {
-  title: string;
-  description: string;
-  path: string;
-  backgroundColor: string;
-  icon: string;
-  isComingSoon?: boolean;
-}
-
-export function HomeContent({ games }: { games: Game[] }) {
-  const [showLeaderboard, setShowLeaderboard] = useState(false);
-
+export function HomeContent() {
   return (
-    <div className="min-h-[calc(100vh-3.5rem)] bg-background">
-      <div className="max-w-7xl mx-auto px-4 pb-12">
-        <div className="text-center space-y-4 mb-12">
-          <h1 className="text-4xl font-bold text-foreground">
-            <div className="flex flex-col items-center gap-2">
-              {/* EL REY DEL en una línea en desktop, dos en mobile */}
-              <span className="flex flex-col md:flex-row gap-2 md:gap-6">
-                {/* EL REY */}
-                <div className="flex gap-1 mx-auto">
-                  {["E", "L", " ", "R", "E", "Y"].map((letter, i) => (
-                    <span
-                      key={i}
-                      className={`${
-                        letter === " "
-                          ? "w-3 h-10 md:w-6 md:h-16 bg-transparent"
-                          : i === 0
-                          ? "w-10 h-10 md:w-16 md:h-16 bg-green-500"
-                          : i === 3
-                          ? "w-10 h-10 md:w-16 md:h-16 bg-gray-500"
-                          : i === 4
-                          ? "w-10 h-10 md:w-16 md:h-16 bg-yellow-500"
-                          : i === 5
-                          ? "w-10 h-10 md:w-16 md:h-16 bg-green-500"
-                          : "w-10 h-10 md:w-16 md:h-16 bg-green-500"
-                      } flex items-center justify-center rounded-lg text-white font-bold text-xl md:text-3xl relative ${letter !== " " ? "shadow-md" : ""}`}
-                    >
-                      {letter === " " ? (
-                        "\u00A0"
-                      ) : (
-                        <>
-                          {letter === "R" && (
-                            <span className="absolute -top-6 md:-top-7 -left-5 transform -rotate-[20deg] md:-rotate-[18deg]">
-                              <Crown className="size-6 md:size-8 text-yellow-500" />
-                            </span>
-                          )}
-                          {letter}
-                        </>
-                      )}
-                    </span>
-                  ))}
-                </div>
-
-                {/* DEL */}
-                <div className="flex gap-1 mx-auto">
-                  {["D", "E", "L"].map((letter, i) => (
-                    <span
-                      key={i}
-                      className={`${
-                        letter === " "
-                          ? "w-3 h-10 md:w-6 md:h-16 bg-transparent"
-                          : i === 0
-                          ? "w-10 h-10 md:w-16 md:h-16 bg-gray-500"
-                          : "w-10 h-10 md:w-16 md:h-16 bg-green-500"
-                      } flex items-center justify-center rounded-lg text-white font-bold text-xl md:text-3xl ${letter !== " " ? "shadow-md" : ""}`}
-                    >
-                      {letter === " " ? "\u00A0" : letter}
-                    </span>
-                  ))}
-                </div>
-              </span>
-
-              {/* WORDLE siempre en su propia línea */}
-              <div className="flex gap-1 mx-auto">
-                {["W", "O", "R", "D", "L", "E"].map((letter, i) => (
-                  <span
-                    key={i}
-                    className={`${
-                      letter === " "
-                        ? "w-3 h-10 md:w-6 md:h-16 bg-transparent"
-                        : i === 0
-                        ? "w-10 h-10 md:w-16 md:h-16 bg-gray-500"
-                        : i === 2
-                        ? "w-10 h-10 md:w-16 md:h-16 bg-green-500"
-                        : i === 3
-                        ? "w-10 h-10 md:w-16 md:h-16 bg-yellow-500"
-                        : "w-10 h-10 md:w-16 md:h-16 bg-green-500"
-                    } flex items-center justify-center rounded-lg text-white font-bold text-xl md:text-3xl ${letter !== " " ? "shadow-md" : ""}`}
-                  >
-                    {letter === " " ? (
-                      "\u00A0"
-                    ) : letter === "O" ? (
-                      <Link
-                        className="w-full h-full grid place-items-center group"
-                        href="https://www.youtube.com/@pache00games"
-                        target="_blank"
-                      >
-                        <Image
-                          src="/images/channel_profile.jpg"
-                          alt="Descripción"
-                          width={500}
-                          height={300}
-                          className="rounded-full size-[90%] group-hover:scale-110 transition-transform object-cover"
-                        />
-                      </Link>
-                    ) : (
-                      letter
-                    )}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </h1>
-          <p className="text-lg text-muted-foreground">
-            Explora nuestra colección de juegos de palabras
+    <article className="max-w-4xl mx-auto px-4 py-8 prose dark:prose-invert prose-sm">
+      <h1 className="sr-only">Wordle Infinito - El Juego de Palabras Definitivo</h1>
+      
+      <section className="mt-8">
+        <h2 className="text-xl font-bold mb-4">¿Qué es Wordle Infinito?</h2>
+        <p className="text-gray-600 dark:text-gray-300 mb-4">
+          Wordle Infinito revoluciona el clásico juego de palabras permitiéndote jugar múltiples partidas simultáneamente. 
+          A diferencia del Wordle tradicional que limita a una palabra por día, aquí puedes desafiar tu mente con 8, 16, 32, 
+          64 o incluso más palabras al mismo tiempo, creando una experiencia única y más desafiante.
+        </p>
+      </section>
+      
+      <section className="mt-8">
+        <h2 className="text-xl font-bold mb-4">Características Principales</h2>
+        <ul className="list-disc list-inside text-gray-600 dark:text-gray-300 space-y-2">
+          <li>Múltiples tableros simultáneos para un desafío mayor</li>
+          <li>Sistema de vidas que te permite seguir jugando incluso si cometes errores</li>
+          <li>Modo de palabras raras para jugadores expertos</li>
+          <li>Creación y compartición de partidas personalizadas</li>
+          <li>Interfaz intuitiva adaptada a todos los dispositivos</li>
+        </ul>
+      </section>
+      
+      <section className="mt-8">
+        <h2 className="text-xl font-bold mb-4">Cómo Jugar</h2>
+        <p className="text-gray-600 dark:text-gray-300 mb-4">
+          El objetivo es descubrir todas las palabras antes de agotar tus intentos. Cada palabra debe tener 5 letras, 
+          y tras cada intento, el juego te dará pistas mediante colores: verde para letras en la posición correcta, 
+          amarillo para letras presentes pero en posición incorrecta, y gris para letras que no están en la palabra.
+        </p>
+      </section>
+      
+      <section className="mt-8">
+        <h2 className="text-xl font-bold mb-4">Modos de Juego</h2>
+        <div className="space-y-4">
+          <p className="text-gray-600 dark:text-gray-300">
+            Elige entre el modo normal con palabras comunes o el modo experto con palabras más raras. 
+            Personaliza la cantidad de tableros según tu nivel de habilidad y tiempo disponible.
           </p>
-          <div className="flex justify-center mt-8 mb-12">
-            <Button
-              variant="default"
-              size="lg"
-              className="flex items-center gap-3 px-8 py-6 text-lg font-bold hover:scale-105 transition-transform shadow-lg hover:shadow-xl"
-              onClick={() => setShowLeaderboard(true)}
-            >
-              <Trophy className="h-6 w-6 text-yellow-500" />
-              Ver Tabla de Clasificación
-            </Button>
-          </div>
+          <p className="text-gray-600 dark:text-gray-300">
+            Crea tus propias partidas personalizadas seleccionando las palabras que desees y comparte 
+            el enlace con amigos para competir o usar en entornos educativos.
+          </p>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {games.map((game, index) => (
-            <div
-              key={index}
-              className="transform transition-transform hover:scale-105"
-            >
-              <GameCard {...game} />
-            </div>
-          ))}
-        </div>
-      </div>
-      <LeaderboardModal
-        open={showLeaderboard}
-        onOpenChange={setShowLeaderboard}
-      />
-    </div>
+      </section>
+      
+      <section className="mt-8">
+        <h2 className="text-xl font-bold mb-4">Beneficios del Juego</h2>
+        <ul className="list-disc list-inside text-gray-600 dark:text-gray-300 space-y-2">
+          <li>Mejora tu vocabulario en español de forma divertida</li>
+          <li>Desarrolla el pensamiento lógico y la deducción</li>
+          <li>Entrena tu memoria y capacidad de concentración</li>
+          <li>Perfecciona tu ortografía mientras juegas</li>
+          <li>Compite contigo mismo y supera tus récords</li>
+        </ul>
+      </section>
+      
+      <section className="mt-8">
+        <h2 className="text-xl font-bold mb-4">Juega Donde Quieras</h2>
+        <p className="text-gray-600 dark:text-gray-300">
+          Wordle Infinito está optimizado para funcionar en cualquier dispositivo, ya sea computadora, 
+          tablet o teléfono móvil. No requiere instalación ni registro, simplemente abre el navegador 
+          y comienza a jugar. ¡Desafía tu mente con este adictivo juego de palabras en español!
+        </p>
+      </section>
+    </article>
   );
 }

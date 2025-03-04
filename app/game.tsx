@@ -331,7 +331,7 @@ export default function Game({ customWords }: GameProps) {
       </div>
       {process.env.NODE_ENV === "development" && (
         <div className="text-lg font-mono bg-gray-100 dark:bg-gray-800 p-4 rounded-lg">
-          <p>
+          <p className="flex flex-wrap gap-2">
             SOLUCIONES: {" "}
             {gameState.boards.map((board, i) => (
               <span key={i} className="mr-2">
@@ -346,7 +346,9 @@ export default function Game({ customWords }: GameProps) {
       <div className="w-full">
         <div
           className={`
-            grid grid-cols-2 ${
+            grid 
+            ${gameState.boards.length <= 10 ? "grid-cols-1" : "grid-cols-2"}
+            ${
               BOARD_MAX_WIDTHS[wordLength]?.[gameState.boards.length] ||
               BOARD_MAX_WIDTHS[wordLength]?.["all"] ||
               "max-w-[1600px]"

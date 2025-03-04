@@ -142,7 +142,7 @@ export function Menu({
           </div>
         </div>
 
-        <div className="bg-gray-50 dark:bg-gray-800 md:p-8 rounded-2xl shadow-lg w-full max-w-md space-y-6">
+        <div className="bg-gray-50 p-4 dark:bg-gray-800 md:p-8 rounded-2xl shadow-lg w-full max-w-md space-y-6">
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-semibold flex items-center gap-2">
@@ -166,7 +166,7 @@ export function Menu({
                         : "bg-gray-200 dark:bg-gray-700"
                         }`}
                     >
-                      {length} letra{length !== 1 ? "s" : ""}
+                      <span className="block md:inline">{length}</span> letra{length !== 1 ? "s" : ""}
                     </button>
                   )
                 )}

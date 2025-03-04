@@ -1,5 +1,6 @@
 'use client';
 
+import { HomeContent } from '../HomeContent';
 import MainNav from '../ui/MainNav';
 
 interface MainLayoutProps {
@@ -12,8 +13,8 @@ const MainLayout = ({ children }: MainLayoutProps) => {
       <MainNav />
       <main className="pt-20">
         {children}
-        
       </main>
+      <HomeContent />
     </div>
   );
 };

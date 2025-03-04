@@ -12,7 +12,7 @@ import {
   Trophy
 } from "lucide-react";
 import { Share2 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/app/context/AuthContext";
 import Link from "next/link";
 import { LeaderboardModal } from "@/app/components/ui/LeaderboardModal";
@@ -45,7 +45,18 @@ export function Nav({ isDark, onThemeToggle }: NavProps) {
   const [showSettings, setShowSettings] = useState(false);
   const [showShareMessage, setShowShareMessage] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const { user, logout } = useAuth();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY;
+      setIsScrolled(scrollPosition > 10);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const handleBack = () => {
     // Limpiar el localStorage para evitar que se restaure el juego
@@ -78,17 +89,21 @@ export function Nav({ isDark, onThemeToggle }: NavProps) {
     }
   };
   return (
-    <div className="fixed top-5 w-full px-5">
+    <div className="fixed top-5 w-full px-5 z-10 py-2">
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-2">
-          <Button variant="ghost" className="flex items-center gap-2 px-2" onClick={handleBack}>
+          <Button 
+            variant="ghost" 
+            className={`flex items-center gap-2 px-2 transition-all duration-200 ${isScrolled ? 'bg-background/80 backdrop-blur-md shadow-sm' : ''}`} 
+            onClick={handleBack}
+          >
             <Home className="h-5 w-5" />
             <span className="hidden xs:block">Inicio</span>
           </Button>
 
           <Button
             variant="ghost"
-            className="flex items-center gap-2 text-yellow-600  px-2"
+            className={`flex items-center gap-2 text-yellow-600 px-2 transition-all duration-200 ${isScrolled ? 'bg-background/80 backdrop-blur-md shadow-sm' : ''}`}
             onClick={() => setShowLeaderboard(true)}
           >
             <Trophy className="h-5 w-5" />
@@ -99,7 +114,7 @@ export function Nav({ isDark, onThemeToggle }: NavProps) {
         <div className="relative">
           <Button
             variant="ghost"
-            className="flex items-center gap-2 px-2"
+            className={`flex items-center gap-2 px-2 transition-all duration-200 ${isScrolled ? 'bg-background/80 backdrop-blur-md shadow-sm' : ''}`}
             onClick={() => setShowSettings(!showSettings)}
           >
             <Settings className="h-5 w-5" />

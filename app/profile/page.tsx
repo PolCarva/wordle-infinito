@@ -2,7 +2,6 @@
 
 import { useAuth, AuthProvider } from '@/app/context/AuthContext';
 import { useRouter } from 'next/navigation';
-import {  Swords } from 'lucide-react';
 import Image from 'next/image';
 import MainLayout from '../components/layouts/MainLayout';
 
@@ -54,7 +53,7 @@ function ProfileContent() {
             </div>
           </div>
 
-          <div className="border-t dark:border-gray-700 pt-6">
+         {/*  <div className="border-t dark:border-gray-700 pt-6">
             <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
               <Swords className="w-5 h-5" />
               Estadísticas Versus
@@ -73,7 +72,7 @@ function ProfileContent() {
                 value={`${Math.round(user.stats?.versusWinRate || 0)}%`} 
               />
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

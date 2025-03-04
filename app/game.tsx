@@ -60,10 +60,15 @@ export default function Game({ customWords }: GameProps) {
   const [stats, setStats] = useState<Stats | null>(null);
 
   const initializeGame = useCallback(async () => {
+    // Si hay palabras personalizadas, usar la longitud de la primera palabra
+    const wordLengthToUse = customWords && customWords.length > 0 
+      ? customWords[0].length 
+      : wordLength;
+    
     const finalBoardCount = typeof boardCount === "number" ? boardCount : 1;
-    const dictionary = await getDictionary(wordLength, useRareWords, true);
+    const dictionary = await getDictionary(wordLengthToUse, useRareWords, true);
     const words = customWords || getRandomWords(finalBoardCount, dictionary);
-    const config = await getGameConfig(wordLength, true);
+    const config = await getGameConfig(wordLengthToUse, true);
 
     const newGameState = {
       boards: words.map((word, index) => ({
@@ -91,7 +96,12 @@ export default function Game({ customWords }: GameProps) {
     if (customWords) {
       const validateCustomWords = async () => {
         try {
-          const acceptedWords = await getDictionary(wordLength, true, true);
+          // Usar la longitud de la primera palabra personalizada
+          const customWordLength = customWords[0].length;
+          // Actualizar el estado de wordLength para que coincida con las palabras personalizadas
+          setWordLength(customWordLength);
+          
+          const acceptedWords = await getDictionary(customWordLength, true, true);
           const newWords = customWords.filter(
             (word) => !acceptedWords.includes(word)
           );
@@ -110,7 +120,7 @@ export default function Game({ customWords }: GameProps) {
       };
       validateCustomWords();
     }
-  }, [customWords, wordLength, initializeGame]);
+  }, [customWords, initializeGame]);
 
   useEffect(() => {
     if (user) {
@@ -155,14 +165,20 @@ export default function Game({ customWords }: GameProps) {
     if (!gameState) return;
 
     const guess = gameState.currentGuess.toUpperCase();
-    const acceptedWords = await getDictionary(wordLength, true, true);
+    // Usar la longitud de la primera palabra del tablero
+    const currentWordLength = gameState.boards[0].word.length;
+    const acceptedWords = await getDictionary(currentWordLength, true, true);
 
-    if (guess.length !== wordLength) {
-      setError(`La palabra debe tener ${wordLength} letras`);
+    if (guess.length !== currentWordLength) {
+      setError(`La palabra debe tener ${currentWordLength} letras`);
       return;
     }
 
-    if (!acceptedWords.includes(guess)) {
+    // Si hay palabras personalizadas, considerarlas como válidas
+    const customWordsSet = customWords ? new Set(customWords) : new Set();
+    
+    // Verificar si la palabra está en el diccionario o es una palabra personalizada
+    if (!acceptedWords.includes(guess) && !customWordsSet.has(guess)) {
       setError("Palabra no válida");
       return;
     }
@@ -207,15 +223,18 @@ export default function Game({ customWords }: GameProps) {
     setGameState(newGameState);
     localStorage.setItem("gameState", JSON.stringify(newGameState));
     setError(null);
-  }, [gameState, wordLength, updateGameStats]);
+  }, [gameState, updateGameStats, customWords]);
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
       if (!gameState || gameState.gameOver) return;
 
+      // Usar la longitud de la primera palabra del tablero
+      const currentWordLength = gameState.boards[0].word.length;
+
       if (event.key === "Enter") {
-        if (gameState.currentGuess.length !== wordLength) {
-          setError(`La palabra debe tener ${wordLength} letras`);
+        if (gameState.currentGuess.length !== currentWordLength) {
+          setError(`La palabra debe tener ${currentWordLength} letras`);
           return;
         }
 
@@ -230,7 +249,7 @@ export default function Game({ customWords }: GameProps) {
         return;
       }
 
-      if (gameState.currentGuess.length === wordLength) return;
+      if (gameState.currentGuess.length === currentWordLength) return;
 
       if (/^[A-ZÑ]$/.test(event.key.toUpperCase())) {
         setGameState((prev) => ({
@@ -239,7 +258,7 @@ export default function Game({ customWords }: GameProps) {
         }));
       }
     },
-    [gameState, wordLength, handleGuess]
+    [gameState, handleGuess]
   );
 
   useEffect(() => {
@@ -249,6 +268,9 @@ export default function Game({ customWords }: GameProps) {
 
   const handleKeyPress = (key: string) => {
     if (!gameState || gameState.gameOver) return;
+
+    // Usar la longitud de la primera palabra del tablero
+    const currentWordLength = gameState.boards[0].word.length;
 
     // Normalizar las teclas para que coincidan con el evento del teclado físico
     if (key === "ENTER") {
@@ -260,7 +282,7 @@ export default function Game({ customWords }: GameProps) {
       }));
     } else {
       // Solo agregar la letra si no excede el límite
-      if (gameState.currentGuess.length < wordLength) {
+      if (gameState.currentGuess.length < currentWordLength) {
         setGameState(prev => ({
           ...prev!,
           currentGuess: prev!.currentGuess + key

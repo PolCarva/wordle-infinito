@@ -107,7 +107,7 @@ export function Nav({ isDark, onThemeToggle }: NavProps) {
             onClick={() => setShowLeaderboard(true)}
           >
             <Trophy className="h-5 w-5" />
-            <span className="hidden xs:block">Clasificación</span>
+            <span className="hidden xs:block">Tabla</span>
           </Button>
         </div>
 

@@ -22,17 +22,18 @@ export default function CreatePage() {
   const [words, setWords] = useState<string[]>([]);
   const [currentWord, setCurrentWord] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [wordLength, setWordLength] = useState<number>(5);
 
   const handleAddWord = () => {
     const word = currentWord.toUpperCase();
 
-    if (word.length !== 5) {
-      setError("La palabra debe tener 5 letras");
+    if (word.length !== wordLength) {
+      setError(`La palabra debe tener ${wordLength} letras`);
       return;
     }
 
     // Validamos que solo contenga letras válidas
-    if (!/^[A-ZÑ]{5}$/.test(word)) {
+    if (!new RegExp(`^[A-ZÑ]{${wordLength}}$`).test(word)) {
       setError("Solo se permiten letras");
       return;
     }
@@ -138,6 +139,34 @@ export default function CreatePage() {
 
           <div className="bg-card border border-border p-8 rounded-2xl w-full max-w-md space-y-6">
             <div className="space-y-4">
+              <div className="mb-4">
+                <label className="text-sm font-medium mb-2 block">
+                  Longitud de las palabras
+                </label>
+                <div className="flex gap-2 flex-wrap">
+                  {[1, 2, 3, 4, 5, 6].map((length) => (
+                    <button
+                      key={length}
+                      onClick={() => {
+                        if (words.length === 0) {
+                          setWordLength(length);
+                        } else {
+                          setError("No puedes cambiar la longitud después de agregar palabras");
+                          setTimeout(() => setError(null), 3000);
+                        }
+                      }}
+                      className={`px-4 py-2 rounded-lg ${
+                        wordLength === length
+                          ? "bg-green-500 text-white"
+                          : "bg-gray-200 dark:bg-gray-700"
+                      } ${words.length > 0 && wordLength !== length ? "opacity-50 cursor-not-allowed" : ""}`}
+                    >
+                      {length} letra{length !== 1 ? "s" : ""}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               <div className="flex gap-2">
                 <Input
                   value={currentWord}
@@ -145,8 +174,8 @@ export default function CreatePage() {
                     setCurrentWord(e.target.value.toUpperCase());
                     setError(null);
                   }}
-                  placeholder="PALABRA"
-                  maxLength={5}
+                  placeholder={`PALABRA (${wordLength} letras)`}
+                  maxLength={wordLength}
                   className="text-2xl font-bold uppercase text-center bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl shadow-inner focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
                   onKeyDown={(e) => e.key === "Enter" && handleAddWord()}
                 />

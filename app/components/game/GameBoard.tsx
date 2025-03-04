@@ -24,7 +24,9 @@ export function GameBoard({
   const getVisibleRows = () => {
     const rows = [];
     const isLastAttempt = board.guesses.length === gameState.maxAttempts - 1;
+    const MIN_VISIBLE_ROWS = 5; // Mínimo de filas visibles
 
+    // Si el tablero está completado, mostrar solo hasta la fila correcta
     if (board.completed) {
       const correctGuessIndex = board.guesses.findIndex(
         (guess) => guess === board.word
@@ -32,13 +34,21 @@ export function GameBoard({
       for (let i = 0; i <= correctGuessIndex; i++) {
         rows.push(checkGuess(board.guesses[i], board.word));
       }
+      
+      // Si hay menos de MIN_VISIBLE_ROWS, añadir filas vacías hasta alcanzar el mínimo
+      while (rows.length < MIN_VISIBLE_ROWS && rows.length < gameState.maxAttempts) {
+        rows.push(Array(wordLength).fill("empty" as const));
+      }
+      
       return rows;
     }
 
+    // Añadir las filas de intentos ya realizados
     for (let i = 0; i < board.guesses.length; i++) {
       rows.push(checkGuess(board.guesses[i], board.word));
     }
 
+    // Añadir la fila del intento actual si el juego no ha terminado
     if (!board.completed && !gameOver) {
       rows.push(
         currentGuess
@@ -48,14 +58,14 @@ export function GameBoard({
       );
     }
 
+    // Añadir solo una fila adicional para el siguiente intento
     if (!board.completed && !gameOver && !isLastAttempt) {
       rows.push(Array(wordLength).fill("empty" as const));
     }
 
-    if (!board.completed) {
-      while (rows.length < gameState.maxAttempts) {
-        rows.push(Array(wordLength).fill("empty" as const));
-      }
+    // Si hay menos de MIN_VISIBLE_ROWS, añadir filas vacías hasta alcanzar el mínimo
+    while (rows.length < MIN_VISIBLE_ROWS && rows.length < gameState.maxAttempts) {
+      rows.push(Array(wordLength).fill("empty" as const));
     }
 
     return rows;
@@ -65,6 +75,7 @@ export function GameBoard({
   const winningRowIndex = board.completed
     ? board.guesses.findIndex((guess) => guess === board.word)
     : -1;
+    
   return (
     <div
       className={`p-2 md:p-4 ${

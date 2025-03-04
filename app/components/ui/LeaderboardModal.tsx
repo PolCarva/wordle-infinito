@@ -52,7 +52,7 @@ export function LeaderboardModal({
         setLeaderboard(data);
         setError("");
       } catch (err) {
-        setError("Error cargando la clasificación");
+        setError("Error cargando la tabla de posiciones");
         console.error(err);
       } finally {
         setLoading(false);
@@ -114,14 +114,14 @@ export function LeaderboardModal({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl">
             <Trophy className="h-6 w-6 text-yellow-500" />
-            Tabla de Clasificación
+            Tabla de posiciones
             <Target className="h-5 w-5 ml-1" />
           </DialogTitle>
         </DialogHeader>
 
         {loading ? (
           <div className="py-8 text-center text-muted-foreground">
-            Cargando clasificación...
+            Cargando tabla de posiciones...
           </div>
         ) : error ? (
           <div className="py-8 text-center text-destructive">{error}</div>

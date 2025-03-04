@@ -241,15 +241,6 @@ export function Menu({
               Empezar a Jugar
             </Button>
 
-            {/*   <Button
-              onClick={() => setShowLeaderboard(true)}
-              className="w-full bg-yellow-500 hover:bg-yellow-500/90 text-white shadow-[0_6px_0_0_#ca8a04] active:translate-y-1 active:shadow-[0_4px_0_0_#ca8a04] transition-all"
-              size="lg"
-            >
-              <Trophy className="w-5 h-5 mr-2" />
-              Ver Clasificación
-            </Button> */}
-
             <Link href="/create" className="w-full">
               <Button
                 variant="outline"
@@ -267,7 +258,7 @@ export function Menu({
             onClick={() => setShowLeaderboard(true)}
           >
             <Trophy className="h-4 w-4 mr-2" />
-            Ver clasificación
+            Ver tabla de posiciones
           </Button>
           </div>
 

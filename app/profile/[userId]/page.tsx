@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Swords } from 'lucide-react';
 import { api } from '@/app/services/api';
 import Image from 'next/image';
 import MainLayout from '../../components/layouts/MainLayout';
@@ -91,7 +90,7 @@ function ProfileContent({ userId }: { userId: string }) {
             </div>
           </div>
 
-          <div className="border-t dark:border-gray-700 pt-6">
+         {/*  <div className="border-t dark:border-gray-700 pt-6">
             <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
               <Swords className="w-5 h-5" />
               Estadísticas Versus
@@ -103,7 +102,7 @@ function ProfileContent({ userId }: { userId: string }) {
               <StatCard title="Racha actual" value={profileData.stats.versusStreak || 0} />
               <StatCard title="Mejor racha" value={profileData.stats.versusBestStreak || 0} />
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

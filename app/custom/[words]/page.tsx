@@ -23,8 +23,28 @@ export default function CustomGamePage({
       const padding = '='.repeat((4 - base64.length % 4) % 4);
       const decodedWords = atob(base64 + padding).split(",");
       
-      // Solo validamos que sean palabras de 5 letras con caracteres válidos
-      const invalidWords = decodedWords.filter(word => !/^[A-ZÑ]{5}$/.test(word));
+      if (decodedWords.length === 0) {
+        setError("No hay palabras en el link");
+        return;
+      }
+      
+      // Verificar que todas las palabras tengan la misma longitud
+      const firstWordLength = decodedWords[0].length;
+      const invalidLengthWords = decodedWords.filter(word => word.length !== firstWordLength);
+      
+      if (invalidLengthWords.length > 0) {
+        setError("Todas las palabras deben tener la misma longitud");
+        return;
+      }
+      
+      // Verificar que la longitud esté entre 1 y 6
+      if (firstWordLength < 1 || firstWordLength > 6) {
+        setError("Las palabras deben tener entre 1 y 6 letras");
+        return;
+      }
+      
+      // Solo validamos que sean palabras con caracteres válidos
+      const invalidWords = decodedWords.filter(word => !new RegExp(`^[A-ZÑ]{${firstWordLength}}$`).test(word));
       
       if (invalidWords.length > 0) {
         setError("El link contiene palabras inválidas");
@@ -33,7 +53,8 @@ export default function CustomGamePage({
 
       // Trackeamos cuando alguien juega una partida personalizada
       trackEvent('custom_game_played', {
-        word_count: decodedWords.length
+        word_count: decodedWords.length,
+        word_length: firstWordLength
       });
 
       setWords(decodedWords);

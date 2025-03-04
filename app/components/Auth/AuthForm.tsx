@@ -6,6 +6,7 @@ import { useAuth } from '@/app/context/AuthContext';
 import { api } from '@/app/services/api';
 /* import { FcGoogle } from 'react-icons/fc';
  */import Link from 'next/link';
+import { trackEvent } from '@/app/utils/analytics';
 
 interface ApiError {
     response?: {
@@ -41,11 +42,27 @@ const AuthForm = () => {
         }
 
         try {
-            const data = isLogin
-                ? await api.login({ email: formData.email, password: formData.password })
-                : await api.register(formData);
+            if (isLogin) {
+                const data = await api.login({ email: formData.email, password: formData.password });
+                login(data);
+                
+                // Registrar evento de analytics para inicio de sesión
+                trackEvent('user_login', {
+                    method: 'email',
+                    email_domain: formData.email.split('@')[1] || 'unknown'
+                });
+            } else {
+                const data = await api.register(formData);
+                login(data);
+                
+                // Registrar evento de analytics para nuevo usuario
+                trackEvent('user_registered', {
+                    method: 'email',
+                    username: formData.username,
+                    email_domain: formData.email.split('@')[1] || 'unknown'
+                });
+            }
 
-            login(data);
             router.push('/');
             router.refresh();
         } catch (error: unknown) {

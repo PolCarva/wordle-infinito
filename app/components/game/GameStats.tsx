@@ -1,32 +1,24 @@
 "use client";
 
 import { GameState } from "@/app/types";
-import { Button } from "@/app/components/ui/button";
-import { X, Trophy } from "lucide-react";
 import { useState } from "react";
 import { LeaderboardModal } from "@/app/components/ui/LeaderboardModal";
 
 interface GameStatsProps {
   gameState: GameState;
-  stats?: any;
+  stats?: {
+    gamesPlayed?: number;
+    winRate?: number;
+    bestStreak?: number;
+    gamesWon?: number;
+  };
 }
 
-export function GameStats({ gameState, stats }: GameStatsProps) {
+export function GameStats({ gameState }: GameStatsProps) {
   const completedBoards = gameState.boards.filter(board => board.completed).length;
   const totalBoards = gameState.boards.length;
   const currentAttempt = gameState.boards[0]?.guesses.length || 0;
   const [showLeaderboard, setShowLeaderboard] = useState(false);
-
-  const handleExit = () => {
-    // Limpiar el localStorage para evitar que se restaure el juego
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('gameState');
-      localStorage.removeItem('currentGame');
-    }
-    
-    // Redirección simple a la página principal
-    window.location.href = '/';
-  };
 
   return (
     <div className="text-center mb-4 p-2 bg-slate-100 dark:bg-slate-800 rounded-lg relative">

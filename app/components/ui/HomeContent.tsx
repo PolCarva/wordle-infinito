@@ -1,8 +1,5 @@
 "use client";
 
-import { Button } from "@/app/components/ui/button";
-import { Swords } from "lucide-react";
-import Link from "next/link";
 
 export function HomeContent() {
   return (

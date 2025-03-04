@@ -295,11 +295,6 @@ export function Menu({
                 Las letras amarillas están en la palabra pero en otra posición
               </li>
             </ul>
-
-            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-md mx-auto">
-              Juega al Wordle con múltiples palabras simultáneamente. ¡Un desafío
-              mayor para los amantes de las palabras!
-            </p>
           </div>
         </div>
       </div>

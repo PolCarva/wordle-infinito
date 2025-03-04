@@ -13,13 +13,11 @@ import { useAuth } from "@/app/context/AuthContext";
 import { api } from "@/app/services/api";
 import { BOARD_MAX_WIDTHS } from "@/app/constants/styles";
 import { EndGameModal } from "./components/game/EndGameModal";
-import { useRouter } from "next/navigation";
 import { Nav } from "./components/game/Nav";
 import { useTheme } from "next-themes";
 
 interface GameProps {
   customWords?: string[];
-  onExitGame?: () => void;
 }
 
 interface WindowWithTemp extends Window {
@@ -38,8 +36,7 @@ interface Stats {
   versusBestStreak: number;
 }
 
-export default function Game({ customWords, onExitGame }: GameProps) {
-  const router = useRouter();
+export default function Game({ customWords }: GameProps) {
   const { theme, setTheme } = useTheme();
   const isDark = theme === "dark";
   

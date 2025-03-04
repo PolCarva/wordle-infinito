@@ -1,11 +1,9 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { Nav } from '../game/Nav';
 import { useTheme } from 'next-themes';
 
 const MainNav = () => {
-  const router = useRouter();
   const { theme, setTheme } = useTheme();
   const isDark = theme === 'dark';
 

@@ -8,8 +8,6 @@ import { Keyboard } from '@/app/components/game/Keyboard';
 import { api } from '@/app/services/api';
 import { Button } from '@/app/components/ui/button';
 import { Copy } from 'lucide-react';
-import { Nav } from '@/app/components/game/Nav';
-import { useTheme } from 'next-themes';
 
 interface VersusGame {
     _id: string;
@@ -40,7 +38,6 @@ function GameContent({ gameId }: { gameId: string }) {
     const router = useRouter();
     const [game, setGame] = useState<VersusGame | null>(null);
     const [currentGuess, setCurrentGuess] = useState('');
-    const { theme, setTheme } = useTheme();
     const [error, setError] = useState('');
     const [wantsRematch, setWantsRematch] = useState(false);
 
@@ -103,19 +100,6 @@ function GameContent({ gameId }: { gameId: string }) {
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [game?.status, game?.winner, game?.word.length, currentGuess, handleGuess]);
 
-    const handleBack = () => {
-        if (game?.status === 'playing' && !game.winner) {
-            if (window.confirm('¿Estás seguro de que quieres abandonar la partida?')) {
-                router.push('/');
-            }
-        } else {
-            router.push('/');
-        }
-    };
-
-    const handleThemeToggle = () => {
-        setTheme(theme === 'dark' ? 'light' : 'dark');
-    };
 
     const handleRematch = async () => {
         try {

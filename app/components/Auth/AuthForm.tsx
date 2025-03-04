@@ -62,13 +62,13 @@ const AuthForm = () => {
         router.push('/');
     };
 
-    const handleGoogleLogin = () => {
+/*     const handleGoogleLogin = () => {
         const backendUrl = process.env.NODE_ENV === 'production'
             ? 'https://wordle-infinito-back-production.up.railway.app'
             : 'http://localhost:5000';
         
         window.location.href = `${backendUrl}/api/users/auth/google`;
-    };
+    }; */
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-background">

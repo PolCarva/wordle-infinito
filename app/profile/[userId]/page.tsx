@@ -75,7 +75,7 @@ function ProfileContent({ userId }: { userId: string }) {
             )}
             <div>
               <h1 className="text-2xl font-bold">{profileData.username || 'Usuario'}</h1>
-              <p className="text-gray-500 dark:text-gray-400">{profileData.email}</p>
+              {/* <p className="text-gray-500 dark:text-gray-400">{profileData.email}</p> */}
             </div>
           </div>
 

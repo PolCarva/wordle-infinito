@@ -36,7 +36,7 @@ function ProfileContent() {
             )}
             <div>
               <h1 className="text-2xl font-bold">{user.username || 'Usuario'}</h1>
-              <p className="text-gray-500 dark:text-gray-400">{user.email}</p>
+              {/* <p className="text-gray-500 dark:text-gray-400">{user.email}</p> */}
             </div>
           </div>
 

@@ -33,6 +33,13 @@ const AuthForm = () => {
         setLoading(true);
         setError('');
 
+        // Validar longitud de contraseña para registro
+        if (!isLogin && formData.password.length < 6) {
+            setError('La contraseña debe tener al menos 6 caracteres');
+            setLoading(false);
+            return;
+        }
+
         try {
             const data = isLogin
                 ? await api.login({ email: formData.email, password: formData.password })
@@ -145,6 +152,11 @@ const AuthForm = () => {
                             className="mt-1 block w-full rounded-md border border-input px-3 py-2 bg-background text-foreground"
                             required
                         />
+                        {!isLogin && (
+                            <p className="mt-1 text-xs text-gray-500">
+                                La contraseña debe tener al menos 6 caracteres
+                            </p>
+                        )}
                     </div>
 
                     <button

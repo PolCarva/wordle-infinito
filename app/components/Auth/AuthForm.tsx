@@ -4,8 +4,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/app/context/AuthContext';
 import { api } from '@/app/services/api';
-import { FcGoogle } from 'react-icons/fc';
-import Link from 'next/link';
+/* import { FcGoogle } from 'react-icons/fc';
+ */import Link from 'next/link';
 
 interface ApiError {
     response?: {
@@ -83,13 +83,13 @@ const AuthForm = () => {
                     </div>
                 )}
 
-                <button
+              {/*   <button
                     onClick={handleGoogleLogin}
                     className="w-full py-2 px-4 bg-white text-gray-800 rounded-md border border-gray-300 hover:bg-gray-50 flex items-center justify-center gap-2"
                 >
                     <FcGoogle className="w-5 h-5" />
                     Continuar con Google
-                </button>
+                </button> */}
 
                 <div className="relative">
                     <div className="absolute inset-0 flex items-center">

@@ -10,11 +10,14 @@ import {
   LogOut,
   Swords,
   Home,
+  Pencil,
+  Trophy
 } from "lucide-react";
 import { Share2 } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/app/context/AuthContext";
 import Link from "next/link";
+import { LeaderboardModal } from "@/app/components/ui/LeaderboardModal";
 
 interface NavProps {
   onBack?: () => void;
@@ -44,6 +47,7 @@ function getInitials(
 export function Nav({ onBack, isDark, onThemeToggle }: NavProps) {
   const [showSettings, setShowSettings] = useState(false);
   const [showShareMessage, setShowShareMessage] = useState(false);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
   const { user, logout } = useAuth();
 
   const handleBack = () => {
@@ -89,6 +93,15 @@ export function Nav({ onBack, isDark, onThemeToggle }: NavProps) {
               </Link>
             )
           )}
+          
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={() => setShowLeaderboard(true)}
+            className="text-yellow-600"
+          >
+            <Trophy className="h-5 w-5" />
+          </Button>
         </div>
 
         <div className="relative">
@@ -169,6 +182,20 @@ export function Nav({ onBack, isDark, onThemeToggle }: NavProps) {
                 </div>
 
                 <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium">Custom</span>
+                  <Link href="/create">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setShowSettings(false)}
+                      className="text-yellow-600 dark:hover:bg-gray-700"
+                    >
+                      <Pencil className="h-5 w-5" />
+                    </Button>
+                  </Link>
+                </div>
+
+                <div className="flex justify-between items-center">
                   <span className="text-sm font-medium">Tema</span>
                   <Button
                     variant="ghost"
@@ -206,6 +233,11 @@ export function Nav({ onBack, isDark, onThemeToggle }: NavProps) {
           )}
         </div>
       </div>
+      
+      <LeaderboardModal
+        open={showLeaderboard}
+        onOpenChange={setShowLeaderboard}
+      />
     </div>
   );
 }

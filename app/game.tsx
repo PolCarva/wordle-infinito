@@ -13,9 +13,11 @@ import { useAuth } from "@/app/context/AuthContext";
 import { api } from "@/app/services/api";
 import { BOARD_MAX_WIDTHS } from "@/app/constants/styles";
 import { EndGameModal } from "./components/game/EndGameModal";
+import { useRouter } from "next/navigation";
 
 interface GameProps {
   customWords?: string[];
+  onExitGame?: () => void;
 }
 
 interface WindowWithTemp extends Window {
@@ -34,7 +36,8 @@ interface Stats {
   versusBestStreak: number;
 }
 
-export default function Game({ customWords }: GameProps) {
+export default function Game({ customWords, onExitGame }: GameProps) {
+  const router = useRouter();
   const [started, setStarted] = useState(() => {
     if (typeof window === "undefined") return false;
     return !!localStorage.getItem("currentGame");
@@ -53,6 +56,16 @@ export default function Game({ customWords }: GameProps) {
 
   const { user } = useAuth();
   const [stats, setStats] = useState<Stats | null>(null);
+
+  const exitGame = useCallback(() => {
+    localStorage.removeItem("currentGame");
+    localStorage.removeItem("gameState");
+    setStarted(false);
+    setGameState(null);
+    if (onExitGame) {
+      onExitGame();
+    }
+  }, [onExitGame]);
 
   const initializeGame = useCallback(async () => {
     const finalBoardCount = typeof boardCount === "number" ? boardCount : 1;

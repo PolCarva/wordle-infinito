@@ -1,4 +1,9 @@
 import { api } from '../services/api';
+import { 
+    getClientDictionary, 
+    getClientGameConfig, 
+    getClientAvailableLengths 
+} from './client-dictionaries';
 
 export interface GameConfig {
     extraAttempts: number;
@@ -24,7 +29,12 @@ function isCacheValid<T>(entry: CacheEntry<T> | null | undefined): entry is Cach
     return Date.now() - entry.timestamp < CACHE_DURATION;
 }
 
-export async function getAvailableLengths(): Promise<number[]> {
+export async function getAvailableLengths(useClientDictionary = false): Promise<number[]> {
+    // Si se solicita usar el diccionario del cliente, devolver las longitudes disponibles del cliente
+    if (useClientDictionary) {
+        return getClientAvailableLengths();
+    }
+
     if (isCacheValid(cache.lengths)) {
         return cache.lengths.data;
     }
@@ -41,7 +51,12 @@ export async function getAvailableLengths(): Promise<number[]> {
     return lengths || AVAILABLE_LENGTHS;
 }
 
-export async function getDictionary(length: number, useRare = false): Promise<string[]> {
+export async function getDictionary(length: number, useRare = false, useClientDictionary = false): Promise<string[]> {
+    // Si se solicita usar el diccionario del cliente, devolver el diccionario del cliente
+    if (useClientDictionary) {
+        return getClientDictionary(length, useRare);
+    }
+
     const cacheKey = `${length}-${useRare}`;
     const cached = cache.dictionaries.get(cacheKey);
 
@@ -61,7 +76,12 @@ export async function getDictionary(length: number, useRare = false): Promise<st
     return words;
 }
 
-export async function getGameConfig(length: number): Promise<GameConfig> {
+export async function getGameConfig(length: number, useClientConfig = false): Promise<GameConfig> {
+    // Si se solicita usar la configuración del cliente, devolver la configuración del cliente
+    if (useClientConfig) {
+        return getClientGameConfig(length);
+    }
+
     const cached = cache.configs.get(length);
 
     if (isCacheValid(cached)) {

@@ -7,7 +7,7 @@ import {
   Dices,
   AlertCircle,
   PlusCircle,
-  Swords,
+  Trophy,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import {
@@ -20,6 +20,7 @@ import {
 } from "../ui/dialog";
 import Link from "next/link";
 import { getAvailableLengths, getDictionary } from "@/app/dictionaries";
+import { LeaderboardModal } from "@/app/components/ui/LeaderboardModal";
 
 interface MenuProps {
   boardCount: number | "";
@@ -46,10 +47,11 @@ export function Menu({
   const [pendingValue, setPendingValue] = useState<number | null>(null);
   const [availableLengths, setAvailableLengths] = useState<number[]>([]);
   const [maxWords, setMaxWords] = useState(100); // valor por defecto razonable
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
 
   useEffect(() => {
     const loadLengths = async () => {
-      const lengths = await getAvailableLengths();
+      const lengths = await getAvailableLengths(true);
       setAvailableLengths(lengths);
       if (!lengths.includes(wordLength)) {
         setWordLength(lengths[0]);
@@ -60,7 +62,7 @@ export function Menu({
 
   useEffect(() => {
     const loadDictionary = async () => {
-      const dictionary = await getDictionary(wordLength, useRareWords);
+      const dictionary = await getDictionary(wordLength, useRareWords, true);
       setMaxWords(dictionary.length);
     };
     loadDictionary();
@@ -114,7 +116,7 @@ export function Menu({
       >
         <div className="text-center space-y-4">
           <div className="flex flex-col items-center gap-2">
-            <span className="flex flex-col gap-2">
+            <h1 className="flex flex-col gap-2 scale-[85%] xxs:scale-100">
               <div className="flex gap-1 mx-auto">
                 {["W", "O", "R", "D", "L", "E"].map((letter, i) => (
                   <span
@@ -129,23 +131,18 @@ export function Menu({
                 {["I", "N", "F", "I", "N", "I", "T", "O"].map((letter, i) => (
                   <span
                     key={i}
-                    className={`w-10 h-10 md:w-16 md:h-16 ${
-                      i === 0 ? "bg-green-500" : "bg-yellow-500"
-                    } flex items-center justify-center rounded-lg text-white font-bold text-xl md:text-3xl shadow-md`}
+                    className={`w-10 h-10 md:w-16 md:h-16 ${i === 0 ? "bg-green-500" : "bg-yellow-500"
+                      } flex items-center justify-center rounded-lg text-white font-bold text-xl md:text-3xl shadow-md`}
                   >
                     {letter}
                   </span>
                 ))}
               </div>
-            </span>
+            </h1>
           </div>
-          <p className="text-lg text-gray-600 dark:text-gray-300 max-w-md mx-auto">
-            Juega al Wordle con múltiples palabras simultáneamente. ¡Un desafío
-            mayor para los amantes de las palabras!
-          </p>
         </div>
 
-        <div className="bg-gray-50 dark:bg-gray-800 p-8 rounded-2xl shadow-lg w-full max-w-md space-y-6">
+        <div className="bg-gray-50 dark:bg-gray-800 md:p-8 rounded-2xl shadow-lg w-full max-w-md space-y-6">
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-semibold flex items-center gap-2">
@@ -161,18 +158,17 @@ export function Menu({
               <div className="flex gap-2 flex-wrap justify-between">
                 {availableLengths.map(
                   (length) => (
-                      <button
-                        key={length}
-                        onClick={() => setWordLength(length)}
-                        className={`px-4 py-2 w-[calc(calc(100%/3)-0.5rem)] text-center rounded-lg ${
-                          wordLength === length
-                            ? "bg-green-500 text-white"
-                            : "bg-gray-200 dark:bg-gray-700"
+                    <button
+                      key={length}
+                      onClick={() => setWordLength(length)}
+                      className={`px-4 py-2 w-[calc(calc(100%/3)-0.5rem)] text-center rounded-lg ${wordLength === length
+                        ? "bg-green-500 text-white"
+                        : "bg-gray-200 dark:bg-gray-700"
                         }`}
-                      >
-                        {length} letra{length !== 1 ? "s" : ""}
-                      </button>
-                    )
+                    >
+                      {length} letra{length !== 1 ? "s" : ""}
+                    </button>
+                  )
                 )}
               </div>
             </div>
@@ -244,16 +240,15 @@ export function Menu({
             >
               Empezar a Jugar
             </Button>
-            <Link href="/versus" className="w-full">
-              <Button
-                variant="default"
-                className="w-full dark:bg-white bg-black dark:hover:bg-white/90 hover:bg-black/90 dark:text-black text-white shadow-[0_6px_0_0_#3a3a3a] dark:shadow-[0_6px_0_0_#e5e5e5] active:translate-y-1 active:shadow-[0_4px_0_0_#3a3a3a] dark:active:shadow-[0_4px_0_0_#e5e5e5] transition-all"
-                size="lg"
-              >
-                <Swords className="w-5 h-5 mr-2" />
-                Jugar Versus
-              </Button>
-            </Link>
+
+            {/*   <Button
+              onClick={() => setShowLeaderboard(true)}
+              className="w-full bg-yellow-500 hover:bg-yellow-500/90 text-white shadow-[0_6px_0_0_#ca8a04] active:translate-y-1 active:shadow-[0_4px_0_0_#ca8a04] transition-all"
+              size="lg"
+            >
+              <Trophy className="w-5 h-5 mr-2" />
+              Ver Clasificación
+            </Button> */}
 
             <Link href="/create" className="w-full">
               <Button
@@ -265,6 +260,15 @@ export function Menu({
                 Crear Partida Personalizada
               </Button>
             </Link>
+            <Button
+            variant="outline"
+            size="sm"
+            className="w-full max-w-md py-4 border-gray-400 dark:bg-white bg-black hover:text-white dark:hover:text-black hover:bg-black/90 dark:hover:bg-white/90 dark:text-black text-white shadow-[0_6px_0_0_#3a3a3a] dark:shadow-[0_6px_0_0_#e5e5e5] active:translate-y-1 active:shadow-[0_4px_0_0_#3a3a3a] dark:active:shadow-[0_4px_0_0_#e5e5e5] transition-all"
+            onClick={() => setShowLeaderboard(true)}
+          >
+            <Trophy className="h-4 w-4 mr-2" />
+            Ver clasificación
+          </Button>
           </div>
 
           <div className="bg-gray-100 dark:bg-gray-700/50 p-4 rounded-xl space-y-3">
@@ -291,6 +295,11 @@ export function Menu({
                 Las letras amarillas están en la palabra pero en otra posición
               </li>
             </ul>
+
+            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-md mx-auto">
+              Juega al Wordle con múltiples palabras simultáneamente. ¡Un desafío
+              mayor para los amantes de las palabras!
+            </p>
           </div>
         </div>
       </div>
@@ -329,6 +338,8 @@ export function Menu({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <LeaderboardModal open={showLeaderboard} onOpenChange={setShowLeaderboard} />
     </>
   );
 }

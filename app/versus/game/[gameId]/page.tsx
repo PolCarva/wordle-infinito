@@ -167,11 +167,6 @@ function GameContent({ gameId }: { gameId: string }) {
     if (game.status === 'waiting_opponent') {
         return (
             <div className="min-h-screen bg-background">
-                <Nav
-                    onBack={handleBack}
-                    isDark={theme === 'dark'}
-                    onThemeToggle={handleThemeToggle}
-                />
                 <div className="max-w-md mx-auto px-4 py-16">
                     <div className="text-center space-y-6">
                         <h2 className="text-2xl font-bold">Esperando oponente</h2>
@@ -210,11 +205,6 @@ function GameContent({ gameId }: { gameId: string }) {
 
         return (
             <div className="min-h-screen bg-background">
-                <Nav
-                    onBack={handleBack}
-                    isDark={theme === 'dark'}
-                    onThemeToggle={handleThemeToggle}
-                />
                 <div className="max-w-md mx-auto px-4 py-16">
                     <div className="text-center space-y-6">
                         <h2 className="text-2xl font-bold">Preparando partida</h2>
@@ -223,8 +213,8 @@ function GameContent({ gameId }: { gameId: string }) {
                                 <div className="flex items-center justify-between px-4">
                                     <span>Tu estado:</span>
                                     <span className="font-medium">
-                                        {isReady ? 
-                                            <span className="text-green-500">✓ Listo</span> : 
+                                        {isReady ?
+                                            <span className="text-green-500">✓ Listo</span> :
                                             <span className="text-yellow-500">Esperando...</span>
                                         }
                                     </span>
@@ -232,14 +222,14 @@ function GameContent({ gameId }: { gameId: string }) {
                                 <div className="flex items-center justify-between px-4">
                                     <span>{otherPlayerName}:</span>
                                     <span className="font-medium">
-                                        {otherReady ? 
-                                            <span className="text-green-500">✓ Listo</span> : 
+                                        {otherReady ?
+                                            <span className="text-green-500">✓ Listo</span> :
                                             <span className="text-yellow-500">Esperando...</span>
                                         }
                                     </span>
                                 </div>
                                 {!isReady && (
-                                    <Button 
+                                    <Button
                                         onClick={handleReady}
                                         className="w-full mt-4"
                                     >
@@ -266,11 +256,6 @@ function GameContent({ gameId }: { gameId: string }) {
 
     return (
         <div className="min-h-screen bg-background">
-            <Nav
-                onBack={handleBack}
-                isDark={theme === 'dark'}
-                onThemeToggle={handleThemeToggle}
-            />
             <div className="p-4">
                 <div className="max-w-2xl mx-auto">
                     <div className="grid grid-cols-2 gap-4">
@@ -350,10 +335,10 @@ function GameContent({ gameId }: { gameId: string }) {
                                 {game.winner === user.userId ? '¡Ganaste!' : '¡Perdiste!'}
                             </h2>
                             <p className="mt-2">La palabra era: {game.word}</p>
-                            
+
                             <div className="mt-4 space-y-4">
                                 {!wantsRematch ? (
-                                    <Button 
+                                    <Button
                                         onClick={handleRematch}
                                         className="bg-green-500 hover:bg-green-600 text-white"
                                     >
@@ -363,7 +348,7 @@ function GameContent({ gameId }: { gameId: string }) {
                                     <div className="space-y-2">
                                         <p className="text-sm text-gray-600 dark:text-gray-400">
                                             {isCreator ? (
-                                                game.opponentWantsRematch ? 
+                                                game.opponentWantsRematch ?
                                                     "¡El oponente también quiere jugar! Iniciando nueva partida..." :
                                                     "Esperando respuesta del oponente..."
                                             ) : (
@@ -372,8 +357,8 @@ function GameContent({ gameId }: { gameId: string }) {
                                                     "Esperando respuesta del creador..."
                                             )}
                                         </p>
-                                        <Button 
-                                            variant="outline" 
+                                        <Button
+                                            variant="outline"
                                             onClick={() => {
                                                 setWantsRematch(false);
                                                 api.cancelRematch(gameId, user!.userId);

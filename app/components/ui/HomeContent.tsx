@@ -14,12 +14,12 @@ export function HomeContent() {
             Desafía a otros jugadores en tiempo real. ¡El primero en adivinar la
             palabra gana!
           </p>
-          <Link href="/versus">
+         {/*  <Link href="/versus">
             <Button className="flex items-center space-x-2">
               <Swords className="h-5 w-5" />
               <span>Jugar Versus</span>
             </Button>
-          </Link>
+          </Link> */}
         </div>
       </section>
       <h1 className="sr-only">

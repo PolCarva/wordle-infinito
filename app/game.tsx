@@ -14,6 +14,8 @@ import { api } from "@/app/services/api";
 import { BOARD_MAX_WIDTHS } from "@/app/constants/styles";
 import { EndGameModal } from "./components/game/EndGameModal";
 import { useRouter } from "next/navigation";
+import { Nav } from "./components/game/Nav";
+import { useTheme } from "next-themes";
 
 interface GameProps {
   customWords?: string[];
@@ -38,6 +40,9 @@ interface Stats {
 
 export default function Game({ customWords, onExitGame }: GameProps) {
   const router = useRouter();
+  const { theme, setTheme } = useTheme();
+  const isDark = theme === "dark";
+  
   const [started, setStarted] = useState(() => {
     if (typeof window === "undefined") return false;
     return !!localStorage.getItem("currentGame");
@@ -57,21 +62,11 @@ export default function Game({ customWords, onExitGame }: GameProps) {
   const { user } = useAuth();
   const [stats, setStats] = useState<Stats | null>(null);
 
-  const exitGame = useCallback(() => {
-    localStorage.removeItem("currentGame");
-    localStorage.removeItem("gameState");
-    setStarted(false);
-    setGameState(null);
-    if (onExitGame) {
-      onExitGame();
-    }
-  }, [onExitGame]);
-
   const initializeGame = useCallback(async () => {
     const finalBoardCount = typeof boardCount === "number" ? boardCount : 1;
-    const dictionary = await getDictionary(wordLength, useRareWords);
+    const dictionary = await getDictionary(wordLength, useRareWords, true);
     const words = customWords || getRandomWords(finalBoardCount, dictionary);
-    const config = await getGameConfig(wordLength);
+    const config = await getGameConfig(wordLength, true);
 
     const newGameState = {
       boards: words.map((word, index) => ({
@@ -99,7 +94,7 @@ export default function Game({ customWords, onExitGame }: GameProps) {
     if (customWords) {
       const validateCustomWords = async () => {
         try {
-          const acceptedWords = await getDictionary(wordLength, true);
+          const acceptedWords = await getDictionary(wordLength, true, true);
           const newWords = customWords.filter(
             (word) => !acceptedWords.includes(word)
           );
@@ -163,7 +158,7 @@ export default function Game({ customWords, onExitGame }: GameProps) {
     if (!gameState) return;
 
     const guess = gameState.currentGuess.toUpperCase();
-    const acceptedWords = await getDictionary(wordLength, true);
+    const acceptedWords = await getDictionary(wordLength, true, true);
 
     if (guess.length !== wordLength) {
       setError(`La palabra debe tener ${wordLength} letras`);
@@ -299,6 +294,18 @@ export default function Game({ customWords, onExitGame }: GameProps) {
     }
   }, [gameState]);
 
+  const handleThemeToggle = () => {
+    setTheme(isDark ? "light" : "dark");
+  };
+
+  // Mantener solo un efecto simple para limpiar el localStorage cuando se desmonte el componente
+  useEffect(() => {
+    return () => {
+      localStorage.removeItem("currentGame");
+      localStorage.removeItem("gameState");
+    };
+  }, []);
+
   if (!started) {
     return (
       <div className="flex w-full min-h-svh justify-center flex-col items-center gap-4 p-4">
@@ -320,6 +327,7 @@ export default function Game({ customWords, onExitGame }: GameProps) {
 
   return (
     <div className="flex w-full flex-col items-center gap-6 p-4 pb-[240px] md:pb-4">
+      <Nav isDark={isDark} onThemeToggle={handleThemeToggle} />
 
       <div className="flex items-center gap-4">
         <h1 className="text-4xl font-bold">Wordle Infinito</h1>
@@ -395,7 +403,7 @@ export default function Game({ customWords, onExitGame }: GameProps) {
           </div>
         </div>
       )}
-      <div className="fixed lg:relative bottom-0 left-0 right-0 bg-white dark:bg-gray-900 lg:!bg-transparent p-2 md:p-4 lg:border-t-0 border-t dark:border-gray-800">
+      <div className="fixed lg:relative bottom-0 left-0 right-0 bg-white dark:bg-gray-900 lg:!bg-transparent p-0 md:p-4 lg:border-t-0 border-t dark:border-gray-800">
         <Keyboard onKeyDown={handleKeyPress} gameState={gameState} />
       </div>
 

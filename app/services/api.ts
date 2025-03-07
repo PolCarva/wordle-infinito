@@ -29,13 +29,26 @@ interface GameStats {
     versusBestStreak?: number;
 }
 
+// Definir tipos para los datos del juego
+interface BoardData {
+    word: string;
+    completed: boolean;
+    guessCount: number;
+}
+
+interface GameVerificationData {
+    boards: BoardData[];
+    won: boolean;
+    timestamp: number;
+}
+
 // Almacena los tokens de verificación para las actualizaciones de estadísticas
 const gameVerificationTokens: Record<string, { 
     token: string, 
     gameId: string, 
     timestamp: number,
     userId: string,
-    gameData: any
+    gameData: GameVerificationData
 }> = {};
 
 // Tiempo de expiración del token (5 minutos)
@@ -58,7 +71,7 @@ export const api = {
     },
 
     // Genera un token de verificación para la actualización de estadísticas
-    generateGameVerificationToken: (userId: string, gameId: string, gameData: any): string => {
+    generateGameVerificationToken: (userId: string, gameId: string, gameData: GameVerificationData): string => {
         // Limpiar tokens expirados
         const now = Date.now();
         Object.keys(gameVerificationTokens).forEach(key => {

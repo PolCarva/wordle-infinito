@@ -15,6 +15,8 @@ import { BOARD_MAX_WIDTHS } from "@/app/constants/styles";
 import { EndGameModal } from "./components/game/EndGameModal";
 import { Nav } from "./components/game/Nav";
 import { useTheme } from "next-themes";
+import { checkGameRateLimit } from "./utils/gameRateLimiter";
+import { trackEvent } from "./utils/analytics";
 
 interface GameProps {
   customWords?: string[];
@@ -141,6 +143,13 @@ export default function Game({ customWords }: GameProps) {
     async (won: boolean) => {
       if (!user || !stats) return;
 
+      // Verificar rate limit para actualizaciones de juego
+      if (!checkGameRateLimit(user.userId)) {
+        console.error("Rate limit excedido para actualizaciones de juego");
+        setError("Has jugado demasiados juegos en poco tiempo. Por favor, espera un momento.");
+        return;
+      }
+
       const newStats = {
         ...stats,
         gamesPlayed: stats.gamesPlayed + 1,
@@ -152,13 +161,52 @@ export default function Game({ customWords }: GameProps) {
       };
 
       try {
-        const updatedStats = await api.updateStats(user.userId, newStats);
+        // Generar un token de verificación para esta actualización de estadísticas
+        // Usamos un ID único para el juego (o generamos uno si no existe)
+        const gameId = typeof window !== 'undefined' ? 
+          localStorage.getItem('gameId') || `game_${Date.now()}` : 
+          `game_${Date.now()}`;
+        
+        // Guardar el ID del juego para futuras referencias
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('gameId', gameId);
+        }
+        
+        // Datos del juego para verificación
+        const gameData = {
+          boards: gameState?.boards.map(board => ({
+            word: board.word,
+            completed: board.completed,
+            guessCount: board.guesses.length
+          })),
+          won,
+          timestamp: Date.now()
+        };
+        
+        // Registrar evento de analytics para finalización de juego
+        trackEvent('game_completed', {
+          won: won,
+          boardCount: gameState?.boards.length || 0,
+          wordLength: gameState?.boards[0]?.word.length || 5,
+          attempts: gameState?.boards[0]?.guesses.length || 0
+        });
+        
+        // Generar token de verificación
+        const verificationToken = api.generateGameVerificationToken(
+          user.userId, 
+          gameId, 
+          gameData
+        );
+        
+        // Actualizar estadísticas con el token de verificación
+        const updatedStats = await api.updateStats(user.userId, newStats, verificationToken);
         setStats(updatedStats);
       } catch (error) {
         console.error("Error actualizando estadísticas:", error);
+        setError("Error al actualizar estadísticas. Por favor, inténtalo de nuevo.");
       }
     },
-    [user, stats]
+    [user, stats, gameState, setError]
   );
 
   const handleGuess = useCallback(async () => {

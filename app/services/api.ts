@@ -1,20 +1,53 @@
 import axios from 'axios';
+import { v4 as uuidv4 } from 'uuid';
 
 const API_URL = process.env.NODE_ENV === 'development' ?
     'http://localhost:5000/api' :
     'https://wordle-infinito-back-production.up.railway.app/api';
 
+interface RegisterData {
+    username: string;
+    email: string;
+    password: string;
+    recaptchaToken?: string;
+}
+
+interface LoginData {
+    email: string;
+    password: string;
+    recaptchaToken?: string;
+}
+
+interface GameStats {
+    gamesPlayed: number;
+    gamesWon: number;
+    streak: number;
+    winRate: number;
+    versusPlayed: number;
+    versusWon: number;
+    versusWinRate: number;
+    versusBestStreak?: number;
+}
+
+// Almacena los tokens de verificación para las actualizaciones de estadísticas
+const gameVerificationTokens: Record<string, { 
+    token: string, 
+    gameId: string, 
+    timestamp: number,
+    userId: string,
+    gameData: any
+}> = {};
+
+// Tiempo de expiración del token (5 minutos)
+const TOKEN_EXPIRY_MS = 5 * 60 * 1000;
+
 export const api = {
-    register: async (userData: {
-        username: string;
-        email: string;
-        password: string;
-    }) => {
+    register: async (userData: RegisterData) => {
         const response = await axios.post(`${API_URL}/users/register`, userData);
         return response.data;
     },
 
-    login: async (credentials: { email: string; password: string }) => {
+    login: async (credentials: LoginData) => {
         const response = await axios.post(`${API_URL}/users/login`, credentials);
         return response.data;
     },
@@ -24,15 +57,53 @@ export const api = {
         return response.data;
     },
 
-    updateStats: async (userId: string, stats: {
-        gamesPlayed: number;
-        gamesWon: number;
-        streak: number;
-        winRate: number;
-        versusPlayed: number;
-        versusWon: number;
-        versusWinRate: number;
-    }) => {
+    // Genera un token de verificación para la actualización de estadísticas
+    generateGameVerificationToken: (userId: string, gameId: string, gameData: any): string => {
+        // Limpiar tokens expirados
+        const now = Date.now();
+        Object.keys(gameVerificationTokens).forEach(key => {
+            if (now - gameVerificationTokens[key].timestamp > TOKEN_EXPIRY_MS) {
+                delete gameVerificationTokens[key];
+            }
+        });
+        
+        // Generar nuevo token
+        const token = uuidv4();
+        gameVerificationTokens[token] = {
+            token,
+            gameId,
+            userId,
+            timestamp: now,
+            gameData
+        };
+        
+        return token;
+    },
+    
+    // Verifica que el token sea válido para la actualización
+    verifyGameToken: (token: string, userId: string): boolean => {
+        const entry = gameVerificationTokens[token];
+        if (!entry) return false;
+        
+        const now = Date.now();
+        // Verificar que el token no haya expirado y pertenezca al usuario correcto
+        if (now - entry.timestamp > TOKEN_EXPIRY_MS || entry.userId !== userId) {
+            delete gameVerificationTokens[token];
+            return false;
+        }
+        
+        return true;
+    },
+
+    updateStats: async (userId: string, stats: GameStats, verificationToken: string) => {
+        // Verificar el token antes de permitir la actualización
+        if (!api.verifyGameToken(verificationToken, userId)) {
+            throw new Error('Token de verificación inválido o expirado');
+        }
+        
+        // Eliminar el token después de usarlo (uso único)
+        delete gameVerificationTokens[verificationToken];
+        
         const response = await axios.put(`${API_URL}/users/stats/${userId}`, stats);
         return response.data;
     },

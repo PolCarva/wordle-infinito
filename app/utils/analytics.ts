@@ -1,4 +1,4 @@
-type GameEvent = 'game_started' | 'custom_game_created' | 'custom_game_played' | 'user_registered' | 'user_login';
+type GameEvent = 'game_started' | 'custom_game_created' | 'custom_game_played' | 'user_registered' | 'user_login' | 'game_completed';
 type EventParams = Record<string, string | number | boolean>;
 
 interface WindowWithGtag {

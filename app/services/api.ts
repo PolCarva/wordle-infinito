@@ -34,12 +34,19 @@ interface BoardData {
     word: string;
     completed: boolean;
     guessCount: number;
+    lastGuess?: string | null;
+    isCorrect?: boolean;
 }
 
 interface GameVerificationData {
     boards: BoardData[];
     won: boolean;
     timestamp: number;
+    gameId?: string;
+    totalBoards?: number;
+    completedBoards?: number;
+    maxAttempts?: number;
+    currentAttempt?: number;
 }
 
 // Almacena los tokens de verificación para las actualizaciones de estadísticas
@@ -72,40 +79,62 @@ export const api = {
 
     // Genera un token de verificación para la actualización de estadísticas
     generateGameVerificationToken: (userId: string, gameId: string, gameData: GameVerificationData): string => {
-        // Limpiar tokens expirados
-        const now = Date.now();
-        Object.keys(gameVerificationTokens).forEach(key => {
-            if (now - gameVerificationTokens[key].timestamp > TOKEN_EXPIRY_MS) {
-                delete gameVerificationTokens[key];
-            }
-        });
-        
-        // Generar nuevo token
-        const token = uuidv4();
-        gameVerificationTokens[token] = {
-            token,
-            gameId,
+        // Crear un objeto con los datos necesarios para la verificación
+        const tokenData = {
             userId,
-            timestamp: now,
-            gameData
+            gameId,
+            gameData,
+            timestamp: Date.now(),
+            // Añadir un nonce aleatorio para prevenir ataques de repetición
+            nonce: Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
         };
         
-        return token;
+        // Convertir a string y codificar en base64 para transmisión
+        try {
+            return btoa(JSON.stringify(tokenData));
+        } catch (error) {
+            console.error("Error generando token:", error);
+            // Fallback para navegadores que no soporten btoa con caracteres Unicode
+            return btoa(unescape(encodeURIComponent(JSON.stringify(tokenData))));
+        }
     },
     
     // Verifica que el token sea válido para la actualización
     verifyGameToken: (token: string, userId: string): boolean => {
-        const entry = gameVerificationTokens[token];
-        if (!entry) return false;
-        
-        const now = Date.now();
-        // Verificar que el token no haya expirado y pertenezca al usuario correcto
-        if (now - entry.timestamp > TOKEN_EXPIRY_MS || entry.userId !== userId) {
-            delete gameVerificationTokens[token];
+        try {
+            // Decodificar el token
+            let tokenData;
+            try {
+                tokenData = JSON.parse(atob(token));
+            } catch (e) {
+                // Fallback para navegadores que no soporten atob con caracteres Unicode
+                tokenData = JSON.parse(decodeURIComponent(escape(atob(token))));
+            }
+            
+            // Verificaciones básicas
+            if (!tokenData || !tokenData.userId || tokenData.userId !== userId) {
+                console.error("Token inválido: usuario incorrecto");
+                return false;
+            }
+            
+            // Verificar que no haya pasado demasiado tiempo (5 minutos)
+            const MAX_TOKEN_AGE = 5 * 60 * 1000; // 5 minutos
+            if (!tokenData.timestamp || Date.now() - tokenData.timestamp > MAX_TOKEN_AGE) {
+                console.error("Token inválido: expirado");
+                return false;
+            }
+            
+            // Verificar que el token tenga todos los campos necesarios
+            if (!tokenData.gameId || !tokenData.gameData || !tokenData.nonce) {
+                console.error("Token inválido: faltan campos");
+                return false;
+            }
+            
+            return true;
+        } catch (error) {
+            console.error("Error verificando token:", error);
             return false;
         }
-        
-        return true;
     },
 
     updateStats: async (userId: string, stats: GameStats, verificationToken: string) => {
@@ -114,11 +143,53 @@ export const api = {
             throw new Error('Token de verificación inválido o expirado');
         }
         
-        // Eliminar el token después de usarlo (uso único)
-        delete gameVerificationTokens[verificationToken];
-        
-        const response = await axios.put(`${API_URL}/users/stats/${userId}`, stats);
-        return response.data;
+        // Extraer los datos del juego del token
+        try {
+            // Decodificar el token para obtener los datos del juego
+            let tokenData;
+            try {
+                tokenData = JSON.parse(atob(verificationToken));
+            } catch (e) {
+                // Fallback para navegadores que no soporten atob con caracteres Unicode
+                tokenData = JSON.parse(decodeURIComponent(escape(atob(verificationToken))));
+            }
+            
+            const gameData = tokenData.gameData;
+            
+            console.log("Enviando actualización de estadísticas:", {
+                userId,
+                statsResumen: {
+                    gamesPlayed: stats.gamesPlayed,
+                    gamesWon: stats.gamesWon,
+                    streak: stats.streak,
+                    winRate: stats.winRate
+                },
+                gameDataResumen: {
+                    boardCount: gameData.boards.length,
+                    won: gameData.won,
+                    timestamp: new Date(gameData.timestamp).toISOString()
+                }
+            });
+            
+            // Enviar tanto las estadísticas como los datos de verificación
+            const response = await axios.put(`${API_URL}/users/stats/${userId}`, {
+                ...stats,
+                verificationToken,
+                gameData
+            });
+            
+            console.log("Respuesta del servidor:", response.data);
+            return response.data;
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                console.error("Error de red:", error.message);
+                console.error("Detalles:", error.response?.data);
+                throw new Error(`Error de servidor: ${error.response?.data?.message || error.message}`);
+            } else {
+                console.error("Error procesando token:", error);
+                throw new Error('Error al procesar datos de verificación');
+            }
+        }
     },
 
     getProfile: async (userId: string) => {

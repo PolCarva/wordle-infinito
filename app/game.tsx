@@ -143,13 +143,6 @@ export default function Game({ customWords }: GameProps) {
     async (won: boolean) => {
       if (!user || !stats || !gameState) return;
 
-      // Verificar rate limit para actualizaciones de juego
-      if (!checkGameRateLimit(user.userId)) {
-        console.error("Rate limit excedido para actualizaciones de juego");
-        setError("Has jugado demasiados juegos en poco tiempo. Por favor, espera un momento.");
-        return;
-      }
-
       const newStats = {
         ...stats,
         gamesPlayed: stats.gamesPlayed + 1,
@@ -177,10 +170,19 @@ export default function Game({ customWords }: GameProps) {
           boards: gameState.boards.map(board => ({
             word: board.word,
             completed: board.completed,
-            guessCount: board.guesses.length
+            guessCount: board.guesses.length,
+            // Añadir información adicional para depuración
+            lastGuess: board.guesses.length > 0 ? board.guesses[board.guesses.length - 1] : null,
+            isCorrect: board.completed && board.guesses.includes(board.word)
           })),
           won,
-          timestamp: Date.now()
+          timestamp: Date.now(),
+          gameId, // Incluir el gameId en los datos para verificación
+          // Añadir información adicional para depuración
+          totalBoards: gameState.boards.length,
+          completedBoards: gameState.boards.filter(board => board.completed).length,
+          maxAttempts: gameState.maxAttempts,
+          currentAttempt: gameState.boards[0]?.guesses.length || 0
         };
         
         // Registrar evento de analytics para finalización de juego
@@ -191,6 +193,23 @@ export default function Game({ customWords }: GameProps) {
           attempts: gameState.boards[0]?.guesses.length || 0
         });
         
+        console.log("Generando token de verificación con datos:", {
+          userId: user.userId,
+          gameId,
+          gameDataSummary: {
+            boardCount: gameData.boards.length,
+            won: gameData.won,
+            timestamp: new Date(gameData.timestamp).toISOString(),
+            completedBoards: gameData.completedBoards,
+            boardsInfo: gameData.boards.map(b => ({
+              word: b.word,
+              completed: b.completed,
+              guessCount: b.guessCount,
+              isCorrect: b.isCorrect
+            }))
+          }
+        });
+        
         // Generar token de verificación
         const verificationToken = api.generateGameVerificationToken(
           user.userId, 
@@ -198,8 +217,11 @@ export default function Game({ customWords }: GameProps) {
           gameData
         );
         
+        console.log("Token generado, actualizando estadísticas...");
+        
         // Actualizar estadísticas con el token de verificación
         const updatedStats = await api.updateStats(user.userId, newStats, verificationToken);
+        console.log("Estadísticas actualizadas correctamente:", updatedStats);
         setStats(updatedStats);
       } catch (error) {
         console.error("Error actualizando estadísticas:", error);

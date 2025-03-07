@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { v4 as uuidv4 } from 'uuid';
 
 const API_URL = process.env.NODE_ENV === 'development' ?
     'http://localhost:5000/api' :
@@ -49,17 +48,9 @@ interface GameVerificationData {
     currentAttempt?: number;
 }
 
-// Almacena los tokens de verificación para las actualizaciones de estadísticas
-const gameVerificationTokens: Record<string, { 
-    token: string, 
-    gameId: string, 
-    timestamp: number,
-    userId: string,
-    gameData: GameVerificationData
-}> = {};
 
-// Tiempo de expiración del token (5 minutos)
-const TOKEN_EXPIRY_MS = 5 * 60 * 1000;
+
+
 
 export const api = {
     register: async (userData: RegisterData) => {
@@ -109,6 +100,7 @@ export const api = {
             } catch (e) {
                 // Fallback para navegadores que no soporten atob con caracteres Unicode
                 tokenData = JSON.parse(decodeURIComponent(escape(atob(token))));
+                console.error("Error decodificando token:", e);
             }
             
             // Verificaciones básicas
@@ -152,6 +144,7 @@ export const api = {
             } catch (e) {
                 // Fallback para navegadores que no soporten atob con caracteres Unicode
                 tokenData = JSON.parse(decodeURIComponent(escape(atob(verificationToken))));
+                console.error("Error decodificando token:", e);
             }
             
             const gameData = tokenData.gameData;

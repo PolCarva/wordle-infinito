@@ -15,7 +15,6 @@ import { BOARD_MAX_WIDTHS } from "@/app/constants/styles";
 import { EndGameModal } from "./components/game/EndGameModal";
 import { Nav } from "./components/game/Nav";
 import { useTheme } from "next-themes";
-import { checkGameRateLimit } from "./utils/gameRateLimiter";
 import { trackEvent } from "./utils/analytics";
 
 interface GameProps {

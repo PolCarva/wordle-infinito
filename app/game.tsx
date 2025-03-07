@@ -141,7 +141,7 @@ export default function Game({ customWords }: GameProps) {
 
   const updateGameStats = useCallback(
     async (won: boolean) => {
-      if (!user || !stats) return;
+      if (!user || !stats || !gameState) return;
 
       // Verificar rate limit para actualizaciones de juego
       if (!checkGameRateLimit(user.userId)) {
@@ -174,7 +174,7 @@ export default function Game({ customWords }: GameProps) {
         
         // Datos del juego para verificación
         const gameData = {
-          boards: gameState?.boards.map(board => ({
+          boards: gameState.boards.map(board => ({
             word: board.word,
             completed: board.completed,
             guessCount: board.guesses.length
@@ -186,9 +186,9 @@ export default function Game({ customWords }: GameProps) {
         // Registrar evento de analytics para finalización de juego
         trackEvent('game_completed', {
           won: won,
-          boardCount: gameState?.boards.length || 0,
-          wordLength: gameState?.boards[0]?.word.length || 5,
-          attempts: gameState?.boards[0]?.guesses.length || 0
+          boardCount: gameState.boards.length,
+          wordLength: gameState.boards[0]?.word.length || 5,
+          attempts: gameState.boards[0]?.guesses.length || 0
         });
         
         // Generar token de verificación

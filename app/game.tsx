@@ -16,6 +16,8 @@ import { EndGameModal } from "./components/game/EndGameModal";
 import { Nav } from "./components/game/Nav";
 import { useTheme } from "next-themes";
 import { trackEvent } from "./utils/analytics";
+import { Eye, EyeOff } from "lucide-react";
+import { Button } from "./components/ui/button";
 
 interface GameProps {
   customWords?: string[];
@@ -51,6 +53,9 @@ export default function Game({ customWords }: GameProps) {
     const savedState = localStorage.getItem("gameState");
     return savedState ? JSON.parse(savedState) : null;
   });
+
+  // Estado para controlar la visibilidad de los tableros completados
+  const [hideCompletedBoards, setHideCompletedBoards] = useState(false);
 
   const [boardCount, setBoardCount] = useState<number | "">(1);
   const [useRareWords, setUseRareWords] = useState(false);
@@ -400,6 +405,11 @@ export default function Game({ customWords }: GameProps) {
     setTheme(isDark ? "light" : "dark");
   };
 
+  // Función para alternar la visibilidad de los tableros completados
+  const toggleCompletedBoardsVisibility = () => {
+    setHideCompletedBoards(prev => !prev);
+  };
+
   // Mantener solo un efecto simple para limpiar el localStorage cuando se desmonte el componente
   useEffect(() => {
     return () => {
@@ -446,7 +456,32 @@ export default function Game({ customWords }: GameProps) {
           </p>
         </div>
       )}
-      {gameState && <GameStats gameState={gameState} />}
+      
+      <div className="flex items-center justify-between w-full max-w-2xl">
+        <div className="flex-1">
+          {gameState && <GameStats gameState={gameState} />}
+        </div>
+        
+      </div>
+        {gameState.boards.some(board => board.completed) && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={toggleCompletedBoardsVisibility}
+            className="ml-2 flex items-center gap-1 sticky top-8 z-50"
+            title={hideCompletedBoards ? "Mostrar tableros completados" : "Ocultar tableros completados"}
+          >
+            {hideCompletedBoards ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+            <span className="hidden sm:inline">
+              {hideCompletedBoards ? "Mostrar completados" : "Ocultar completados"}
+            </span>
+            {hideCompletedBoards && (
+              <span className="ml-1 text-xs bg-primary text-primary-foreground rounded-full px-1.5 py-0.5">
+                {gameState.boards.filter(board => board.completed).length}
+              </span>
+            )}
+          </Button>
+        )}
 
       <div className="w-full">
         <div
@@ -489,15 +524,31 @@ export default function Game({ customWords }: GameProps) {
           
           `}
         >
-          {gameState.boards.map((board, i) => (
-            <GameBoard
-              key={i}
-              board={board}
-              currentGuess={gameState.currentGuess}
-              gameOver={gameState.gameOver}
-              gameState={gameState}
-            />
-          ))}
+          {gameState.boards
+            .filter(board => !hideCompletedBoards || !board.completed)
+            .map((board, i) => (
+              <GameBoard
+                key={i}
+                board={board}
+                currentGuess={gameState.currentGuess}
+                gameOver={gameState.gameOver}
+                gameState={gameState}
+              />
+            ))}
+            
+          {hideCompletedBoards && gameState.boards.every(board => board.completed) && (
+            <div className="col-span-full text-center p-8 bg-muted rounded-lg">
+              <p className="text-lg font-medium mb-2">¡Todos los tableros están completados!</p>
+              <Button 
+                variant="default" 
+                onClick={toggleCompletedBoardsVisibility}
+                className="flex items-center gap-2"
+              >
+                <Eye className="h-4 w-4" />
+                Mostrar todos los tableros
+              </Button>
+            </div>
+          )}
         </div>
       </div>
       {error && (

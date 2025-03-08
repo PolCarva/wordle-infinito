@@ -63,13 +63,23 @@ export function Menu({
   useEffect(() => {
     const loadDictionary = async () => {
       const dictionary = await getDictionary(wordLength, useRareWords, true);
-      setMaxWords(dictionary.length);
+      // Si la longitud de palabra es 1, limitamos el máximo a la mitad
+      const maxAllowed = wordLength === 1 ? Math.min(13, Math.floor(dictionary.length / 2)) : dictionary.length;
+      setMaxWords(maxAllowed);
+      
+      // Si el número actual de tableros excede el nuevo máximo, ajustarlo
+      if (typeof boardCount === "number" && boardCount > maxAllowed) {
+        setBoardCount(maxAllowed);
+        setError(`Para palabras de 1 letra, el máximo es ${maxAllowed} tableros para evitar que sea demasiado fácil`);
+      }
     };
     loadDictionary();
-  }, [wordLength, useRareWords]);
+  }, [wordLength, useRareWords, boardCount, setBoardCount, setError]);
 
   const handleRandomCount = () => {
-    const random = Math.floor(Math.random() * maxWords) + 1;
+    // Asegurarse de que el número aleatorio no exceda el máximo permitido
+    const max = maxWords;
+    const random = Math.floor(Math.random() * max) + 1;
     setBoardCount(random);
   };
 
@@ -83,6 +93,14 @@ export function Menu({
     }
     if (isNaN(numValue)) return;
 
+    // Si excede el máximo permitido para palabras de 1 letra
+    if (wordLength === 1 && numValue > maxWords) {
+      setBoardCount(maxWords);
+      setError(`Para palabras de 1 letra, el máximo es ${maxWords} tableros para mantener el desafío`);
+      return;
+    }
+
+    // Para otras longitudes, mantener el comportamiento original
     if (numValue > maxWords && !useRareWords) {
       setPendingValue(numValue);
       setShowDialog(true);
@@ -171,6 +189,12 @@ export function Menu({
                   )
                 )}
               </div>
+              {wordLength === 1 && (
+                <div className="text-xs text-amber-600 dark:text-amber-400 mt-1 flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3" />
+                  Para palabras de 1 letra, el máximo es {maxWords} tableros para mantener el desafío
+                </div>
+              )}
             </div>
 
             <div className="flex items-center gap-4">

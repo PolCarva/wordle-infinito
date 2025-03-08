@@ -13,6 +13,7 @@ interface EndGameModalProps {
   solution?: string | string[];
   onClose: () => void;
   onPlayAgain: () => void;
+  isCustomGame?: boolean;
 }
 
 export function EndGameModal({
@@ -22,7 +23,8 @@ export function EndGameModal({
   description,
   solution,
   onClose,
-  onPlayAgain
+  onPlayAgain,
+  isCustomGame = false
 }: EndGameModalProps) {
   const [showConfetti, setShowConfetti] = useState(false);
 
@@ -78,6 +80,12 @@ export function EndGameModal({
           {description && (
             <p className="text-gray-600 dark:text-gray-400 mt-2">
               &ldquo;{description}&rdquo;
+            </p>
+          )}
+          
+          {isCustomGame && (
+            <p className="text-xs text-gray-500 mt-3 italic">
+              Recuerda que las partidas personalizadas no suman a tus estadísticas
             </p>
           )}
         </div>

@@ -106,7 +106,7 @@ const AuthForm = () => {
                 >
                     <FcGoogle className="w-5 h-5" />
                     Continuar con Google
-                </button> */}
+                </button> 
 
                 <div className="relative">
                     <div className="absolute inset-0 flex items-center">
@@ -115,7 +115,7 @@ const AuthForm = () => {
                     <div className="relative flex justify-center text-sm">
                         <span className="px-2 bg-card text-gray-500">O</span>
                     </div>
-                </div>
+                </div>*/}
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     {!isLogin && (

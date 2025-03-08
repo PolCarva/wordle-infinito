@@ -13,6 +13,7 @@ interface LeaderboardEntry {
   gamesPlayed: number;
   winRate: number;
   bestStreak: number;
+  role?: string;
 }
 
 interface LeaderboardData {
@@ -83,12 +84,38 @@ export function LeaderboardModal({
             </div>
             <div>
               <p className="font-medium flex items-center gap-2">
-                <Link 
-                  href={`/profile/${entry.userId}`}
-                  className="hover:underline hover:text-primary transition-colors"
-                >
-                  {entry.username}
-                </Link>
+                <span className="flex items-center gap-2">
+                  {entry.role === 'vip' && (
+                    <span title="Usuario VIP" className="text-yellow-500 cursor-help relative group">
+                      👑
+                    </span>
+                  )}
+                  {entry.role === 'mod' && (
+                    <span title="Moderador" className="text-blue-500 cursor-help relative group">
+                      🛡️
+                    </span>
+                  )}
+                  {entry.role === 'admin' && (
+                    <span title="Administrador" className="text-red-500 cursor-help relative group">
+                      ⚡
+                    </span>
+                  )}
+                  <Link
+                    href={`/profile/${entry.userId}`}
+                    className={`relative after:content-[""] after:absolute after:w-0 after:h-[1px] after:bg-current after:bottom-0 after:left-0 hover:after:w-full after:transition-all after:duration-200`}
+                  >
+                    <span className={`relative ${entry.role === 'vip'
+                        ? 'bg-gradient-to-r from-yellow-500 to-amber-300 text-transparent bg-clip-text font-bold'
+                        : entry.role === 'mod'
+                          ? 'bg-gradient-to-r from-blue-500 to-cyan-400 text-transparent bg-clip-text'
+                          : entry.role === 'admin'
+                            ? 'bg-gradient-to-r from-red-500 to-orange-500 text-transparent bg-clip-text font-bold'
+                            : 'hover:text-primary'
+                      }`}>
+                      {entry.username}
+                    </span>
+                  </Link>
+                </span>
                 {entry.bestStreak > 3 && (
                   <span className="text-sm text-orange-500" title="Mejor racha">
                     🔥{entry.bestStreak}
@@ -100,8 +127,8 @@ export function LeaderboardModal({
               </p>
             </div>
           </div>
-          <div className="text-2xl font-bold text-primary">
-            {entry.gamesWon}pts
+          <div className="text-2xl font-bold text-primary flex flex-col items-center justify-center md:flex-row md:items-baseline gap-1 md:justify-start">
+            <span>{entry.gamesWon}</span><span className="text-sm text-center md:text-xs">pts</span>
           </div>
         </div>
       ))}

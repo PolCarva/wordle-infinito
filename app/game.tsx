@@ -71,6 +71,12 @@ export default function Game({ customWords }: GameProps) {
     const words = customWords || getRandomWords(finalBoardCount, dictionary);
     const config = await getGameConfig(wordLengthToUse, true);
 
+    // Para partidas personalizadas, siempre usar 5 vidas extra
+    const extraAttempts = customWords ? 5 : config.extraAttempts;
+    
+    // El número total de intentos debe ser la cantidad de palabras + las vidas extra
+    const totalAttempts = words.length + extraAttempts;
+
     const newGameState = {
       boards: words.map((word, index) => ({
         word,
@@ -81,8 +87,8 @@ export default function Game({ customWords }: GameProps) {
       currentGuess: "",
       gameOver: false,
       won: false,
-      maxAttempts: finalBoardCount + config.extraAttempts,
-      remainingLives: config.extraAttempts,
+      maxAttempts: totalAttempts,
+      remainingLives: extraAttempts,
       showEndModal: false,
     };
 
@@ -141,6 +147,12 @@ export default function Game({ customWords }: GameProps) {
   const updateGameStats = useCallback(
     async (won: boolean) => {
       if (!user || !stats || !gameState) return;
+      
+      // No actualizar estadísticas para juegos personalizados
+      if (customWords) {
+        console.log("Juego personalizado: no se actualizan estadísticas");
+        return;
+      }
 
       const newStats = {
         ...stats,
@@ -192,7 +204,7 @@ export default function Game({ customWords }: GameProps) {
           attempts: gameState.boards[0]?.guesses.length || 0
         });
         
-        console.log("Generando token de verificación con datos:", {
+       /*  console.log("Generando token de verificación con datos:", {
           userId: user.userId,
           gameId,
           gameDataSummary: {
@@ -207,7 +219,7 @@ export default function Game({ customWords }: GameProps) {
               isCorrect: b.isCorrect
             }))
           }
-        });
+        }); */
         
         // Generar token de verificación
         const verificationToken = api.generateGameVerificationToken(
@@ -216,7 +228,7 @@ export default function Game({ customWords }: GameProps) {
           gameData
         );
         
-        console.log("Token generado, actualizando estadísticas...");
+        /* console.log("Token generado, actualizando estadísticas..."); */
         
         // Actualizar estadísticas con el token de verificación
         const updatedStats = await api.updateStats(user.userId, newStats, verificationToken);
@@ -275,7 +287,8 @@ export default function Game({ customWords }: GameProps) {
     // Solo mostrar la modal si el juego realmente terminó
     const isGameOver = allCompleted || attemptsExhausted;
 
-    if (isGameOver) {
+    // Solo actualizar estadísticas si no es un juego personalizado
+    if (isGameOver && !customWords) {
       updateGameStats(allCompleted);
     }
 
@@ -497,18 +510,20 @@ export default function Game({ customWords }: GameProps) {
         <Keyboard onKeyDown={handleKeyPress} gameState={gameState} />
       </div>
 
-      <EndGameModal
-        show={gameState.showEndModal}
-        won={gameState.won}
-        boards={gameState.boards}
-        solution={gameState.boards.map((board) => board.word)}
-        onClose={() =>
-          setGameState((prev) =>
-            prev ? { ...prev, showEndModal: false } : null
-          )
-        }
-        onPlayAgain={() => initializeGame()}
-      />
+      {gameState.showEndModal && (
+        <EndGameModal
+          show={gameState.showEndModal}
+          won={gameState.won}
+          boards={gameState.boards}
+          onClose={() =>
+            setGameState((prev) =>
+              prev ? { ...prev, showEndModal: false } : null
+            )
+          }
+          onPlayAgain={() => initializeGame()}
+          isCustomGame={!!customWords}
+        />
+      )}
     </div>
   );
 }

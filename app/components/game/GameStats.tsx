@@ -19,6 +19,7 @@ export function GameStats({ gameState }: GameStatsProps) {
   const totalBoards = gameState.boards.length;
   const currentAttempt = gameState.boards[0]?.guesses.length || 0;
   const [showLeaderboard, setShowLeaderboard] = useState(false);
+  
 
   return (
     <div className="text-center mb-4 p-2 bg-slate-100 dark:bg-slate-800 rounded-lg relative">
@@ -38,7 +39,9 @@ export function GameStats({ gameState }: GameStatsProps) {
       </p>
       <p className="text-lg font-semibold">
         Intento <span className="font-bold text-primary">{currentAttempt}</span> de <span className="font-bold">{gameState.maxAttempts}</span>{" "}
-        <span className="text-red-500 block md:inline">({gameState.remainingLives} vida{gameState.remainingLives === 1 ? "" : "s"} restante{gameState.remainingLives === 1 ? "" : "s"} ❤️)</span>
+        <span className="text-red-500 block md:inline">
+          ({gameState.remainingLives} vida{gameState.remainingLives === 1 ? "" : "s"} restante{gameState.remainingLives === 1 ? "" : "s"} ❤️)
+        </span>
       </p>
       
    

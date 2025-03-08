@@ -256,5 +256,46 @@ export const api = {
     cancelRematch: async (gameId: string, userId: string) => {
         const response = await axios.post(`${API_URL}/versus/cancel-rematch/${gameId}`, { userId });
         return response.data;
+    },
+
+    updateUserRole: async (userId: string, role: 'user' | 'vip' | 'mod' | 'admin') => {
+        // Obtener el token del usuario actual
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        console.log("Intentando actualizar rol:", {
+            targetUserId: userId,
+            newRole: role,
+            currentUser: {
+                userId: user.userId,
+                role: user.role,
+                hasToken: !!user.token
+            }
+        });
+        
+        if (!user.token) {
+            throw new Error('No autorizado');
+        }
+
+        // Configurar headers con el token de autorización
+        const config = {
+            headers: {
+                Authorization: `Bearer ${user.token}`
+            }
+        };
+
+        try {
+            const response = await axios.put(
+                `${API_URL}/users/role/${userId}`, 
+                { role }, 
+                config
+            );
+            console.log("Respuesta de actualización de rol:", response.data);
+            return response.data;
+        } catch (error) {
+            console.error("Error al actualizar rol:", error);
+            if (axios.isAxiosError(error)) {
+                throw new Error(`Error: ${error.response?.data?.message || error.message}`);
+            }
+            throw error;
+        }
     }
 }; 

@@ -9,6 +9,7 @@ interface User {
     username?: string;
     email: string;
     imageUrl?: string;
+    role?: string;
     stats: {
         gamesPlayed: number;
         gamesWon: number;
@@ -38,7 +39,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         // Verificar si hay un usuario en localStorage al cargar
         const storedUser = localStorage.getItem('user');
         if (storedUser) {
-            setUser(JSON.parse(storedUser));
+            try {
+                const parsedUser = JSON.parse(storedUser);
+               /*  console.log("Usuario cargado desde localStorage:", {
+                    userId: parsedUser.userId,
+                    role: parsedUser.role,
+                    isAdmin: parsedUser.role === 'admin'
+                }); */
+                setUser(parsedUser);
+            } catch (error) {
+                console.error("Error al parsear usuario desde localStorage:", error);
+                localStorage.removeItem('user'); // Limpiar datos corruptos
+            }
+        } else {
+            console.log("No hay usuario en localStorage");
         }
         setLoading(false);
     }, []);
@@ -54,10 +68,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 versusPlayed: 0,
                 versusWon: 0,
                 versusWinRate: 0
-            }
+            },
+            role: userData.role || 'user'
         };
-        setUser(userWithStats);
+        
         localStorage.setItem('user', JSON.stringify(userWithStats));
+        setUser(userWithStats);
     };
 
     const logout = () => {

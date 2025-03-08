@@ -53,7 +53,7 @@ function VersusContent() {
     }
 
     try {
-      console.log("Intentando unirse con código:", joinCode.toUpperCase());
+      /* console.log("Intentando unirse con código:", joinCode.toUpperCase()); */
       const { gameId } = await api.joinVersusGame(
         joinCode.toUpperCase(),
         user!.userId

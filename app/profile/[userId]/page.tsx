@@ -46,7 +46,7 @@ function getInitials(name: string | undefined): string {
 }
 
 // Componente para seleccionar el rol del usuario
-function RoleSelector({ userId, currentRole }: { userId: string, currentRole: string }) {
+function RoleSelector({ userId }: { userId: string }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);

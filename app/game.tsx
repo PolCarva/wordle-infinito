@@ -239,6 +239,7 @@ export default function Game({ customWords }: GameProps) {
         setError("Error al actualizar estadísticas. Por favor, inténtalo de nuevo.");
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [user, stats, gameState, setError]
   );
 

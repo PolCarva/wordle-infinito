@@ -192,7 +192,7 @@ function ProfileContent({ userId }: { userId: string }) {
                 
                 {/* Mostrar el selector de rol si el usuario actual es admin y no es su propio perfil */}
                 {user?.role === 'admin' && user.userId !== userId && (
-                  <RoleSelector userId={userId} currentRole={profileData.role || 'user'} />
+                  <RoleSelector userId={userId} />
                 )}
               </div>
             </div>

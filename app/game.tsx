@@ -16,7 +16,7 @@ import { EndGameModal } from "./components/game/EndGameModal";
 import { Nav } from "./components/game/Nav";
 import { useTheme } from "next-themes";
 import { trackEvent } from "./utils/analytics";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, RefreshCw } from "lucide-react";
 import { Button } from "./components/ui/button";
 
 interface GameProps {
@@ -56,6 +56,9 @@ export default function Game({ customWords }: GameProps) {
 
   // Estado para controlar la visibilidad de los tableros completados
   const [hideCompletedBoards, setHideCompletedBoards] = useState(false);
+
+  // Estado para controlar la visibilidad de la modal de reinicio
+  const [showResetModal, setShowResetModal] = useState(false);
 
   const [boardCount, setBoardCount] = useState<number | "">(1);
   const [useRareWords, setUseRareWords] = useState(false);
@@ -463,12 +466,14 @@ export default function Game({ customWords }: GameProps) {
         </div>
         
       </div>
+        
+      <div className="flex items-center gap-2 sticky top-8 z-50">
         {gameState.boards.some(board => board.completed) && (
           <Button
             variant="outline"
             size="sm"
             onClick={toggleCompletedBoardsVisibility}
-            className="ml-2 flex items-center gap-1 sticky top-8 z-50"
+            className="flex items-center gap-1"
             title={hideCompletedBoards ? "Mostrar tableros completados" : "Ocultar tableros completados"}
           >
             {hideCompletedBoards ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
@@ -482,6 +487,18 @@ export default function Game({ customWords }: GameProps) {
             )}
           </Button>
         )}
+        
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setShowResetModal(true)}
+          className="flex items-center gap-1"
+          title="Reiniciar juego"
+        >
+          <RefreshCw className="h-4 w-4" />
+          <span className="hidden sm:inline">Reiniciar juego</span>
+        </Button>
+      </div>
 
       <div className="w-full">
         <div
@@ -575,6 +592,33 @@ export default function Game({ customWords }: GameProps) {
           onPlayAgain={() => initializeGame()}
           isCustomGame={!!customWords}
         />
+      )}
+
+      {/* Modal de confirmación para reiniciar juego */}
+      {showResetModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg max-w-md w-full p-6">
+            <h3 className="text-xl font-bold mb-4">Confirmar reinicio</h3>
+            <p className="mb-6">¿Estás seguro de que deseas reiniciar el juego? Se perderá tu progreso actual.</p>
+            <div className="flex justify-end gap-3">
+              <Button
+                variant="default"
+                onClick={() => setShowResetModal(false)}
+              >
+                Cancelar
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={() => {
+                  setShowResetModal(false);
+                  initializeGame();
+                }}
+              >
+                Reiniciar
+              </Button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

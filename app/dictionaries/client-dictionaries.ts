@@ -17,12 +17,12 @@ export const clientDictionaries: Record<number, string[]> = {
 
 // Diccionario de palabras raras por longitud
 export const clientRareDictionaries: Record<number, string[]> = {
-  1: rare_one_letter,
-  2: rare_two_letter,
-  3: rare_three_letter,
-  4: rare_four_letter,
-  5: rare_five_letter,
-  6: rare_six_letter
+  1: [...rare_one_letter, ...normal_one_letter],
+  2: [...rare_two_letter, ...normal_two_letter],
+  3: [...rare_three_letter, ...normal_three_letter],
+  4: [...rare_four_letter, ...normal_four_letter],
+  5: [...rare_five_letter, ...normal_five_letter],
+  6: [...rare_six_letter, ...normal_six_letter]
 };
 
 // Configuración del juego por longitud
@@ -38,38 +38,10 @@ export const clientGameConfigs: Record<number, { extraAttempts: number }> = {
 // Longitudes disponibles
 export const clientAvailableLengths = [1, 2, 3, 4, 5, 6];
 
-/**
- * Función para obtener el diccionario de palabras aceptadas
- * Siempre devuelve la combinación de palabras normales y raras
- * para permitir al usuario escribir cualquier palabra válida
- */
-export function getClientDictionary(length: number): string[] {
-  const normalWords = clientDictionaries[length] || [];
-  const rareWords = clientRareDictionaries[length] || [];
-  
-  // Combinamos ambos conjuntos y eliminamos duplicados
-  const allWords = [...new Set([...normalWords, ...rareWords])];
-  return allWords;
-}
-
-/**
- * Función para obtener solo las palabras que pueden ser soluciones
- * @param length Longitud de las palabras
- * @param useRare Si es true, incluye palabras raras como posibles soluciones
- * @returns Un array con las palabras que pueden ser soluciones
- */
-export function getClientSolutionWords(length: number, useRare = false): string[] {
-  const normalWords = clientDictionaries[length] || [];
-  
-  if (!useRare) {
-    // En modo normal, solo las palabras normales son soluciones
-    return normalWords;
-  } else {
-    // En modo raro, tanto las palabras normales como raras son soluciones
-    const rareWords = clientRareDictionaries[length] || [];
-    const allWords = [...normalWords, ...rareWords];
-    return allWords;
-  }
+// Función para obtener el diccionario del cliente
+export function getClientDictionary(length: number, useRare = false): string[] {
+  const dictionary = useRare ? clientRareDictionaries[length] || [] : clientDictionaries[length] || [];
+  return dictionary;
 }
 
 // Función para obtener la configuración del juego del cliente

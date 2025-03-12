@@ -37,9 +37,41 @@ export function EndGameModal({
   }, [won, show]);
 
   const getSolutionText = () => {
-    if (!solution) return boards.map((board) => board.word).join(", ");
-    if (Array.isArray(solution)) return solution.join(", ");
+    if (!solution) {
+      if (boards.length === 1) return boards[0].word;
+      return null; // Retornamos null para manejar múltiples palabras de forma diferente
+    }
+    if (Array.isArray(solution)) return null; // Retornamos null para manejar múltiples palabras de forma diferente
     return solution;
+  };
+
+  const renderSolutionWords = () => {
+    // Si tenemos una solución simple, la mostramos directamente
+    const solutionText = getSolutionText();
+    if (solutionText) {
+      return <strong>{solutionText}</strong>;
+    }
+
+    // Para múltiples palabras, verificamos cuáles fueron adivinadas
+    const solutionWords = Array.isArray(solution) ? solution : boards.map(board => board.word);
+    const completedBoards = boards.filter(board => board.completed);
+    const completedWords = completedBoards.map(board => board.word);
+
+    return (
+      <span>
+        {solutionWords.map((word, index) => {
+          const isCompleted = completedWords.includes(word);
+          return (
+            <span key={index}>
+              {index > 0 && ", "}
+              <strong className={isCompleted ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}>
+                {word}
+              </strong>
+            </span>
+          );
+        })}
+      </span>
+    );
   };
 
   if (!show) return null;
@@ -74,8 +106,8 @@ export function EndGameModal({
         </p>
         <div className="mb-4">
           <p>
-            {Array.isArray(solution) ? "Las palabras eran: " : "La palabra era: "}
-            <strong>{getSolutionText()}</strong>
+            {boards.length > 1 ? "Las palabras eran: " : "La palabra era: "}
+            {renderSolutionWords()}
           </p>
           {description && (
             <p className="text-gray-600 dark:text-gray-400 mt-2">

@@ -624,7 +624,7 @@ export default function Game({ customWords }: GameProps) {
         >
           {getCurrentPageBoards()
             .filter(board => !hideCompletedBoards || !board.completed)
-            .map((board, i) => (
+            .map((board) => (
               <GameBoard
                 key={board.id}
                 board={board}

@@ -70,7 +70,7 @@ export function Nav({ isDark, onThemeToggle }: NavProps) {
         const parsedGameState = JSON.parse(gameState);
         
         // Verificar si hay algún intento en alguno de los tableros
-        const hasAttempts = parsedGameState.boards.some((board: any) => board.guesses.length > 0);
+        const hasAttempts = parsedGameState.boards.some((board: { guesses: unknown[] }) => board.guesses.length > 0);
         
         // Solo actualizar estadísticas si hay intentos
         if (hasAttempts) {
@@ -92,7 +92,7 @@ export function Nav({ isDark, onThemeToggle }: NavProps) {
           
           // Datos del juego para verificación
           const gameData = {
-            boards: parsedGameState.boards.map((board: any) => ({
+            boards: parsedGameState.boards.map((board: { word: string; completed: boolean; guesses: unknown[] }) => ({
               word: board.word,
               completed: board.completed,
               guessCount: board.guesses.length,
@@ -101,7 +101,7 @@ export function Nav({ isDark, onThemeToggle }: NavProps) {
             timestamp: Date.now(),
             gameId,
             totalBoards: parsedGameState.boards.length,
-            completedBoards: parsedGameState.boards.filter((board: any) => board.completed).length,
+            completedBoards: parsedGameState.boards.filter((board: { completed: boolean }) => board.completed).length,
             maxAttempts: parsedGameState.maxAttempts,
             currentAttempt: parsedGameState.boards[0]?.guesses.length || 0
           };

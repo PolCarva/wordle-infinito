@@ -16,6 +16,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/app/context/AuthContext";
 import Link from "next/link";
 import { LeaderboardModal } from "@/app/components/ui/LeaderboardModal";
+import { api } from "@/app/services/api";
 
 interface NavProps {
   isDark: boolean;
@@ -58,7 +59,72 @@ export function Nav({ isDark, onThemeToggle }: NavProps) {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleBack = () => {
+  const handleBack = async () => {
+    // Verificar si hay un juego en curso
+    const gameState = localStorage.getItem('gameState');
+    const isCustomGame = localStorage.getItem('isCustomGame') === 'true';
+    
+    // Si hay un juego en curso y no es un juego personalizado, verificar si hay intentos
+    if (gameState && !isCustomGame && user) {
+      try {
+        const parsedGameState = JSON.parse(gameState);
+        
+        // Verificar si hay algún intento en alguno de los tableros
+        const hasAttempts = parsedGameState.boards.some((board: any) => board.guesses.length > 0);
+        
+        // Solo actualizar estadísticas si hay intentos
+        if (hasAttempts) {
+          // Obtener estadísticas actuales
+          const currentStats = await api.getStats(user.userId);
+          
+          // Actualizar estadísticas como perdido
+          const newStats = {
+            ...currentStats,
+            gamesPlayed: currentStats.gamesPlayed + 1,
+            streak: 0, // Reiniciar racha
+            winRate: Math.round(
+              (currentStats.gamesWon / (currentStats.gamesPlayed + 1)) * 100
+            ),
+          };
+          
+          // Generar un token de verificación para esta actualización de estadísticas
+          const gameId = `game_${Date.now()}`;
+          
+          // Datos del juego para verificación
+          const gameData = {
+            boards: parsedGameState.boards.map((board: any) => ({
+              word: board.word,
+              completed: board.completed,
+              guessCount: board.guesses.length,
+            })),
+            won: false,
+            timestamp: Date.now(),
+            gameId,
+            totalBoards: parsedGameState.boards.length,
+            completedBoards: parsedGameState.boards.filter((board: any) => board.completed).length,
+            maxAttempts: parsedGameState.maxAttempts,
+            currentAttempt: parsedGameState.boards[0]?.guesses.length || 0
+          };
+          
+          // Generar token de verificación
+          const verificationToken = api.generateGameVerificationToken(
+            user.userId, 
+            gameId, 
+            gameData
+          );
+          
+          // Actualizar estadísticas con el token de verificación
+          await api.updateStats(user.userId, newStats, verificationToken);
+          
+          console.log("Estadísticas actualizadas como perdido al volver al inicio (con intentos)");
+        } else {
+          console.log("No se actualizan estadísticas: juego sin intentos");
+        }
+      } catch (error) {
+        console.error("Error actualizando estadísticas al volver al inicio:", error);
+      }
+    }
+    
     // Limpiar el localStorage para evitar que se restaure el juego
     if (typeof window !== 'undefined') {
       localStorage.removeItem('gameState');

@@ -16,7 +16,7 @@ import { EndGameModal } from "./components/game/EndGameModal";
 import { Nav } from "./components/game/Nav";
 import { useTheme } from "next-themes";
 import { trackEvent } from "./utils/analytics";
-import { Eye, EyeOff, RefreshCw } from "lucide-react";
+import { Eye, EyeOff, RefreshCw, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "./components/ui/button";
 
 interface GameProps {
@@ -68,6 +68,10 @@ export default function Game({ customWords }: GameProps) {
   const { user } = useAuth();
   const [stats, setStats] = useState<Stats | null>(null);
 
+  // Estado para controlar la paginación
+  const [currentPage, setCurrentPage] = useState(0);
+  const boardsPerPage = 100;
+
   const initializeGame = useCallback(async () => {
     // Si hay palabras personalizadas, usar la longitud de la primera palabra
     const wordLengthToUse = customWords && customWords.length > 0 
@@ -104,6 +108,8 @@ export default function Game({ customWords }: GameProps) {
     setStarted(true);
     localStorage.setItem("currentGame", "true");
     localStorage.setItem("gameState", JSON.stringify(newGameState));
+    // Guardar información sobre si es un juego personalizado
+    localStorage.setItem("isCustomGame", !!customWords ? "true" : "false");
     setError(null);
   }, [boardCount, customWords, useRareWords, wordLength]);
 
@@ -250,6 +256,32 @@ export default function Game({ customWords }: GameProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [user, stats, gameState, setError]
   );
+
+  // Función para calcular el número total de páginas
+  const getTotalPages = useCallback(() => {
+    if (!gameState) return 0;
+    return Math.ceil(gameState.boards.length / boardsPerPage);
+  }, [gameState]);
+  
+  // Función para obtener los tableros de la página actual
+  const getCurrentPageBoards = useCallback(() => {
+    if (!gameState) return [];
+    
+    const startIndex = currentPage * boardsPerPage;
+    const endIndex = Math.min(startIndex + boardsPerPage, gameState.boards.length);
+    
+    return gameState.boards.slice(startIndex, endIndex);
+  }, [gameState, currentPage]);
+  
+  // Función para navegar a la página anterior
+  const goToPreviousPage = useCallback(() => {
+    setCurrentPage(prev => Math.max(0, prev - 1));
+  }, []);
+  
+  // Función para navegar a la página siguiente
+  const goToNextPage = useCallback(() => {
+    setCurrentPage(prev => Math.min(getTotalPages() - 1, prev + 1));
+  }, [getTotalPages]);
 
   const handleGuess = useCallback(async () => {
     if (!gameState) return;
@@ -421,6 +453,18 @@ export default function Game({ customWords }: GameProps) {
     };
   }, []);
 
+  // Función para reiniciar el juego y actualizar estadísticas como perdido
+  const handleResetGame = useCallback(() => {
+    // Si hay un juego en curso y no es un juego personalizado, actualizar estadísticas como perdido
+    if (gameState && !customWords && !gameState.gameOver) {
+      updateGameStats(false); // false = perdido
+    }
+    
+    // Reiniciar el juego
+    initializeGame();
+    setShowResetModal(false);
+  }, [gameState, customWords, updateGameStats, initializeGame]);
+
   if (!started) {
     return (
       <div className="flex w-full min-h-svh justify-center flex-col items-center gap-4 p-4">
@@ -442,7 +486,10 @@ export default function Game({ customWords }: GameProps) {
 
   return (
     <div className="flex w-full flex-col items-center gap-6 p-4 pb-[240px] md:pb-4">
-      <Nav isDark={isDark} onThemeToggle={handleThemeToggle} />
+      <Nav 
+        isDark={isDark} 
+        onThemeToggle={handleThemeToggle} 
+      />
 
       <div className="flex items-center gap-4">
         <h1 className="text-4xl font-bold">Wordle Infinito</h1>
@@ -501,6 +548,40 @@ export default function Game({ customWords }: GameProps) {
       </div>
 
       <div className="w-full">
+        {/* Controles de paginación */}
+        {gameState.boards.length > boardsPerPage && (
+          <div className="flex items-center justify-center gap-4 mb-4">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={goToPreviousPage}
+              disabled={currentPage === 0}
+              className="flex items-center gap-1"
+            >
+              <ChevronLeft className="h-4 w-4" />
+              <span className="hidden sm:inline">Anterior</span>
+            </Button>
+            
+            <div className="text-sm">
+              Página {currentPage + 1} de {getTotalPages()}
+              <span className="ml-2 text-xs text-muted-foreground">
+                ({getCurrentPageBoards().length} de {gameState.boards.length} tableros)
+              </span>
+            </div>
+            
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={goToNextPage}
+              disabled={currentPage === getTotalPages() - 1}
+              className="flex items-center gap-1"
+            >
+              <span className="hidden sm:inline">Siguiente</span>
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
+        
         <div
           className={`
             grid 
@@ -541,11 +622,11 @@ export default function Game({ customWords }: GameProps) {
           
           `}
         >
-          {gameState.boards
+          {getCurrentPageBoards()
             .filter(board => !hideCompletedBoards || !board.completed)
             .map((board, i) => (
               <GameBoard
-                key={i}
+                key={board.id}
                 board={board}
                 currentGuess={gameState.currentGuess}
                 gameOver={gameState.gameOver}
@@ -553,7 +634,7 @@ export default function Game({ customWords }: GameProps) {
               />
             ))}
             
-          {hideCompletedBoards && gameState.boards.every(board => board.completed) && (
+          {hideCompletedBoards && getCurrentPageBoards().every(board => board.completed) && (
             <div className="col-span-full text-center p-8 bg-muted rounded-lg">
               <p className="text-lg font-medium mb-2">¡Todos los tableros están completados!</p>
               <Button 
@@ -602,17 +683,14 @@ export default function Game({ customWords }: GameProps) {
             <p className="mb-6">¿Estás seguro de que deseas reiniciar el juego? Se perderá tu progreso actual.</p>
             <div className="flex justify-end gap-3">
               <Button
-                variant="default"
+                variant="outline"
                 onClick={() => setShowResetModal(false)}
               >
                 Cancelar
               </Button>
               <Button
                 variant="destructive"
-                onClick={() => {
-                  setShowResetModal(false);
-                  initializeGame();
-                }}
+                onClick={handleResetGame}
               >
                 Reiniciar
               </Button>

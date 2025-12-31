@@ -2,6 +2,7 @@
 
 import { HomeContent } from '../HomeContent';
 import MainNav from '../ui/MainNav';
+import { Footer } from '../ui/Footer';
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -15,6 +16,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
         {children}
       </main>
       <HomeContent />
+      <Footer />
     </div>
   );
 };

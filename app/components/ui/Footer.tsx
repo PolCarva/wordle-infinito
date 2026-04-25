@@ -25,7 +25,7 @@ export function Footer() {
           <div className="text-sm text-gray-600 dark:text-gray-400">
             <p className="mb-2">Más juegos del creador:</p>
             <Link
-              href="https://impostor.pablocarvalho.dev"
+              href="https://impostor.gratis"
               target="_blank"
               rel="noopener noreferrer"
               className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium transition-colors"

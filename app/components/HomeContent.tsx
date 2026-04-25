@@ -1,3 +1,7 @@
+"use client";
+
+import { HomeArticleAd } from "./ads/HomeArticleAd";
+
 export function HomeContent() {
   return (
     <article className="max-w-4xl mx-auto px-4 py-8 prose dark:prose-invert prose-sm">
@@ -11,6 +15,8 @@ export function HomeContent() {
           64 o incluso más palabras al mismo tiempo, creando una experiencia única y más desafiante.
         </p>
       </section>
+
+      <HomeArticleAd />
       
       <section className="mt-8">
         <h2 className="text-xl font-bold mb-4">Características Principales</h2>

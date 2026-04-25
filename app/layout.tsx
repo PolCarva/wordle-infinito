@@ -1,5 +1,6 @@
 import localFont from "next/font/local";
 import "./globals.css";
+import Script from "next/script";
 import { GoogleAnalytics } from '@next/third-parties/google'
 import { JsonLd } from "./components/seo/JsonLd";
 import type { Metadata } from 'next'
@@ -56,6 +57,12 @@ export default function RootLayout({
             {children}
           </ThemeProvider>
         </AuthProvider>
+        <Script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8052007653549292"
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
+        />
         <GoogleAnalytics gaId="G-RGBJB9PVJV" />
       </body>
     </html>

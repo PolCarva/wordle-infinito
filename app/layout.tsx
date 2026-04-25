@@ -18,6 +18,9 @@ export const metadata: Metadata = {
   title: 'Wordle Infinito',
   description: 'Juega múltiples partidas de Wordle simultáneamente',
   metadataBase: new URL('https://wordleinfinito.com'),
+  other: {
+    'google-adsense-account': 'ca-pub-8052007653549292',
+  },
 }
 
 export const viewport = {

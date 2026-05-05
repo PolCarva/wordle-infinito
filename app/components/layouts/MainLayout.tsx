@@ -8,23 +8,29 @@ import { Footer } from '../ui/Footer';
 
 interface MainLayoutProps {
   children: React.ReactNode;
+  showAds?: boolean;
+  showHomeContent?: boolean;
 }
 
-const MainLayout = ({ children }: MainLayoutProps) => {
+const MainLayout = ({
+  children,
+  showAds = false,
+  showHomeContent = false,
+}: MainLayoutProps) => {
   return (
     <div className="min-h-screen bg-background">
       <MainNav />
       <div className="flex w-full min-w-0 max-w-full flex-row pt-20">
-        <AdRailColumn side="left" />
+        {showAds ? <AdRailColumn side="left" /> : null}
         <div className="min-w-0 flex-1">
           <main>
             {children}
-            <GameBelowAds />
+            {showAds ? <GameBelowAds /> : null}
           </main>
         </div>
-        <AdRailColumn side="right" />
+        {showAds ? <AdRailColumn side="right" /> : null}
       </div>
-      <HomeContent />
+      {showHomeContent ? <HomeContent /> : null}
       <Footer />
     </div>
   );
